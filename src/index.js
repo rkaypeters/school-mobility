@@ -41,6 +41,7 @@ Promise.all([
     
     //console.log(entersdata);
     
+    //should I put this in a separate script?
     const enters1718 = entersdata.filter(d => d.reportID ==77)
         .filter(d => d.schcode_dest != ' ')
         .filter(d => d.schcode_origin != d.schcode_dest)
@@ -69,7 +70,6 @@ Promise.all([
         
     //console.log(enters1718);
     
-
     
     const mobstab_sch = mobstab
         .filter(d => d.schname != '')
@@ -82,8 +82,6 @@ Promise.all([
         .filter(d => d.adminSite == 'N');
     
     //console.log(mobstab_sch);
-    //drawBarChart(select('.overview').node(), mobstab_sch);
-    //drawMap(select('.map').node(),geodata);
     
     
     const enters1718Network = enters1718.filter(d =>d.gradeCfg_dest == 'H').filter(d => d.schcode_dest!= '00000').filter(d => d.schcode_origin != '00000');
@@ -91,7 +89,6 @@ Promise.all([
     console.log(enters1718Network);
     
     const networkSetup = NetworkSetup();
-		//.data(enters1718);
     
     var nodesData = networkSetup(enters1718)[0];
     var linksData = networkSetup(enters1718)[1];
@@ -122,7 +119,7 @@ Promise.all([
 
 
 
-
+/////////// OLD STUFF //////////////
 
 //This isn't actually the bar chart; it's just the dots to practicing displaying this for now.
 //retired this, but leaving the code for now in case it helps later when/if I want circles for the nodes.

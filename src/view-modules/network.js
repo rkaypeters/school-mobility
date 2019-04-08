@@ -4,7 +4,7 @@ import {min,max,select,selectAll} from 'd3';
 
 function MyNetwork(){
 
-    // may add force layout stuff later (I think I can?) to spread stuff if needed, but it seems to not handle what I want specifically enough so doing it by scratch seems right for now.
+    // may add force layout stuff later (I think I can?) to spread stuff if needed, but it seems to not handle what I want specifically enough so doing it by scratch seems right for now. also might not be necessary.
 
     function exportFunction(rootDom,nodesData,linksData){
         const w = rootDom.clientWidth;
@@ -84,6 +84,11 @@ function MyNetwork(){
 
 export default MyNetwork;
 
+
+
+
+
+////////// OLD STUFF ///////////
 
 // District-specific version - in progress, not very far
 
