@@ -8,6 +8,7 @@ import NetworkSetup from './network-data';
     //filter for district and grade span can probably be applied after the factor that that this doesn't need to run repeatedly. However, if I ever build in anything with additional years, such as a time-slider (I'm thinking not), I'd need to re-run this for the appropriate year.
 import MyProjection from './projection';
     //next steps for projection include re-scaling coordinates for filter based on district and possibly grade span. I think I can do this outside of projection; the relationships between the coordinates don't change, they're just mapped to a different range.
+import MyNetwork from './view-modules/network';
 
 
 //// The bulk of it - after the promises
@@ -30,7 +31,7 @@ Promise.all([
     
     myProjection(select('.network').node(),geodata,45000) //still need to set up network DOM dimensions
         .push({schcode: '00000',xy: [20,20]}); ///This is the out of system position
-    //console.log(geodata);
+    //when I switched to webpack the translate piece broke - it's stuck with the middle of the y at the top; need to fix
     
     const geo_tmp = geodata.map(d => {
         return[d.schcode,d]
@@ -99,6 +100,8 @@ Promise.all([
     console.log(nodesData);
     console.log(linksData);
     
+    const myNetwork = MyNetwork();
+    
     myNetwork('.network',nodesData,linksData.filter(d => d.target.schcode != '00000').filter(d => d.source.schcode != '00000')//.filter(d => d.value != 1)
              );
     
@@ -114,197 +117,6 @@ Promise.all([
 
 
 
-// okay, trying a network
-// may add force layout stuff later (I think I can?) to spread stuff if needed, but it seems to not handle what I want specifically enough so trying this by scratch first.
-
-function myNetwork(rootDom,nodesData,linksData){
-    const w = rootDom.clientWidth;
-    
-    /*linksData.forEach(d => {  //not necessary for this version but might need to remember this format for something else
-        if(d.source.xy){
-            d.x = [d.source.xy[0]];
-            d.y = [d.source.xy[1]];
-        }else{
-            d.x = [];
-            d.y = [];
-        };
-        if(d.target.xy){
-            d.x.push(d.target.xy[0]);
-            d.y.push(d.target.xy[1]);
-        };
-    });
-    
-    const lineGenerator = d3.line()
-		.x(d => d.x)
-		.y(d => d.y)
-    
-    console.log(linksData);*/
-    
-    const plot = select(rootDom)
-        .append('svg')
-        .attr('width',750)
-        .attr('height',1000);
-    
-    const links = plot
-        .selectAll('.link')
-        .data(linksData);
-    const linksEnter = links.enter().append('line').attr('class','link')
-        .style('stroke-opacity',0.05)
-		.style('stroke-width','1px')
-		.style('stroke','black');
-    
-    //console.log(links.merge(linksEnter).selectAll('.link'));
-    
-    links.merge(linksEnter)
-        .attr('x1', d=> {
-            if(d.target.xy){
-                return d.target.xy[0];
-            }else{
-                return 0;
-            }
-        })
-        .attr('y1', d=> {
-            if(d.target.xy){
-                return d.target.xy[1];
-            }else{
-                return 0;
-            }
-        })
-        .attr('x2', d=> {
-            if(d.source.xy){
-                return d.source.xy[0];
-            }else{
-                return 0;
-            }
-        })
-        .attr('y2', d=> {
-            if(d.source.xy){
-                return d.source.xy[1];
-            }else{
-                return 0;
-            }
-        })
-        //.style('stroke-width', d=>{
-        //return (d.value.toString() + 'px');
-        //})
-        .style('stroke-opacity',d => {return (d.value * 0.05)});
-    
-    
-    //console.log(nodesData);
-    
-    const nodes = plot.selectAll('.node')
-        .data(nodesData);
-    const nodesEnter = nodes.enter().append('g').attr('class','node');
-
-    nodesEnter.append('circle')
-        .style('fill-opacity',.1)
-		.style('stroke','#333')
-		.style('stroke-width','2px');
-
-	nodes.merge(nodesEnter)
-        .attr('r',d=> d.value.totalEnters)
-		.attr('transform', d => `translate(${d.xy[0]}, ${d.xy[1]})`);
-    
-    console.log(nodes.merge(nodesEnter));
-    
-}
-
-
-// District-specific version - in progress, not very far
-
-function myDistrictNetwork(rootDom,data,district){
-    
-    //console.log(district);
-    const districtData = data.filter(d => d.distcode_dest === district);
-    
-    districtData.forEach(d => {
-        delete d.xy_dest;
-        delete d.xy_origin;});
-    
-    console.log(districtData);
-    
-    myProjection2(rootDom,districtData,90000); 
-    
-    console.log(districtData);
-    
-    
-    //const w = rootDom.clientWidth;
-    
-    
-    
-
-    
-    //console.log(linksData);
-    
-    /*const plot = d3.select(rootDom)
-        .append('svg')
-        .attr('width',750)
-        .attr('height',1000);
-    
-    const links = plot
-        .selectAll('.link')
-        .data(linksData);
-    const linksEnter = links.enter().append('line').attr('class','link')
-        .style('stroke-opacity',0.05)
-		.style('stroke-width','1px')
-		.style('stroke','black');
-    
-    //console.log(links.merge(linksEnter).selectAll('.link'));
-    
-    links.merge(linksEnter)
-        .attr('x1', d=> {
-            if(d.target.xy){
-                return d.target.xy[0];
-            }else{
-                return 0;
-            }
-        })
-        .attr('y1', d=> {
-            if(d.target.xy){
-                return d.target.xy[1];
-            }else{
-                return 0;
-            }
-        })
-        .attr('x2', d=> {
-            if(d.source.xy){
-                return d.source.xy[0];
-            }else{
-                return 0;
-            }
-        })
-        .attr('y2', d=> {
-            if(d.source.xy){
-                return d.source.xy[1];
-            }else{
-                return 0;
-            }
-        })
-        //.style('stroke-width', d=>{
-        //return (d.value.toString() + 'px');
-        //})
-        .style('stroke-opacity',d => {return (d.value * 0.05)});
-    
-    
-    //console.log(nodesData);
-    
-    const nodes = plot.selectAll('.node')
-        .data(nodesData);
-    const nodesEnter = nodes.enter().append('g').attr('class','node');
-
-    nodesEnter.append('circle')
-        .style('fill-opacity',.1)
-		.style('stroke','#333')
-		.style('stroke-width','2px');
-
-	nodes.merge(nodesEnter)
-        .attr('r',d=> d.value.totalEnters)
-		.attr('transform', d => `translate(${d.xy[0]}, ${d.xy[1]})`);
-    
-    console.log(nodes.merge(nodesEnter));*/
-    
-}
-
 
 
 
@@ -313,6 +125,7 @@ function myDistrictNetwork(rootDom,data,district){
 
 
 //This isn't actually the bar chart; it's just the dots to practicing displaying this for now.
+//retired this, but leaving the code for now in case it helps later when/if I want circles for the nodes.
 
 function drawBarChart(rootDom,data){
     

@@ -27,7 +27,7 @@ function MyProjection(){
             .scale(myScale)
             .center([(maxLng+minLng)/2,(maxLat+minLat)/2+.2])
             //.center(289,127)
-            .translate([w/2,h/2]);
+            .translate([w/2,h/2]);     //when I switched to webpack the translate piece broke - it's stuck with the middle of the y at the top; need to fix
 
         //console.log(data);
 
