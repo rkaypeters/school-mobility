@@ -5,6 +5,9 @@ import {select,min,max,geoMercator} from 'd3';
 import {mobstabdataPromise, metadataPromise, geodataPromise, schEntersPromise
 } from './data-import';
 import NetworkSetup from './network-data';
+    //filter for district and grade span can probably be applied after the factor that that this doesn't need to run repeatedly. However, if I ever build in anything with additional years, such as a time-slider (I'm thinking not), I'd need to re-run this for the appropriate year.
+import MyProjection from './projection';
+    //next steps for projection include re-scaling coordinates for filter based on district and possibly grade span. I think I can do this outside of projection; the relationships between the coordinates don't change, they're just mapped to a different range.
 
 
 //// The bulk of it - after the promises
@@ -22,6 +25,8 @@ Promise.all([
 			});
     const metaMap = new Map(meta_tmp);
     //console.log(metaMap);
+    
+    const myProjection = MyProjection();
     
     myProjection(select('.network').node(),geodata,45000) //still need to set up network DOM dimensions
         .push({schcode: '00000',xy: [20,20]}); ///This is the out of system position
@@ -76,8 +81,8 @@ Promise.all([
         .filter(d => d.adminSite == 'N');
     
     //console.log(mobstab_sch);
-    drawBarChart(select('.overview').node(), mobstab_sch);
-    drawMap(select('.map').node(),geodata);
+    //drawBarChart(select('.overview').node(), mobstab_sch);
+    //drawMap(select('.map').node(),geodata);
     
     
     const enters1718Network = enters1718.filter(d =>d.gradeCfg_dest == 'H').filter(d => d.schcode_dest!= '00000').filter(d => d.schcode_origin != '00000');
@@ -89,9 +94,7 @@ Promise.all([
     
     var nodesData = networkSetup(enters1718)[0];
     var linksData = networkSetup(enters1718)[1];
-    
-    //const nodesData = networkSetup(enters1718)[0];
-    //const linksData = networkSetup(enters1718)[1]; //doesn't seem like the most efficient way to do this, but seems to work...
+    // still doesn't seem like the most efficient way to do this, but seems to work...
     
     console.log(nodesData);
     console.log(linksData);
@@ -305,56 +308,6 @@ function myDistrictNetwork(rootDom,data,district){
 
 
 
-// broke the prep of nodes and links out into its own function
-
-/*function networkSetup(data){
-    
-    //console.log(data);
-    const nodesData = new Map();
-    const linksData = [];
-    
-    data.forEach(d => {
-        const newLink = {
-            value: d.enters
-        };
-        
-        if(!nodesData.get(d.schcode_dest)){
-            const newNode = {
-                schcode: d.schcode_dest,
-                xy: d.xy_dest,
-                totalEnters: newLink.value
-            }; 
-            
-            nodesData.set(d.schcode_dest,newNode);
-            newLink.target = newNode;
-        }else{
-            const existingNode = nodesData.get(d.schcode_dest);
-            existingNode.totalEnters += newLink.value;
-            newLink.target = existingNode;
-        };
-        
-        if(!nodesData.get(d.schcode_origin)){
-            const newNode = {
-                schcode: d.schcode_origin,
-                xy: d.xy_origin,
-                totalEnters: 0
-            };
-            nodesData.set(d.shcode_origin,newNode);
-            newLink.source = newNode;
-        }else{
-            const existingNode = nodesData.get(d.schcode_origin);
-            newLink.source = existingNode;
-        }
-        linksData.push(newLink);  
-    })
-    
-    //console.log(nodesData);
-    //console.log(linksData);
-    
-    return[nodesData,linksData];
-    
-}*/
-
 
 
 
@@ -397,43 +350,6 @@ function drawBarChart(rootDom,data){
 }
 
 
-// returns xy, added to the objects for an array data, with ojbect property lndLat, baed on rootDom specifications
-
-function myProjection(rootDom,data,myScale){
-    const w = rootDom.clientWidth;
-    const h = rootDom.clientHeight;
-    
-    const projection_tm = geoMercator()
-    
-    const minLng = min(data, function(d){
-        return d.lngLat[0];
-    })
-    const maxLng = max(data, function(d){
-        return d.lngLat[0];
-    })
-    const minLat = min(data, function(d){
-        return d.lngLat[1];
-    })
-    const maxLat = max(data, function(d){
-        return d.lngLat[1];
-    })
-    
-    const projection = geoMercator()
-        .scale(myScale)
-        .center([(maxLng+minLng)/2,(maxLat+minLat)/2+.2])
-        //.center(289,127)
-        .translate([w/2,h/2]);
-    
-    //console.log(data);
-    
-    data.forEach(d=>
-                 {d.xy = projection(d.lngLat);
-                 }
-    );
-    //console.log(data);
-    return(data);
-    
-}
 
 //// in progress
 function myProjection2(rootDom,data,myScale){
