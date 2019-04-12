@@ -8,14 +8,14 @@ function renderNetwork(rootDom,nodesData,linksData){
 
   
   const svg = select(rootDom)
-		.selectAll('svg')
-		.data([1]);
+    .selectAll('svg')
+    .data([1]);
   const svgEnter = svg.enter()
-		.append('svg');
+    .append('svg');
 
-	const plot = svg.merge(svgEnter)
-		.attr('width', 750)
-		.attr('height', 1000);
+  const plot = svg.merge(svgEnter)
+    .attr('width', 750)
+    .attr('height', 1000);
 
   const links = plot
     .selectAll('.link')
@@ -67,22 +67,83 @@ function renderNetwork(rootDom,nodesData,linksData){
 function renderNetworkUpdate(rootDom,nodesData,linksData){
   const w = rootDom.clientWidth;
 
-  /*const scaleWeight = scalePow()
-    .domain(1,100)
-    .range(.1,1)
-    .exponent([-2]);*/
+  console.log(nodesData);
   
+  const nodesDataArray = Array.from(nodesData.values());
+  
+  console.log(nodesDataArray);
   
   const svg = select(rootDom)
-		.selectAll('svg')
-		.data([1]);
+    .selectAll('svg')
+    .data([1]);
   const svgEnter = svg.enter()
-		.append('svg');
+    .append('svg');
 
-	const plot = svg.merge(svgEnter)
-		.attr('width', 750)
-		.attr('height', 1000);
+  const plot = svg.merge(svgEnter)
+    .attr('width', 750)
+    .attr('height', 1000);
 
+  /*const nodes = plot
+    .selectAll('.node')
+    .data(nodesData, d => d.key);
+  
+  const nodesEnter = nodes.enter()
+    .append('circle')
+    .attr('class','node')
+    .style('fill','black');
+  
+  console.log(nodes.merge(nodesEnter));
+  
+  nodes.merge(nodesEnter)
+    .attr('r',d => {
+      return d.value.totalEnters*3;
+    })
+    .attr('cx', d=>
+          {return d.value.xy[0]})
+    .attr('cy', d=>
+          {return d.value.xy[1]});*/
+  
+  const nodes = plot.selectAll('.node')
+    .data(nodesDataArray,d => d.schcode);
+  
+  console.log(nodes);
+  console.log(nodes.enter());
+  
+  const nodesEnter = nodes.enter()
+    .append('circle')
+    .attr('class','node');
+  
+  console.log(nodes.merge(nodesEnter));
+    
+  /*nodes.merge(nodesEnter)
+    .filter(d => d.xy)
+    .attr('transform', d => {
+      const xy = projection(d.lngLat);
+      return `translate(${xy[0]}, ${xy[1]})`;
+      console.log(xy[0] + ' ' + xy[1]);
+    });*/
+  nodes.merge(nodesEnter)
+    //.attr('x', d => d.mobRate1)
+    //.selectAll('circle')
+    //.attr('r', d => scaleSize(d.total))
+    .attr('r', 10)
+    .style('fill-opacity', .3)
+    .style('stroke', '#000')
+    .style('stroke-width', '1px')
+    .style('stroke-opacity', .2)
+    .attr('cx', d=>
+          {if(d.xy){
+            return d.xy[0]
+          }})
+    .attr('cy', d=>
+          {if(d.xy){
+            return d.xy[1]}});
+  
+  
+  
+  
+  
+  
   const links = plot
     .selectAll('.link')
     .data(linksData);
@@ -90,9 +151,6 @@ function renderNetworkUpdate(rootDom,nodesData,linksData){
     .style('stroke-opacity',0.05)
     .style('stroke-width','1px')
     .style('stroke','black');
-
-  
-  
   
   links.merge(linksEnter)
     .attr('x1', d=> {
@@ -123,10 +181,10 @@ function renderNetworkUpdate(rootDom,nodesData,linksData){
           return 0;
       }
     })
-    //.style('stroke-width', d=>{
-    //return (d.value.toString() + 'px');
-    //})
-    .style('stroke-opacity',d => {return (d.value*d.value * 0.05)});
+    .style('stroke-width', d=>{
+    return ((d.value/2).toString() + 'px');
+    })
+    .style('stroke-opacity',d => d.value*d.value * 0.03);
   //.style('stroke-opacity',d => {return scaleWeight(d.value)});
   
   links.exit().remove();

@@ -35,8 +35,10 @@ Promise.all([ mobstabdataPromise,
   const metaMap = new Map(meta_tmp);
   //console.log(metaMap);
     
-  myProjection(select('.network').node(),geodata,45000) //still need to set up network DOM dimensions
-      .push({schcode: '00000',xy: [20,20]});
+  myProjection(select('.network').node(),
+               geodata,
+               45000) //still need to set up network DOM dimensions
+    .push({schcode: '00000',xy: [20,20]});
 
   const geo_tmp = geodata.map(d => {
       return[d.schcode,d]
@@ -80,12 +82,17 @@ Promise.all([ mobstabdataPromise,
           if(gd){
               d.lngLat_dest = gd.lngLat;
               d.xy_dest = gd.xy;
+          }else{
+            d.xy_dest = [20,700];
           }
           const go = geoMap.get(d.schcode_origin);
           if(go){
               d.lngLat_origin = go.lngLat;
               d.xy_origin = go.xy;
           }
+        //else{
+          //  d.xy_origin = [20,700];
+          //}
           return d;
           });
 

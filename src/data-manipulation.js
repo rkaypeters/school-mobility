@@ -101,14 +101,34 @@ function adjustProjection(data){
   const margin = 20;
   
   console.log(data);
+  console.log(data.length);
   
-  const minX = min(data, d => d.target.xy[0]);
-  const maxX = max(data, d => d.target.xy[0]);
-  const minY = min(data, d => d.target.xy[1]);
-  const maxY = max(data, d => d.target.xy[1]);
+  var minX;
+  var maxX;
+  var minY;
+  var maxY;
+  
+  if(data.length>=6){
+    
+    //console.log('length GT 6');
+    minX = min(data, d => d.target.xy[0]);
+    maxX = max(data, d => d.target.xy[0]);
+    minY = min(data, d => d.target.xy[1]);
+    maxY = max(data, d => d.target.xy[1]);
+    
+    //console.log(minY);
+    //console.log(maxY);
+    
+  }else{ ///need to fix this; it's not working with undefined sources
+    minX = Math.min(min(data, d=> d.target.xy[0]),min(data,d => d.source.xy[0]));
+    maxX = Math.max(max(data, d=> d.target.xy[0]),max(data,d => d.source.xy[0]));
+    minY = Math.min(min(data, d=> d.target.xy[1]),min(data,d => d.source.xy[1]));
+    maxY = Math.max(max(data, d=> d.target.xy[1]),max(data,d => d.source.xy[1]));
+  };
   
   const yProportion = (maxY - minY)/(h - 2*margin);
   const xProportion = (maxX - minX)/(w - 2*margin);
+  
   
   if(yProportion < xProportion){
     console.log('X is the limitation');
@@ -151,10 +171,10 @@ function adjustProjection(data){
     .range([h/4,3*h/4]);*/
   
   
-  console.log(minX);
-  console.log(maxX);
-  console.log(minY);
-  console.log(maxY);
+  //console.log(minX);
+  //console.log(maxX);
+  //console.log(minY);
+  //console.log(maxY);
   
   
   data.forEach(d => {
@@ -180,7 +200,7 @@ function adjustProjection(data){
   })
   
   
-  console.log(data);
+  //console.log(data);
   
   return(data);
   
