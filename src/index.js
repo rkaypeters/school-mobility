@@ -9,10 +9,9 @@ import {mobstabdataPromise,
         leaMetadataPromise
 } from './data-import';
 
-import networkSetup from './network-data';
-import myProjection from './projection';
-import renderNetwork from './view-modules/network';
+import {renderNetwork,renderNetworkUpdate} from './view-modules/network';
 import MakeDropdown from './view-modules/dropdowns';
+import {networkSetup,myProjection,adjustProjection} from './data-manipulation';
 
 
 //// The bulk of it - after the promises
@@ -25,115 +24,105 @@ Promise.all([ mobstabdataPromise,
   .then(([mobstab,metadataSch,geodata,entersdata,metadataLEA]) => {
                                               
   //console.log(metadataSch);
-    //console.log(mobstab);
-    //console.log(geodata);
-    //console.log(entersdata);
-    //console.log(metadataLEA);
+  //console.log(mobstab);
+  //console.log(geodata);
+  //console.log(entersdata);
+  //console.log(metadataLEA);
     
-    const meta_tmp = metadataSch.map(d => {
-		return [d.schcode, d]
-	});
-    const metaMap = new Map(meta_tmp);
-    //console.log(metaMap);
+  const meta_tmp = metadataSch.map(d => {
+    return [d.schcode, d]
+  });
+  const metaMap = new Map(meta_tmp);
+  //console.log(metaMap);
     
-    myProjection(select('.network').node(),geodata,45000) //still need to set up network DOM dimensions
-        .push({schcode: '00000',xy: [20,20]});
-    
-    const geo_tmp = geodata.map(d => {
-        return[d.schcode,d]
-    });
-    const geoMap = new Map(geo_tmp);
-    //console.log(geoMap);
-    
-    //console.log(entersdata);
-    
-    //should I put this in a separate script?
-    const enters1718 = entersdata.filter(d => d.reportID ==77)
-        .filter(d => d.schcode_dest != ' ')
-        .filter(d => d.schcode_origin != d.schcode_dest)
-        .map(d => {
-        const md = metaMap.get(d.schcode_dest);
-        d.adminSite_dest = md.adminSite;
-        d.distcode_dest = md.distcode;
-        d.schname30_dest = md.schname30;
-        d.gradeCfg_dest = md.gradeCfg;
-        return d;
-    })
-      /*.map(d => {
-        if (d.schcode_origin != '00000' && d.schcode_origin != ' '){
-          
-        
-        const md = metaMap.get(d.schcode_origin);
-        /*if(md.distcode){
-          d.adminSite_origin = md.adminSite;
-          d.distcode_origin = md.distcode;
-          d.schname30_origin = md.schname30;
-          d.gradeCfg_origin = md.gradeCfg;
-        }
-        return d;*
-        console.log(md);
-        }
-      })*/
-    
-        .filter(d => d.adminSite_dest == 'N')
-        .map(d => {
-            const gd = geoMap.get(d.schcode_dest);
-            if(gd){
-                d.lngLat_dest = gd.lngLat;
-                d.xy_dest = gd.xy;
-            }
-            const go = geoMap.get(d.schcode_origin);
-            if(go){
-                d.lngLat_origin = go.lngLat;
-                d.xy_origin = go.xy;
-            }
-            return d;
-            });
-        
-    console.log(enters1718);
-    
-    
-    const mobstab_sch = mobstab
-        .filter(d => d.schname != '')
-        .map(d => {
-        const md = metaMap.get(d.schcode);
-        d.adminSite = md.adminSite;
-        
-        return d;
-    })
-        .filter(d => d.adminSite == 'N');
-    
-    //console.log(mobstab_sch);
-    
-    
-    const enters1718Network = enters1718.filter(d =>d.gradeCfg_dest == 'H').filter(d => d.schcode_dest!= '00000').filter(d => d.schcode_origin != '00000');
-    
-    console.log(enters1718Network);
-    
-    var nodesData = networkSetup(enters1718)[0];
-    var linksData = networkSetup(enters1718)[1];
-    // still doesn't seem like the most efficient way to do this, but seems to work...
-    
-    console.log(nodesData);
-    console.log(linksData);
-    
-    //const myNetwork = MyNetwork();
-    
-    renderNetwork('.network',
-              nodesData,
-              linksData.filter(d => d.target.schcode != '00000')
-                .filter(d => d.source.schcode != '00000')//.filter(d => d.value != 1)
-             );
+  myProjection(select('.network').node(),geodata,45000) //still need to set up network DOM dimensions
+      .push({schcode: '00000',xy: [20,20]});
+
+  const geo_tmp = geodata.map(d => {
+      return[d.schcode,d]
+  });
+  const geoMap = new Map(geo_tmp);
+  //console.log(geoMap);
+
+  //console.log(entersdata);
+
+  //should I put this in a separate script?
+  const enters1718 = entersdata.filter(d => d.reportID ==77)
+      .filter(d => d.schcode_dest != ' ')
+      .filter(d => d.schcode_origin != d.schcode_dest)
+      .map(d => {
+      const md = metaMap.get(d.schcode_dest);
+      d.adminSite_dest = md.adminSite;
+      d.distcode_dest = md.distcode;
+      d.schname30_dest = md.schname30;
+      d.gradeCfg_dest = md.gradeCfg;
+      return d;
+  })
+    /*.map(d => {
+      if (d.schcode_origin != '00000' && d.schcode_origin != ' '){
+
+
+      const md = metaMap.get(d.schcode_origin);
+      /*if(md.distcode){
+        d.adminSite_origin = md.adminSite;
+        d.distcode_origin = md.distcode;
+        d.schname30_origin = md.schname30;
+        d.gradeCfg_origin = md.gradeCfg;
+      }
+      return d;*
+      console.log(md);
+      }
+    })*/
+
+      .filter(d => d.adminSite_dest == 'N')
+      .map(d => {
+          const gd = geoMap.get(d.schcode_dest);
+          if(gd){
+              d.lngLat_dest = gd.lngLat;
+              d.xy_dest = gd.xy;
+          }
+          const go = geoMap.get(d.schcode_origin);
+          if(go){
+              d.lngLat_origin = go.lngLat;
+              d.xy_origin = go.xy;
+          }
+          return d;
+          });
+
+  //console.log(enters1718);
+
+
+  const mobstab_sch = mobstab
+      .filter(d => d.schname != '')
+      .map(d => {
+      const md = metaMap.get(d.schcode);
+      d.adminSite = md.adminSite;
+
+      return d;
+  })
+      .filter(d => d.adminSite == 'N');
+
+  //console.log(mobstab_sch);
+
+  //const enters1718Network = enters1718.filter(d =>d.gradeCfg_dest == 'H').filter(d => d.schcode_dest!= '00000').filter(d => d.schcode_origin != '00000');
+
+  const [nodesData,linksData] = networkSetup(enters1718);
+  
+  console.log(nodesData);
+  console.log(linksData);
+
+  //const myNetwork = MyNetwork();
+
+  renderNetwork('.network',
+            nodesData,
+            linksData.filter(d => d.target.schcode != '00000')
+              .filter(d => d.source.schcode != '00000')//.filter(d => d.value != 1)
+           );
   
   districtDropDown(metadataLEA.filter(d => [1,2,3].includes(+d.leaType)),
                    '.dropdown',
                    nodesData,
                    linksData);
-  
-  
-  //const distDropdown = MakeDropdown('distcode','distname');
-  //distDropdown(metadataLEA.filter(d => [1,2,3].includes(+d.leaType)),'.dropdown');
-  //this combo works but I'm not sure how to work with it with dispatch.
   
   
   
@@ -166,32 +155,21 @@ function districtDropDown(leaData,rootDom,nodes,links){
 const globalDispatch = dispatch('change:district');
 
 globalDispatch.on('change:district', (distcode,nodesData,linksData) => {
-	//originCode = code;
 
   const filteredLinks = linksData.filter(d => d.target.distcode == distcode);
+  const projFiltLinks = adjustProjection(filteredLinks.filter(d => d.source.schcode != '00000'));
   
   console.log(distcode);
-  console.log(filteredLinks);
+  //console.log(filteredLinks);
+  console.log(projFiltLinks);
   
-  renderNetwork('.network',
+  renderNetworkUpdate('.network',
               nodesData,
-              filteredLinks.filter(d => d.target.schcode != '00000')
-                .filter(d => d.source.schcode != '00000')//.filter(d => d.value != 1)
+              //filteredLinks
+                //.filter(d => d.source.schcode != '00000')//.filter(d => d.value != 1)
+              projFiltLinks
              );
   
-  
-  //const filteredLinks = linksData.filter(d )
-  
-/*	//Update title 
-	title.html(displayName);
-
-	//Update other view modules
-	migrationDataCombined.then(data => {
-		const filteredData = data.filter(d => d.origin_code === originCode);
-		renderLineCharts(groupBySubregionByYear(filteredData));
-		renderComposition(filteredData, currentYear);
-		renderCartogram(filteredData, currentYear);
-	});*/
 });
 
 

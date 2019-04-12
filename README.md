@@ -7,6 +7,9 @@ My next steps (I think) as of 4/7:
         
     3. add feature to zoom/pan to the location of filtered data when district or grade span is updated. This means mapping xy to a new range. This could potentially happen to nodesData and linksData before myNetwork.
         a. potentially, if there are 4+ target nodes focus on those 4+; if fewer than 4, include source in the focus
+    DONE with all zoooming, missing variation by number of targets or for weird layouts.
+        
+        
     4. reconsider visual elements; this is a good point for design considerations (color for source v target for filters? whats the best way to show the strength of these relationships? where should the 190s and 000s go?, etc). this needs work.
         a. consider repsentation of overall mobility rate in a channel in this chart (size?)
         b. consider altering weight of links to match percentage of students rather than count
@@ -18,6 +21,13 @@ My next steps (I think) as of 4/7:
         b. additional view: streamgraph of students by school over time
         c. additional view: school information (mobility and stability rate, % economicaly disadvantaged, english learners, nonwhite, proficiency, etc; consider what makes sense)
     6. (optional if time) - try panning and zooming features on map. d3 has funcationality such that users can move around if I want to go that way
+    
+    
+    Additional steps 4/11:
+    - add distcode to source
+    - clean up indentation
+    - combine data utils
+    - work on missing coordinates
 
 
 Key questions for Siqi:
