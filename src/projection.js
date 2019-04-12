@@ -2,9 +2,7 @@ import {min, max, geoMercator} from 'd3';
 
 // returns xy, added to the objects for an array data, with object property lndLat, baed on rootDom specifications
 
-function MyProjection(){
-
-    function exportFunction(rootDom,data,myScale){
+function myProjection(rootDom,data,myScale){
         const w = rootDom.clientWidth;
         const h = rootDom.clientHeight;
 
@@ -27,7 +25,7 @@ function MyProjection(){
             .scale(myScale)
             .center([(maxLng+minLng)/2,(maxLat+minLat)/2+.2])
             //.center(289,127)
-            .translate([w/2,h/2]);     //when I switched to webpack the translate piece broke - it's stuck with the middle of the y at the top; need to fix
+            //.translate([w/2,h/2]);     //when I switched to webpack the translate piece broke - it's stuck with the middle of the y at the top; need to fix
 
         //console.log(data);
 
@@ -37,11 +35,8 @@ function MyProjection(){
         );
         //console.log(data);
         return(data);
-
-    }
     
-    return exportFunction;
     
 }
 
-export default MyProjection;
+export default myProjection;

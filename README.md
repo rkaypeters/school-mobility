@@ -1,7 +1,10 @@
 My next steps (I think) as of 4/7:
-    1. fix translate in myProjection
+    DONE - 1. fix translate in myProjection
     2. add drop-down filters for district and grade span (filters nodesData and linksData potentially, goes after projection and network setup, re-runs myNetwork through dispatch)
         a. enter-exit-update! dispatch! maybe more!
+    DONE with district, hold on grade span.
+        
+        
     3. add feature to zoom/pan to the location of filtered data when district or grade span is updated. This means mapping xy to a new range. This could potentially happen to nodesData and linksData before myNetwork.
         a. potentially, if there are 4+ target nodes focus on those 4+; if fewer than 4, include source in the focus
     4. reconsider visual elements; this is a good point for design considerations (color for source v target for filters? whats the best way to show the strength of these relationships? where should the 190s and 000s go?, etc). this needs work.

@@ -1,37 +1,43 @@
 console.log('index.js!');
 
-import {select,min,max,geoMercator} from 'd3';
+import {select,min,max,geoMercator,dispatch} from 'd3';
 
-import {mobstabdataPromise, metadataPromise, geodataPromise, schEntersPromise
+import {mobstabdataPromise,
+        metadataPromise,
+        geodataPromise,
+        schEntersPromise,
+        leaMetadataPromise
 } from './data-import';
-import NetworkSetup from './network-data';
-    //filter for district and grade span can probably be applied after the factor that that this doesn't need to run repeatedly. However, if I ever build in anything with additional years, such as a time-slider (I'm thinking not), I'd need to re-run this for the appropriate year.
-import MyProjection from './projection';
-    //next steps for projection include re-scaling coordinates for filter based on district and possibly grade span. I think I can do this outside of projection; the relationships between the coordinates don't change, they're just mapped to a different range.
-import MyNetwork from './view-modules/network';
+
+import networkSetup from './network-data';
+import myProjection from './projection';
+import renderNetwork from './view-modules/network';
+import MakeDropdown from './view-modules/dropdowns';
 
 
 //// The bulk of it - after the promises
 
-Promise.all([
-    mobstabdataPromise,metadataPromise,geodataPromise,schEntersPromise]).then(([mobstab,metadataSch,geodata,entersdata]) => {
+Promise.all([ mobstabdataPromise,
+             metadataPromise,
+             geodataPromise,
+             schEntersPromise,
+             leaMetadataPromise])
+  .then(([mobstab,metadataSch,geodata,entersdata,metadataLEA]) => {
                                               
-    //console.log(metadataSch);
+  //console.log(metadataSch);
     //console.log(mobstab);
     //console.log(geodata);
     //console.log(entersdata);
+    //console.log(metadataLEA);
     
     const meta_tmp = metadataSch.map(d => {
-				return [d.schcode, d]
-			});
+		return [d.schcode, d]
+	});
     const metaMap = new Map(meta_tmp);
     //console.log(metaMap);
     
-    const myProjection = MyProjection();
-    
     myProjection(select('.network').node(),geodata,45000) //still need to set up network DOM dimensions
-        .push({schcode: '00000',xy: [20,20]}); ///This is the out of system position
-    //when I switched to webpack the translate piece broke - it's stuck with the middle of the y at the top; need to fix
+        .push({schcode: '00000',xy: [20,20]});
     
     const geo_tmp = geodata.map(d => {
         return[d.schcode,d]
@@ -53,6 +59,22 @@ Promise.all([
         d.gradeCfg_dest = md.gradeCfg;
         return d;
     })
+      /*.map(d => {
+        if (d.schcode_origin != '00000' && d.schcode_origin != ' '){
+          
+        
+        const md = metaMap.get(d.schcode_origin);
+        /*if(md.distcode){
+          d.adminSite_origin = md.adminSite;
+          d.distcode_origin = md.distcode;
+          d.schname30_origin = md.schname30;
+          d.gradeCfg_origin = md.gradeCfg;
+        }
+        return d;*
+        console.log(md);
+        }
+      })*/
+    
         .filter(d => d.adminSite_dest == 'N')
         .map(d => {
             const gd = geoMap.get(d.schcode_dest);
@@ -68,7 +90,7 @@ Promise.all([
             return d;
             });
         
-    //console.log(enters1718);
+    console.log(enters1718);
     
     
     const mobstab_sch = mobstab
@@ -88,8 +110,6 @@ Promise.all([
     
     console.log(enters1718Network);
     
-    const networkSetup = NetworkSetup();
-    
     var nodesData = networkSetup(enters1718)[0];
     var linksData = networkSetup(enters1718)[1];
     // still doesn't seem like the most efficient way to do this, but seems to work...
@@ -97,20 +117,82 @@ Promise.all([
     console.log(nodesData);
     console.log(linksData);
     
-    const myNetwork = MyNetwork();
+    //const myNetwork = MyNetwork();
     
-    myNetwork('.network',nodesData,linksData.filter(d => d.target.schcode != '00000').filter(d => d.source.schcode != '00000')//.filter(d => d.value != 1)
+    renderNetwork('.network',
+              nodesData,
+              linksData.filter(d => d.target.schcode != '00000')
+                .filter(d => d.source.schcode != '00000')//.filter(d => d.value != 1)
              );
-    
-    //myNetwork('.network2',networkSetup(enters1718Network)[0],networkSetup(enters1718Network)[1]);
-    
-    //myNetwork('.network3',networkSetup(enters1718Network.filter(d => d.distcode_dest =='28'))[0],networkSetup(enters1718Network.filter(d => d.distcode_dest =='28'))[1]);
-    
-    //myDistrictNetwork('.network3',enters1718,'28');
+  
+  districtDropDown(metadataLEA.filter(d => [1,2,3].includes(+d.leaType)),
+                   '.dropdown',
+                   nodesData,
+                   linksData);
+  
+  
+  //const distDropdown = MakeDropdown('distcode','distname');
+  //distDropdown(metadataLEA.filter(d => [1,2,3].includes(+d.leaType)),'.dropdown');
+  //this combo works but I'm not sure how to work with it with dispatch.
+  
+  
+  
 }
     
 )
 
+
+function districtDropDown(leaData,rootDom,nodes,links){
+  
+  const districtList = select(rootDom)
+    .append('select');
+  districtList.selectAll('option')
+    .data(leaData)
+    .enter()
+    .append('option')
+    .attr('value',d=> d.distcode)
+    .html(d => d.distname);
+  
+  districtList.on('change',function(){
+    const distcode = this.value;
+    globalDispatch.call('change:district',null,distcode,nodes,links);
+    
+  });
+
+  
+}
+
+
+const globalDispatch = dispatch('change:district');
+
+globalDispatch.on('change:district', (distcode,nodesData,linksData) => {
+	//originCode = code;
+
+  const filteredLinks = linksData.filter(d => d.target.distcode == distcode);
+  
+  console.log(distcode);
+  console.log(filteredLinks);
+  
+  renderNetwork('.network',
+              nodesData,
+              filteredLinks.filter(d => d.target.schcode != '00000')
+                .filter(d => d.source.schcode != '00000')//.filter(d => d.value != 1)
+             );
+  
+  
+  //const filteredLinks = linksData.filter(d )
+  
+/*	//Update title 
+	title.html(displayName);
+
+	//Update other view modules
+	migrationDataCombined.then(data => {
+		const filteredData = data.filter(d => d.origin_code === originCode);
+		renderLineCharts(groupBySubregionByYear(filteredData));
+		renderComposition(filteredData, currentYear);
+		renderCartogram(filteredData, currentYear);
+	});*/
+});
 
 
 

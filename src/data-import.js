@@ -6,9 +6,14 @@ const mobstabdataPromise = csv('./data/mobstab18/school.csv',parseMobstab);
 const metadataPromise = csv('./data/sch_metadata.csv',parseMetadata);
 const geodataPromise = csv('./data/RI_Schools_coordinates_Mar2019.csv',parseGeodata);
 const schEntersPromise = csv('./data/sch_enters_data_0809_1718.csv',parseEnterdata);
+const leaMetadataPromise = csv('./data/lea_metadata.csv',parseLeaMetadata);
 
 
-export {mobstabdataPromise, metadataPromise, geodataPromise, schEntersPromise};
+export {mobstabdataPromise,
+  metadataPromise,
+  geodataPromise,
+  schEntersPromise,
+  leaMetadataPromise};
 
 //// Parse functions
 
@@ -69,6 +74,26 @@ function parseMetadata(d){
     delete d.OPENDATE;
     delete d.CLOSEDATE;
     
+}
+
+function parseLeaMetadata(d){
+  return{
+    distcode: d.LEA_CODE,
+    distname: d.LEA_NAME,
+    distname16: d.LEA_NAME16,
+    distname8: d.LEA_NAME8,
+    leaLowGrade: d.LEA_LOW_GRADE,
+    leaHighGrade: d.LEA_HIGH_GRADE,
+    leaType: d.LEA_TYPE
+  }
+  
+  delete d.SUPTADDRL1;
+  delete d.SUPTADDRL2;
+  delete d.SUPTADDRL3;
+  delete d.SUPTCITY;
+  delete d.SUPTSATE;
+  delete d.SUPTZIP;
+  delete d.LEA;
 }
 
 function parseGeodata(d){
