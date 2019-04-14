@@ -11,7 +11,7 @@ import {mobstabdataPromise,
 
 import {renderNetwork,renderNetworkUpdate} from './view-modules/network';
 import MakeDropdown from './view-modules/dropdowns';
-import {networkSetup,myProjection,adjustProjection} from './data-manipulation';
+import {networkSetup,myProjection,adjustProjection,adjustProjection2} from './data-manipulation';
 
 
 //// The bulk of it - after the promises
@@ -163,12 +163,17 @@ const globalDispatch = dispatch('change:district');
 
 globalDispatch.on('change:district', (distcode,nodesData,linksData) => {
 
+  console.log(distcode);
+  
   const filteredLinks = linksData.filter(d => d.target.distcode == distcode);
   const projFiltLinks = adjustProjection(filteredLinks.filter(d => d.source.schcode != '00000'));
+  const [adjNodes,adjLinks] = adjustProjection2(nodesData,linksData,distcode);
   
-  console.log(distcode);
+  console.log(adjNodes);
+  console.log(adjLinks);
+  
   //console.log(filteredLinks);
-  console.log(projFiltLinks);
+  //console.log(projFiltLinks);
   
   renderNetworkUpdate('.network',
               nodesData,

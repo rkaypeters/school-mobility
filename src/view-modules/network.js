@@ -67,11 +67,11 @@ function renderNetwork(rootDom,nodesData,linksData){
 function renderNetworkUpdate(rootDom,nodesData,linksData){
   const w = rootDom.clientWidth;
 
-  console.log(nodesData);
+  //console.log(nodesData);
   
   const nodesDataArray = Array.from(nodesData.values());
   
-  console.log(nodesDataArray);
+  //console.log(nodesDataArray);
   
   const svg = select(rootDom)
     .selectAll('svg')
@@ -82,50 +82,15 @@ function renderNetworkUpdate(rootDom,nodesData,linksData){
   const plot = svg.merge(svgEnter)
     .attr('width', 750)
     .attr('height', 1000);
-
-  /*const nodes = plot
-    .selectAll('.node')
-    .data(nodesData, d => d.key);
-  
-  const nodesEnter = nodes.enter()
-    .append('circle')
-    .attr('class','node')
-    .style('fill','black');
-  
-  console.log(nodes.merge(nodesEnter));
-  
-  nodes.merge(nodesEnter)
-    .attr('r',d => {
-      return d.value.totalEnters*3;
-    })
-    .attr('cx', d=>
-          {return d.value.xy[0]})
-    .attr('cy', d=>
-          {return d.value.xy[1]});*/
   
   const nodes = plot.selectAll('.node')
     .data(nodesDataArray,d => d.schcode);
-  
-  console.log(nodes);
-  console.log(nodes.enter());
   
   const nodesEnter = nodes.enter()
     .append('circle')
     .attr('class','node');
   
-  console.log(nodes.merge(nodesEnter));
-    
-  /*nodes.merge(nodesEnter)
-    .filter(d => d.xy)
-    .attr('transform', d => {
-      const xy = projection(d.lngLat);
-      return `translate(${xy[0]}, ${xy[1]})`;
-      console.log(xy[0] + ' ' + xy[1]);
-    });*/
   nodes.merge(nodesEnter)
-    //.attr('x', d => d.mobRate1)
-    //.selectAll('circle')
-    //.attr('r', d => scaleSize(d.total))
     .attr('r', 10)
     .style('fill-opacity', .3)
     .style('stroke', '#000')
@@ -138,11 +103,6 @@ function renderNetworkUpdate(rootDom,nodesData,linksData){
     .attr('cy', d=>
           {if(d.xy){
             return d.xy[1]}});
-  
-  
-  
-  
-  
   
   const links = plot
     .selectAll('.link')
