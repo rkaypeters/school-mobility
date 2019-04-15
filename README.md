@@ -9,6 +9,7 @@ My next steps (I think) as of 4/7:
         a. potentially, if there are 4+ target nodes focus on those 4+; if fewer than 4, include source in the focus
     DONE with all zoooming, missing variation by number of targets or for weird layouts.
         
+    3 1/2. add option to return to full state.
         
     4. reconsider visual elements; this is a good point for design considerations (color for source v target for filters? whats the best way to show the strength of these relationships? where should the 190s and 000s go?, etc). this needs work.
         a. consider repsentation of overall mobility rate in a channel in this chart (size?)

@@ -9,7 +9,7 @@ import {mobstabdataPromise,
         leaMetadataPromise
 } from './data-import';
 
-import {renderNetwork,renderNetworkUpdate} from './view-modules/network';
+import {renderNetwork,renderNetworkUpdate,renderNetworkUpdate2} from './view-modules/network';
 import MakeDropdown from './view-modules/dropdowns';
 import {networkSetup,myProjection,adjustProjection,adjustProjection2} from './data-manipulation';
 
@@ -175,12 +175,14 @@ globalDispatch.on('change:district', (distcode,nodesData,linksData) => {
   //console.log(filteredLinks);
   //console.log(projFiltLinks);
   
-  renderNetworkUpdate('.network',
+  /*renderNetworkUpdate('.network',
               nodesData,
               //filteredLinks
                 //.filter(d => d.source.schcode != '00000')//.filter(d => d.value != 1)
               projFiltLinks
-             );
+             );*/
+  
+  renderNetworkUpdate2('.network',adjNodes,adjLinks,distcode);
   
 });
 
@@ -228,47 +230,6 @@ function drawBarChart(rootDom,data){
 		.style('stroke-opacity', .2) ;
     
     //console.loge(nodes);
-    
-}
-
-
-
-//// in progress
-function myProjection2(rootDom,data,myScale){
-    const w = rootDom.clientWidth;
-    const h = rootDom.clientHeight;
-    
-    const projection_tm = geoMercator()
-    
-    console.log(data);
-    
-    const minLng = min(data, function(d){
-        return d.lngLat_dest[0];
-    })
-    const maxLng = max(data, function(d){
-        return d.lngLat_dest[0];
-    })
-    const minLat = min(data, function(d){
-        return d.lngLat_dest[1];
-    })
-    const maxLat = max(data, function(d){
-        return d.lngLat_dest[1];
-    })
-    
-    const projection = geoMercator()
-        .scale(myScale)
-        .center([(maxLng+minLng)/2,(maxLat+minLat)/2+.2])
-        //.center(289,127)
-        .translate([w/2,h/2]);
-    
-    //console.log(data);
-    
-    data.forEach(d=>
-                 {d.xy_dest = projection(d.lngLat_dest);
-                 }
-    );
-    //console.log(data);
-    return(data);
     
 }
 
