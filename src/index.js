@@ -1,4 +1,4 @@
-console.log('index.js!');
+/// Imports
 
 import {select,min,max,geoMercator,dispatch} from 'd3';
 
@@ -9,12 +9,18 @@ import {mobstabdataPromise,
         leaMetadataPromise
 } from './data-import';
 
-import {renderNetwork,renderNetworkUpdate,renderNetworkUpdate2} from './view-modules/network';
+import {renderNetwork,
+        renderNetworkUpdate,
+        renderNetworkUpdate2} from './view-modules/network';
 import MakeDropdown from './view-modules/dropdowns';
-import {networkSetup,myProjection,adjustProjection,adjustProjection2} from './data-manipulation';
+import {networkSetup,
+        myProjection,
+        adjustProjection,
+        adjustProjection2,
+        formatEnters} from './data-manipulation';
 
 
-//// The bulk of it - after the promises
+/// Main
 
 Promise.all([ mobstabdataPromise,
              metadataPromise,
@@ -22,84 +28,19 @@ Promise.all([ mobstabdataPromise,
              schEntersPromise,
              leaMetadataPromise])
   .then(([mobstab,metadataSch,geodata,entersdata,metadataLEA]) => {
-                                              
+                                 
+  
   //console.log(metadataSch);
   //console.log(mobstab);
   //console.log(geodata);
   //console.log(entersdata);
   //console.log(metadataLEA);
     
-  const meta_tmp = metadataSch.map(d => {
-    return [d.schcode, d]
-  });
-  const metaMap = new Map(meta_tmp);
-  //console.log(metaMap);
-    
-  myProjection(select('.network').node(),
-               geodata,
-               45000) //still need to set up network DOM dimensions
-    .push({schcode: '00000',xy: [20,20]});
-
-  const geo_tmp = geodata.map(d => {
-      return[d.schcode,d]
-  });
-  const geoMap = new Map(geo_tmp);
-  //console.log(geoMap);
-
-  //console.log(entersdata);
-
-  //should I put this in a separate script?
-  const enters1718 = entersdata.filter(d => d.reportID ==77)
-      .filter(d => d.schcode_dest != ' ')
-      .filter(d => d.schcode_origin != d.schcode_dest)
-      .map(d => {
-      const md = metaMap.get(d.schcode_dest);
-      d.adminSite_dest = md.adminSite;
-      d.distcode_dest = md.distcode;
-      d.schname30_dest = md.schname30;
-      d.gradeCfg_dest = md.gradeCfg;
-      return d;
-  })
-    /*.map(d => {
-      if (d.schcode_origin != '00000' && d.schcode_origin != ' '){
-
-
-      const md = metaMap.get(d.schcode_origin);
-      /*if(md.distcode){
-        d.adminSite_origin = md.adminSite;
-        d.distcode_origin = md.distcode;
-        d.schname30_origin = md.schname30;
-        d.gradeCfg_origin = md.gradeCfg;
-      }
-      return d;*
-      console.log(md);
-      }
-    })*/
-
-      .filter(d => d.adminSite_dest == 'N')
-      .map(d => {
-          const gd = geoMap.get(d.schcode_dest);
-          if(gd){
-              d.lngLat_dest = gd.lngLat;
-              d.xy_dest = gd.xy;
-          }else{
-            d.xy_dest = [20,700];
-          }
-          const go = geoMap.get(d.schcode_origin);
-          if(go){
-              d.lngLat_origin = go.lngLat;
-              d.xy_origin = go.xy;
-          }
-        //else{
-          //  d.xy_origin = [20,700];
-          //}
-          return d;
-          });
-
-  //console.log(enters1718);
-
-
-  const mobstab_sch = mobstab
+  
+  //console.log(formatEnters(metadataSch,mobstab,geodata,entersdata));
+  const enters1718 = formatEnters(metadataSch,mobstab,geodata,entersdata);
+  
+  /*const mobstab_sch = mobstab
       .filter(d => d.schname != '')
       .map(d => {
       const md = metaMap.get(d.schcode);
@@ -107,19 +48,18 @@ Promise.all([ mobstabdataPromise,
 
       return d;
   })
-      .filter(d => d.adminSite == 'N');
+      .filter(d => d.adminSite == 'N');*/
 
-  //console.log(mobstab_sch);
 
   //const enters1718Network = enters1718.filter(d =>d.gradeCfg_dest == 'H').filter(d => d.schcode_dest!= '00000').filter(d => d.schcode_origin != '00000');
 
   const [nodesData,linksData] = networkSetup(enters1718);
   
+  
   console.log(nodesData);
   console.log(linksData);
 
-  //const myNetwork = MyNetwork();
-
+  
   renderNetwork('.network',
             nodesData,
             linksData.filter(d => d.target.schcode != '00000')
@@ -158,6 +98,8 @@ function districtDropDown(leaData,rootDom,nodes,links){
   
 }
 
+
+/// Global Dispatches
 
 const globalDispatch = dispatch('change:district');
 

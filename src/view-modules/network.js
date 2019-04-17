@@ -176,9 +176,15 @@ function renderNetworkUpdate2(rootDom,nodesData,linksData,distcode){
   nodes.merge(nodesEnter)
     .transition()
     .duration(1500)
-    .attr('r', 10)
-    .style('fill-opacity', .3)
-    .style('stroke', '#000')
+    //.attr('r', d=>
+         //Math.sqrt(d.totalEnters + 4)*2)
+    .attr('r',d => Math.sqrt(d.adm + 16))
+    .style('fill-opacity', .7)
+    .style('fill', d => {
+      if(d.distcode ==distcode){
+        return '#87C3CC'
+      }else{return '#DCDCDC'}
+    })
     .style('stroke-width', '1px')
     .style('stroke-opacity', .2)
     .attr('cx', d=>
@@ -186,6 +192,23 @@ function renderNetworkUpdate2(rootDom,nodesData,linksData,distcode){
             return d.xyNew[0]
           }})
     .attr('cy', d=>
+          {if(d.xyNew){
+            return d.xyNew[1]}});
+  
+  const labels = plot.selectAll('.label')
+    .data(nodesData, d=> d.schcode);
+  
+  const labelsEnter = labels.enter()
+    .append('text')
+    .attr('class','label');
+  
+  labels.merge(labelsEnter)
+    .text(d => d.schcode)
+    .attr('x',d=>
+          {if(d.xyNew){
+            return d.xyNew[0]
+          }})
+    .attr('y', d=>
           {if(d.xyNew){
             return d.xyNew[1]}});
   

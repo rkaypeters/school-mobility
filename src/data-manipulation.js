@@ -1,6 +1,85 @@
-import {min, max, geoMercator,scaleLinear} from 'd3';    
+import {min, max, geoMercator,scaleLinear,select} from 'd3';    
     
     
+
+function formatEnters(metadataSch,mobstab,geodata,entersdata){
+    // make maps
+  
+  console.log(geodata);
+  
+  const meta_tmp = metadataSch.map(d => [d.schcode,d]);
+  const metaMap = new Map(meta_tmp);
+  
+  const mobstab_tmp = mobstab.map(d => [d.schcode,d]);
+  const mobstabMap = new Map(mobstab_tmp);
+
+  
+  myProjection(select('.network').node(),geodata,45000) //still need to set up network DOM dimensions
+    .push({schcode: '00000',xy: [20,20]});
+
+  const geo_tmp = geodata.map(d => [d.schcode,d]);
+  const geoMap = new Map(geo_tmp);
+
+
+  //should I put this in a separate script?
+  const enters1718 = entersdata.filter(d => d.reportID ==77)
+    .filter(d => d.schcode_dest != ' ')
+    .filter(d => d.schcode_origin != d.schcode_dest)
+    .map(d => {
+      const md = metaMap.get(d.schcode_dest);
+      d.adminSite_dest = md.adminSite;
+      d.distcode_dest = md.distcode;
+      d.schname30_dest = md.schname30;
+      d.gradeCfg_dest = md.gradeCfg;
+      return d;
+    })
+    .map( d =>{
+      const msd = mobstabMap.get(d.schcode_dest);
+      d.adm = msd.adm;
+      d.mobRate = msd.mobRate1;
+      return d;
+    })
+    /*.map(d => {
+      if (d.schcode_origin != '00000' && d.schcode_origin != ' '){
+
+
+      const md = metaMap.get(d.schcode_origin);
+      /*if(md.distcode){
+        d.adminSite_origin = md.adminSite;
+        d.distcode_origin = md.distcode;
+        d.schname30_origin = md.schname30;
+        d.gradeCfg_origin = md.gradeCfg;
+      }
+      return d;*
+      console.log(md);
+      }
+    })*/
+
+      .filter(d => d.adminSite_dest == 'N')
+      .map(d => {
+          const gd = geoMap.get(d.schcode_dest);
+          if(gd){
+              d.lngLat_dest = gd.lngLat;
+              d.xy_dest = gd.xy;
+          }else{
+            d.xy_dest = [20,700];
+          }
+          const go = geoMap.get(d.schcode_origin);
+          if(go){
+              d.lngLat_origin = go.lngLat;
+              d.xy_origin = go.xy;
+          }
+        //else{
+          //  d.xy_origin = [20,700];
+          //}
+          return d;
+          });
+  
+  return(enters1718);
+  
+}
+
+
 function networkSetup(data){
 
   //console.log(data);
@@ -17,7 +96,9 @@ function networkSetup(data){
         schcode: d.schcode_dest,
         distcode: d.distcode_dest,
         xy: d.xy_dest,
-        totalEnters: newLink.value
+        totalEnters: newLink.value,
+        adm: +d.adm,
+        mobRate: +d.mobRate
       }; 
 
       nodesData.set(d.schcode_dest,newNode);
@@ -337,4 +418,4 @@ function adjustProjection2(nodesData,linksData,distcode){
 }
 
 
-export {networkSetup,myProjection,adjustProjection,adjustProjection2};
+export {networkSetup,myProjection,adjustProjection,adjustProjection2,formatEnters};
