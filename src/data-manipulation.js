@@ -1,11 +1,11 @@
-import {min, max, geoMercator,scaleLinear,select} from 'd3';    
+import {min, max, geoMercator,scaleLinear,select,nest,key,entries} from 'd3';    
     
     
 
 function formatEnters(metadataSch,mobstab,geodata,entersdata){
-    // make maps
   
-  console.log(geodata);
+  //console.log(geodata);
+  console.log(entersdata);
   
   const meta_tmp = metadataSch.map(d => [d.schcode,d]);
   const metaMap = new Map(meta_tmp);
@@ -14,14 +14,13 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
   const mobstabMap = new Map(mobstab_tmp);
 
   
-  myProjection(select('.network').node(),geodata,45000) //still need to set up network DOM dimensions
-    .push({schcode: '00000',xy: [20,20]});
+  myProjection(select('.network').node(),geodata,45000); //still need to set up network DOM dimensions
+    //.push({schcode: '00000',xy: [20,20]});
 
   const geo_tmp = geodata.map(d => [d.schcode,d]);
   const geoMap = new Map(geo_tmp);
-
-
-  //should I put this in a separate script?
+  
+  
   const enters1718 = entersdata.filter(d => d.reportID ==77)
     .filter(d => d.schcode_dest != ' ')
     .filter(d => d.schcode_origin != d.schcode_dest)
@@ -61,19 +60,44 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
           if(gd){
               d.lngLat_dest = gd.lngLat;
               d.xy_dest = gd.xy;
-          }else{
-            d.xy_dest = [20,700];
-          }
+              //console.log('geoMap!');
+          }else{//console.log('no geoMap!');
+            if(d.schcode_dest === '00000'){
+               d.xy_dest = [20,20];
+                console.log('out of state');
+               //};
+               //if(d.schcode === /190$/){
+                  //console.log('190 school');
+                  //d.xy_dest = [20,700];
+               //}
+                }else{d.xy_dest = [20,700];
+                     console.log('other');}
+               }
           const go = geoMap.get(d.schcode_origin);
           if(go){
               d.lngLat_origin = go.lngLat;
               d.xy_origin = go.xy;
-          }
+          }else{if(d.schcode === '00000'){
+               d.xy_origin = [20,20];
+                console.log('out of state');
+               //};
+               //if(d.schcode === /190$/){
+                  //console.log('190 school');
+                  //d.xy_dest = [20,700];
+               //}
+                }else{d.xy_origin = [20,700];}
+               }
         //else{
           //  d.xy_origin = [20,700];
           //}
           return d;
           });
+  
+  const entersBySch = nest()
+    .key(d => d.schcode_dest)
+    .entries(enters1718);
+  
+  console.log(entersBySch);
   
   return(enters1718);
   
@@ -135,12 +159,14 @@ function networkSetup(data){
 
 
 
-// returns xy, added to the objects for an array data, with object property lndLat, baed on rootDom specifications
+// returns xy, added to the objects for an array data, with object property lndLat, based on rootDom specifications
 
 function myProjection(rootDom,data,myScale){
   const w = rootDom.clientWidth;
   const h = rootDom.clientHeight;
 
+  //console.log(data);
+  
   const projection_tm = geoMercator()
 
   const minLng = min(data, function(d){
@@ -162,9 +188,8 @@ function myProjection(rootDom,data,myScale){
     //.center(289,127)
     //.translate([w/2,h/2]);
 
-  data.forEach(d=>
-     {d.xy = projection(d.lngLat);
-     }
+  data.forEach(d => {d.xy = projection(d.lngLat);
+                    }
   );
   
   return(data);

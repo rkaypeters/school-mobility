@@ -55,17 +55,17 @@ LEA_CODE,LEA_NAME,LEA_NAME16,LEA_NAME8,SUPTADDRL1,SUPTADDRL2,SUPTADDRL3,SUPTCITY
 64,Village Green Virtual,Village Green Vi,Village,135 Weybosset Street, , ,Providence,RI,02903,Y,09,12,2
 67,DCYF,DCYF,DCYF,57 Power Rd., , ,Cranston,RI,02920,Y,06,12,3
 68,The Hope Academy,The Hope Academy,Hope Aca,1000 Eddy Street, , ,Providence,RI,02905,Y,KG,08,2
-75,Northern RI Collaborative,Northern RI Coll,Northern,640 George Washington Hwy,"Bldg. B, Suite 200", ,Lincoln,RI,02865,Y,PK,12,3
-76,West Bay Collaborative,West Bay Collabo,West Bay, 144 Bignall Street, , ,Warwick,RI,02888,Y,KG,12,3
-77,East Bay Educational Collaborative,East Bay Educati,East Bay,317 Market Street, , ,Warren,RI,02885,Y,KG,12,3
+75,Northern RI Collaborative,Northern RI Coll,Northern,640 George Washington Hwy,"Bldg. B, Suite 200", ,Lincoln,RI,02865,Y,PK,12,9
+76,West Bay Collaborative,West Bay Collabo,West Bay, 144 Bignall Street, , ,Warwick,RI,02888,Y,KG,12,9
+77,East Bay Educational Collaborative,East Bay Educati,East Bay,317 Market Street, , ,Warren,RI,02885,Y,KG,12,9
 79,RISE Prep Mayoral Academy,RISE Prep Mayora,RISE,1 Social Street, , ,Woonsocket,RI,02895,Y,KF,08,2
-81,Charette Charter,Charette Charter,Charette,335 Westminster St., , ,Providence,RI,02903,Y,09,10,2
-82,Wangari Maathai Community School,Wangari Maathai,Wangari,10 Dorrance Street,Suite 800, ,Providence,RI,02903,Y,KF,08,2
+81,Charette Charter,Charette Charter,Charette,335 Westminster St., , ,Providence,RI,02903,Y,09,10,0
+82,Wangari Maathai Community School,Wangari Maathai,Wangari,10 Dorrance Street,Suite 800, ,Providence,RI,02903,Y,KF,08,0
 96,Bristol Warren,Bristol Warren,Bris War,151 State Street, , ,Bristol,RI,02809,Y,PK,12,1
 97,Exeter-West Greenwich,Exeter-W. Greenw,Ex-W. G.,940 Nooseneck Hill Road, , ,West Greenwich,RI,02817,Y,PK,12,1
 98,Chariho,Chariho,Chariho,455A Switch Road, , ,Wood River Junction,RI,02894,Y,PK,12,1
 99,Foster-Glocester,Foster-Glocester,Fos-Gloc,91 Anan Wade Road, , ,North Scituate,RI,02857,Y,06,12,1
-66,Dept of Corrections,Corrections,Correct,"18 Wilma Schesler Lane, D", , ,Cranston,RI,02920,Y, , ,3
+66,Dept of Corrections,Corrections,Correct,"18 Wilma Schesler Lane, D", , ,Cranston,RI,02920,Y, , ,9
 70,Out-of-State Sped School,Out-of-State, , , , , , , ,Y, , ,9
 74,RIDE Collaborators,RIDECollaborator,RIColl, , , , , , ,Y, , ,9
 80,Outplacement SpedSchools,Outplacement Sch,OutSch, , , , , , ,Y, , ,9

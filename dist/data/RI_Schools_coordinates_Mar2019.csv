@@ -1,4 +1,7 @@
 SCH_CODE,DISTCODE,SCH_NAME,School_address_for_geocode,SCH_CITY,SCH_STATE,SCH_ZIP,SCH_STATUS,SCH_LEVEL_code,school_level,School_type_code,School_type,geocode_amentity,Longitude_geocode,Latitude_geocode,Updated,updated_by
+35124,35,Randall Holden School,61 Hoxsie Avenue,Warwick,RI,02889,,20,Elementary,1,Public,building,-71.409249,41.73147,4/17/19,RPeters
+35129,35,John Wilkes School,50 Child Lane,Warwick,RI,02886,,20,Elementary,1,Public,building,-71.43441,41.706451,4/17/19,RPeters
+35129,35,Francis School,325 Maintonomo Drive,Warwick,RI,02888,,20,Elementary,1,Public,building,-71.405027,41.743665,4/17/19,RPeters
 01103,01,Primrose Hill School,60 Middle Highway,Barrington,RI,02806,1,12,PK-3,1,Public,building,-71.32978,41.75371,3/22/19,MJJames
 01104,01,Nayatt School,400 Nayatt Road,Barrington,RI,02806,1,12,PK-3,1,Public,building,-71.30619,41.72988,3/22/19,MJJames
 01105,01,Hampden Meadows School,297 New Meadow Road,Barrington,RI,02806,1,20,Elementary,1,Public,building,-71.30146,41.75386,3/22/19,MJJames
@@ -602,10 +605,12 @@ SCH_CODE,DISTCODE,SCH_NAME,School_address_for_geocode,SCH_CITY,SCH_STATE,SCH_ZIP
 39903,,Hope Street School,Hope Street,Woonsocket,RI,02895,1,10,PK Only,9,Other,highway,-71.52068,41.99972,3/22/19,MJJames
 39907,,Cass Park Head Start,350 Newland Avenue,Woonsocket,RI,02895,1,10,PK Only,9,Other,place,-71.48929,42.00254,3/22/19,MJJames
 48601,48,Highlander Elementary Charter School,42 Lexington Avenue,Providence,RI,02907,1,20,Elementary,6,Charter,place,-71.41821,41.7994,3/22/19,MJJames
+28601,48,Highlander Elementary Charter School,42 Lexington Avenue,Providence,RI,02907,1,20,Elementary,6,Charter,place,-71.41821,41.7994,4/17/19,RPeters
 48602,48,Highlander Secondary Charter School,360 Market Street,Warren,RI,02885,1,40,Secondary,6,Charter,place,-71.27288,41.74592,3/22/19,MJJames
 51601,51,Paul Cuffee Lower School,459 Promenade Street,Providence,RI,02908,1,20,Elementary,6,Charter,place,-71.4276,41.82915,3/22/19,MJJames
 51602,51,Paul Cuffee Middle School,30 Barton Street,Providence,RI,02909,1,30,Middle,6,Charter,building,-71.43649,41.81706,3/22/19,MJJames
 51603,51,Paul Cuffee Upper School,544 Elmwood Avenue,Providence,RI,02907,1,40,Secondary,6,Charter,place,-71.42629,41.79795,3/22/19,MJJames
+28602,51,Paul Cuffee Charter School,459 Promenade Street,Providence,RI,02908,1,20,Elementary,6,Charter,place,-71.4276,41.82915,4/17/19,RPeters
 81601,81,Charette Charter School,335 Westminster St.,Providence,RI,02903,1,40,Secondary,6,Charter,place,-71.41426,41.82182,3/22/19,MJJames
 82190,82,Wangari Maathai Community School,10 Dorrance Street,Providence,RI,02903,1,22,Elementary/Middle,1,Public,place,-71.4121,41.82406,3/22/19,MJJames
 82601,82,Wangari Maathai Community School,10 Dorrance Street,Providence,RI,02903,1,22,Elementary/Middle,6,Charter,place,-71.4121,41.82406,3/22/19,MJJames

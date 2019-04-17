@@ -6,8 +6,7 @@ import {mobstabdataPromise,
         metadataPromise,
         geodataPromise,
         schEntersPromise,
-        leaMetadataPromise
-} from './data-import';
+        leaMetadataPromise} from './data-import';
 
 import {renderNetwork,
         renderNetworkUpdate,
@@ -36,9 +35,8 @@ Promise.all([ mobstabdataPromise,
   //console.log(entersdata);
   //console.log(metadataLEA);
     
-  
-  //console.log(formatEnters(metadataSch,mobstab,geodata,entersdata));
   const enters1718 = formatEnters(metadataSch,mobstab,geodata,entersdata);
+  //console.log(enters1718);
   
   /*const mobstab_sch = mobstab
       .filter(d => d.schname != '')
@@ -66,7 +64,7 @@ Promise.all([ mobstabdataPromise,
               .filter(d => d.source.schcode != '00000')//.filter(d => d.value != 1)
            );
   
-  districtDropDown(metadataLEA.filter(d => [1,2,3].includes(+d.leaType)),
+  districtDropdown(metadataLEA.filter(d => [1,2,3].includes(+d.leaType)),
                    '.dropdown',
                    nodesData,
                    linksData);
@@ -78,7 +76,16 @@ Promise.all([ mobstabdataPromise,
 )
 
 
-function districtDropDown(leaData,rootDom,nodes,links){
+/// Dropdown
+
+function districtDropdown(leaData,rootDom,nodes,links){
+  
+  leaData.sort(function(a,b){
+    if(a.distname < b.distname) {return -1;}
+    if(a.firstname > b.firstname) {return 1;}
+  })
+  
+  //console.log(leaData);
   
   const districtList = select(rootDom)
     .append('select');

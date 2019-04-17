@@ -20,4 +20,30 @@ function MakeDropdown(codeField,nameField){
   return exportFunction;
 }
 
-export default MakeDropdown;
+
+function districtDropdown(leaData,rootDom,nodes,links){
+  
+  ///doesn't work unless I fix the dispatch.
+  
+  console.log(leaData);
+  
+  const districtList = select(rootDom)
+    .append('select');
+  districtList.selectAll('option')
+    .data(leaData)
+    .enter()
+    .append('option')
+    .attr('value',d=> d.distcode)
+    .html(d => d.distname);
+  
+  districtList.on('change',function(){
+    const distcode = this.value;
+    globalDispatch.call('change:district',null,distcode,nodes,links);
+    
+  });
+
+  
+}
+
+
+export {MakeDropdown, districtDropdown};
