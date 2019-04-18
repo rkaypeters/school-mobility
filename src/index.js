@@ -35,11 +35,9 @@ Promise.all([ mobstabdataPromise,
   //console.log(entersdata);
   //console.log(metadataLEA);
     
-  console.log(geodata);
   const geoFilter = geodata.filter(d => [1,6,7].includes(+d.schType));
   
   const enters1718 = formatEnters(metadataSch,mobstab,geoFilter,entersdata);
-  //console.log(enters1718);
   
   /*const mobstab_sch = mobstab
       .filter(d => d.schname != '')
@@ -54,8 +52,8 @@ Promise.all([ mobstabdataPromise,
   const w = innerWidth;
   const h = innerHeight;
   
-  console.log(w);
-  console.log(h);
+  //console.log(w);
+  //console.log(h);
   
   select('.network')
     .attr('width',w)
@@ -119,14 +117,14 @@ function districtDropdown(leaData,rootDom,nodes,links){
 
 /// Global Dispatches
 
-const globalDispatch = dispatch('change:district');
+const globalDispatch = dispatch('change:district','select:school');
 
 globalDispatch.on('change:district', (distcode,nodesData,linksData) => {
 
   console.log(distcode);
   
   const filteredLinks = linksData.filter(d => d.target.distcode == distcode);
-  const projFiltLinks = adjustProjection(filteredLinks.filter(d => d.source.schcode != '00000'));
+  //const projFiltLinks = adjustProjection(filteredLinks.filter(d => d.source.schcode != '00000'));
   const [adjNodes,adjLinks] = adjustProjection2(nodesData,linksData,distcode);
   
   console.log(adjNodes);
@@ -142,7 +140,14 @@ globalDispatch.on('change:district', (distcode,nodesData,linksData) => {
               projFiltLinks
              );*/
   
-  renderNetworkUpdate2('.network',adjNodes,adjLinks,distcode);
+  renderNetworkUpdate2('.network',adjNodes,adjLinks,distcode,globalDispatch);
+  
+});
+
+globalDispatch.on('select:school', (schcode,nodesData,linksData) => {
+
+  console.log(schcode);
+  
   
 });
 

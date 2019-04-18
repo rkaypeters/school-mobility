@@ -20,6 +20,7 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
   const geo_tmp = geodata.map(d => [d.schcode,d]);
   const geoMap = new Map(geo_tmp);
   
+  //console.log(entersdata);
   
   const enters1718 = entersdata.filter(d => d.reportID ==77)
     .filter(d => d.schcode_dest != ' ')
@@ -38,22 +39,21 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
       d.mobRate = msd.mobRate1;
       return d;
     })
-    /*.map(d => {
-      if (d.schcode_origin != '00000' && d.schcode_origin != ' '){
-
-
-      const md = metaMap.get(d.schcode_origin);
-      /*if(md.distcode){
-        d.adminSite_origin = md.adminSite;
-        d.distcode_origin = md.distcode;
-        d.schname30_origin = md.schname30;
-        d.gradeCfg_origin = md.gradeCfg;
-      }
-      return d;*
-      console.log(md);
-      }
-    })*/
-
+    .map(d => {
+      //if (d.schcode_origin != '00000' && d.schcode_origin != ' '){
+      if (metaMap.get(d.schcode_origin)){
+        //console.log('step 1!');
+        const md = metaMap.get(d.schcode_origin);
+        if(md.distcode){
+          d.adminSite_origin = md.adminSite;
+          d.distcode_origin = md.distcode;
+          d.schname30_origin = md.schname30;
+          d.gradeCfg_origin = md.gradeCfg;
+        }
+        //return d;
+        //console.log(md);
+      } return d;
+      })
       .filter(d => d.adminSite_dest == 'N')
       .map(d => {
           const gd = geoMap.get(d.schcode_dest);
@@ -93,6 +93,8 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
           return d;
           });
   
+  console.log(enters1718);
+  
   const entersBySch = nest()
     .key(d => d.schcode_dest)
     .entries(enters1718);
@@ -122,7 +124,8 @@ function networkSetup(data){
         xy: d.xy_dest,
         totalEnters: newLink.value,
         adm: +d.adm,
-        mobRate: +d.mobRate
+        mobRate: +d.mobRate,
+        schname: d.schname30_dest
       }; 
 
       nodesData.set(d.schcode_dest,newNode);
@@ -138,6 +141,11 @@ function networkSetup(data){
         schcode: d.schcode_origin,
         xy: d.xy_origin,
         totalEnters: 0
+      }
+      if(d.distcode_origin){
+          newNode.distcode = d.distcode_origin;
+          newNode.adm = d.adm_origin;
+          newNode.schname = d.schname30_dest;
       };
       nodesData.set(d.shcode_origin,newNode);
       newLink.source = newNode;
@@ -166,8 +174,8 @@ function myProjection(rootDom,data){
   const wW = window.innerWidth;
   const wH = window.innerHeight;
 
-  console.log(wW);
-  console.log(data);
+  //console.log(wW);
+  //console.log(data);
   
   var w, h;
   
@@ -337,8 +345,20 @@ function adjustProjection2(nodesData,linksData,distcode){
   //console.log(nodesData);
   
   const minDNodes = 4;
-  const h = 1000;
-  const w = 750;//NEED TO ADJUST FOR FLEXIBILITY!
+  //const h = 1000;
+  //const w = 750;//NEED TO ADJUST FOR FLEXIBILITY!
+  const cW = window.innerWidth;
+  const cH = window.innerHeight;
+
+  var w, h;
+  
+  if(cW>=400){
+     w = cW;
+  }else{ w = 400;};
+  if(cH>=800){
+    h = cH-200;
+  }else{h = 600;};
+  
   const margin = 20;
   
   const nodesDataArray = Array.from(nodesData.values());

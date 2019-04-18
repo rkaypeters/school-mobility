@@ -164,10 +164,23 @@ function renderNetworkUpdate(rootDom,nodesData,linksData){
 
 }
 
-function renderNetworkUpdate2(rootDom,nodesData,linksData,distcode){
-  const w = rootDom.clientWidth;
+function renderNetworkUpdate2(rootDom,nodesData,linksData,distcode,dispatch){
+  //const w = rootDom.clientWidth; // these aren't working out for me; i'm getting much smaller blocks
+  //const h = rootDom.clientHeight;
 
   //console.log(nodesData);
+  
+  const cW = window.innerWidth;
+  const cH = window.innerHeight;
+
+  var w, h;
+  
+  if(cW>=400){
+     w = cW;
+  }else{ w = 400;};
+  if(cH>=800){
+    h = cH-200;
+  }else{h = 600;};
   
   const svg = select(rootDom)
     .selectAll('svg')
@@ -176,8 +189,8 @@ function renderNetworkUpdate2(rootDom,nodesData,linksData,distcode){
     .append('svg');
 
   const plot = svg.merge(svgEnter)
-    .attr('width', 750)
-    .attr('height', 1000);
+    .attr('width', w)
+    .attr('height', h);
   
   const nodes = plot.selectAll('.node')
     .data(nodesData, d => d.schcode);
@@ -207,6 +220,11 @@ function renderNetworkUpdate2(rootDom,nodesData,linksData,distcode){
     .attr('cy', d=>
           {if(d.xyNew){
             return d.xyNew[1]}});
+    
+  nodes.merge(nodesEnter).on('click', d=>{
+      dispatch.call('select:school',null,d.schcode)
+    });
+  
   
   const labels = plot.selectAll('.label')
     .data(nodesData, d=> d.schcode);
@@ -216,7 +234,7 @@ function renderNetworkUpdate2(rootDom,nodesData,linksData,distcode){
     .attr('class','label');
   
   labels.merge(labelsEnter)
-    .text(d => d.schcode)
+    .text(d => d.schname)
     .attr('x',d=>
           {if(d.xyNew){
             return d.xyNew[0]
