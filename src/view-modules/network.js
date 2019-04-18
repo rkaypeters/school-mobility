@@ -4,8 +4,21 @@ import {min,max,select,selectAll,scalePow,transition} from 'd3';
     // may add force layout stuff later (I think I can?) to spread stuff if needed, but it seems to not handle what I want specifically enough so doing it by scratch seems right for now. also might not be necessary.
 
 function renderNetwork(rootDom,nodesData,linksData){
-  const w = rootDom.clientWidth;
+  
+  const cW = window.innerWidth;
+  const cH = window.innerHeight;
 
+  var w, h;
+  
+  if(cW>=400){
+     w = cW;
+  }else{ w = 400;};
+  if(cH>=800){
+    h = cH-200;
+  }else{h = 600;};
+  
+  //console.log(w);
+  //console.log(h);
   
   const svg = select(rootDom)
     .selectAll('svg')
@@ -14,8 +27,8 @@ function renderNetwork(rootDom,nodesData,linksData){
     .append('svg');
 
   const plot = svg.merge(svgEnter)
-    .attr('width', 750)
-    .attr('height', 1000);
+    .attr('width', w)
+    .attr('height', h);
 
   const links = plot
     .selectAll('.link')

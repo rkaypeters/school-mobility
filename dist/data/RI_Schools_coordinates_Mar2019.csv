@@ -1,7 +1,7 @@
 SCH_CODE,DISTCODE,SCH_NAME,School_address_for_geocode,SCH_CITY,SCH_STATE,SCH_ZIP,SCH_STATUS,SCH_LEVEL_code,school_level,School_type_code,School_type,geocode_amentity,Longitude_geocode,Latitude_geocode,Updated,updated_by
 35124,35,Randall Holden School,61 Hoxsie Avenue,Warwick,RI,02889,,20,Elementary,1,Public,building,-71.409249,41.73147,4/17/19,RPeters
 35129,35,John Wilkes School,50 Child Lane,Warwick,RI,02886,,20,Elementary,1,Public,building,-71.43441,41.706451,4/17/19,RPeters
-35129,35,Francis School,325 Maintonomo Drive,Warwick,RI,02888,,20,Elementary,1,Public,building,-71.405027,41.743665,4/17/19,RPeters
+35125,35,Francis School,325 Maintonomo Drive,Warwick,RI,02888,,20,Elementary,1,Public,building,-71.405027,41.743665,4/17/19,RPeters
 01103,01,Primrose Hill School,60 Middle Highway,Barrington,RI,02806,1,12,PK-3,1,Public,building,-71.32978,41.75371,3/22/19,MJJames
 01104,01,Nayatt School,400 Nayatt Road,Barrington,RI,02806,1,12,PK-3,1,Public,building,-71.30619,41.72988,3/22/19,MJJames
 01105,01,Hampden Meadows School,297 New Meadow Road,Barrington,RI,02806,1,20,Elementary,1,Public,building,-71.30146,41.75386,3/22/19,MJJames

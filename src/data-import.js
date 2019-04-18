@@ -104,7 +104,8 @@ function parseGeodata(d){
         zip: d.SCH_ZIP,
         //lng: d.Longitude_geocode,
         //lat: d.Latitude_geocode
-        lngLat: [+d.Longitude_geocode, +d.Latitude_geocode]
+        lngLat: [+d.Longitude_geocode, +d.Latitude_geocode],
+        schType: d.School_type_code
     }
     
     delete d.DISTCODE;
@@ -113,7 +114,6 @@ function parseGeodata(d){
     delete d.SCH_STATUS;
     delete d.SCH_LEVEL_code;
     delete d.school_level;
-    delete d.School_type_code;
     delete d.School_type;
     delete d.Update;
     delete d.updated_by;

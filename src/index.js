@@ -35,7 +35,10 @@ Promise.all([ mobstabdataPromise,
   //console.log(entersdata);
   //console.log(metadataLEA);
     
-  const enters1718 = formatEnters(metadataSch,mobstab,geodata,entersdata);
+  console.log(geodata);
+  const geoFilter = geodata.filter(d => [1,6,7].includes(+d.schType));
+  
+  const enters1718 = formatEnters(metadataSch,mobstab,geoFilter,entersdata);
   //console.log(enters1718);
   
   /*const mobstab_sch = mobstab
@@ -48,8 +51,16 @@ Promise.all([ mobstabdataPromise,
   })
       .filter(d => d.adminSite == 'N');*/
 
-
-  //const enters1718Network = enters1718.filter(d =>d.gradeCfg_dest == 'H').filter(d => d.schcode_dest!= '00000').filter(d => d.schcode_origin != '00000');
+  const w = innerWidth;
+  const h = innerHeight;
+  
+  console.log(w);
+  console.log(h);
+  
+  select('.network')
+    .attr('width',w)
+    .attr('height',h);
+  
 
   const [nodesData,linksData] = networkSetup(enters1718);
   

@@ -5,7 +5,7 @@ import {min, max, geoMercator,scaleLinear,select,nest,key,entries} from 'd3';
 function formatEnters(metadataSch,mobstab,geodata,entersdata){
   
   //console.log(geodata);
-  console.log(entersdata);
+  //console.log(entersdata);
   
   const meta_tmp = metadataSch.map(d => [d.schcode,d]);
   const metaMap = new Map(meta_tmp);
@@ -14,7 +14,7 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
   const mobstabMap = new Map(mobstab_tmp);
 
   
-  myProjection(select('.network').node(),geodata,45000); //still need to set up network DOM dimensions
+  myProjection(select('.network').node(),geodata); //still need to set up network DOM dimensions
     //.push({schcode: '00000',xy: [20,20]});
 
   const geo_tmp = geodata.map(d => [d.schcode,d]);
@@ -77,7 +77,7 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
           if(go){
               d.lngLat_origin = go.lngLat;
               d.xy_origin = go.xy;
-          }else{if(d.schcode === '00000'){
+          }else{if(d.schcode_origin === '00000'){
                d.xy_origin = [20,20];
                 console.log('out of state');
                //};
@@ -97,7 +97,7 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
     .key(d => d.schcode_dest)
     .entries(enters1718);
   
-  console.log(entersBySch);
+  //console.log(entersBySch);
   
   return(enters1718);
   
@@ -161,11 +161,29 @@ function networkSetup(data){
 
 // returns xy, added to the objects for an array data, with object property lndLat, based on rootDom specifications
 
-function myProjection(rootDom,data,myScale){
-  const w = rootDom.clientWidth;
-  const h = rootDom.clientHeight;
+function myProjection(rootDom,data){
 
+  const wW = window.innerWidth;
+  const wH = window.innerHeight;
+
+  console.log(wW);
+  console.log(data);
+  
+  var w, h;
+  
+  if(wW>=400){
+     w = wW;
+  }else{ w = 400;};
+  if(wH>=800){
+    h = wH-200;
+  }else{h = 600;};
+  
+  
+  const myScale = 50*h;
+  
   //console.log(data);
+  //console.log(w);
+  //console.log(h);
   
   const projection_tm = geoMercator()
 
@@ -184,7 +202,7 @@ function myProjection(rootDom,data,myScale){
 
   const projection = geoMercator()
     .scale(myScale)
-    .center([(maxLng+minLng)/2,(maxLat+minLat)/2+.2])
+    .center([(maxLng+minLng-.35)/2,(maxLat+minLat)/2+.2])
     //.center(289,127)
     //.translate([w/2,h/2]);
 
