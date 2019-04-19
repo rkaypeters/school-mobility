@@ -9,14 +9,14 @@ import {mobstabdataPromise,
         leaMetadataPromise} from './data-import';
 
 import {renderNetwork,
-        renderNetworkUpdate,
-        renderNetworkUpdate2} from './view-modules/network';
+        renderNetworkUpdate} from './view-modules/network';
 import MakeDropdown from './view-modules/dropdowns';
 import {networkSetup,
         myProjection,
         adjustProjection,
         adjustProjection2,
         formatEnters} from './data-manipulation';
+import renderStream from './view-modules/streamgraph';
 
 
 /// Main
@@ -34,6 +34,26 @@ Promise.all([ mobstabdataPromise,
   //console.log(geodata);
   //console.log(entersdata);
   //console.log(metadataLEA);
+  
+  
+  
+  
+  
+  //// Testing stream ////
+  
+    const entersDataSch = entersdata
+      .filter(d => d.schcode_dest == '96107')
+      .filter(d => d.schcode_origin != '96107')
+    
+    //console.log(entersDataSch);
+    
+    renderStream(entersDataSch);
+  
+  
+  /////end of testing///
+  
+  
+  
     
   const geoFilter = geodata.filter(d => [1,6,7].includes(+d.schType));
   
@@ -49,7 +69,7 @@ Promise.all([ mobstabdataPromise,
   })
       .filter(d => d.adminSite == 'N');*/
 
-  const w = innerWidth;
+  /*const w = innerWidth;
   const h = innerHeight;
   
   //console.log(w);
@@ -57,14 +77,14 @@ Promise.all([ mobstabdataPromise,
   
   select('.network')
     .attr('width',w)
-    .attr('height',h);
+    .attr('height',h);*/
   
 
   const [nodesData,linksData] = networkSetup(enters1718);
   
   
-  console.log(nodesData);
-  console.log(linksData);
+  //console.log(nodesData);
+  //console.log(linksData);
 
   
   renderNetwork('.network',
@@ -77,7 +97,6 @@ Promise.all([ mobstabdataPromise,
                    '.dropdown',
                    nodesData,
                    linksData);
-  
   
   
 }
@@ -123,30 +142,37 @@ globalDispatch.on('change:district', (distcode,nodesData,linksData) => {
 
   console.log(distcode);
   
-  const filteredLinks = linksData.filter(d => d.target.distcode == distcode);
-  //const projFiltLinks = adjustProjection(filteredLinks.filter(d => d.source.schcode != '00000'));
   const [adjNodes,adjLinks] = adjustProjection2(nodesData,linksData,distcode);
   
   console.log(adjNodes);
   console.log(adjLinks);
   
-  //console.log(filteredLinks);
-  //console.log(projFiltLinks);
   
-  /*renderNetworkUpdate('.network',
-              nodesData,
-              //filteredLinks
-                //.filter(d => d.source.schcode != '00000')//.filter(d => d.value != 1)
-              projFiltLinks
-             );*/
-  
-  renderNetworkUpdate2('.network',adjNodes,adjLinks,distcode,globalDispatch);
+  renderNetworkUpdate('.network',adjNodes,adjLinks,distcode,globalDispatch);
   
 });
+
 
 globalDispatch.on('select:school', (schcode,nodesData,linksData) => {
 
   console.log(schcode);
+  
+  Promise.all([ metadataPromise,
+             schEntersPromise,
+             leaMetadataPromise])
+  .then(([metadataSch,entersdata,metadataLEA]) => {
+  
+  //const entersData = schEntersPromise.then(result =>{
+    
+    const entersDataSch = entersdata
+      .filter(d => d.schcode_dest == schcode)
+      .filter(d => d.schcode_origin != schcode)
+    
+    console.log(entersDataSch);
+    
+    renderStream(entersDataSch);
+    
+  });
   
   
 });
@@ -197,73 +223,4 @@ function drawBarChart(rootDom,data){
     //console.loge(nodes);
     
 }
-
-
-
-
-///First map - just locations
-
-function drawMap(rootDom,data){
-    const w = rootDom.clientWidth;
-    const h = rootDom.clientHeight;
-    
-    const projection_tm = geoMercator()
-    
-    const minLng = min(data, function(d){
-        if(d.lngLat){
-            return d.lngLat[0];
-        }
-    })
-    const maxLng = max(data, function(d){
-        if(d.lngLat){
-            return d.lngLat[0];
-        }
-    })
-    const minLat = min(data, function(d){
-        if(d.lngLat){
-            return d.lngLat[1];
-        }
-    })
-    const maxLat = max(data, function(d){
-        if(d.lngLat){
-            return d.lngLat[1];
-        }
-    })
-    
-    const projection = geoMercator()
-        .scale(45000)
-        .center([(maxLng+minLng)/2,(maxLat+minLat)/2+.2])
-        //.center(289,127)
-        .translate([w/2,h/2]);
-    
-    const plot = select(rootDom)
-        .append('svg')
-        .attr('width', w)
-        .attr('height', 1000)
-        .append('g');
-    
-    const nodes = plot.selectAll('.node')
-        .data(data,d => d.key);
-    const nodesEnter = nodes.enter().append ('g')
-        .attr('class','node');
-    nodesEnter.append('circle');
-    
-    nodes.merge(nodesEnter)
-        .filter(d => d.lngLat)
-		.attr('transform', d => {
-			const xy = projection(d.lngLat);
-			return `translate(${xy[0]}, ${xy[1]})`;
-            console.log(xy[0] + ' ' + xy[1]);
-        });
-    nodes.merge(nodesEnter)
-        //.attr('x', d => d.mobRate1)
-        .select('circle')
-		//.attr('r', d => scaleSize(d.total))
-        .attr('r', 10)
-		.style('fill-opacity', .3)
-		.style('stroke', '#000')
-		.style('stroke-width', '1px')
-		.style('stroke-opacity', .2) ;
-}
-
 

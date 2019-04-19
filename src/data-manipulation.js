@@ -79,7 +79,7 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
               d.xy_origin = go.xy;
           }else{if(d.schcode_origin === '00000'){
                d.xy_origin = [20,20];
-                console.log('out of state');
+                //console.log('out of state');
                //};
                //if(d.schcode === /190$/){
                   //console.log('190 school');
@@ -93,7 +93,7 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
           return d;
           });
   
-  console.log(enters1718);
+  //console.log(enters1718);
   
   const entersBySch = nest()
     .key(d => d.schcode_dest)
