@@ -32,7 +32,7 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
       }
     });
     if(count == 0){
-      console.log(d.schcode);
+      //console.log(d.schcode);
       enters_tmp.push({
         reportID: '77',
         schcode_dest: d.schcode,
@@ -42,7 +42,7 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
     
   });
   
-  console.log(enters_tmp);
+  //console.log(enters_tmp);
   
   
   const enters1718 = enters_tmp
@@ -510,7 +510,7 @@ function adjustProjection2(nodesData,linksData,distcode){
 function adjustProjection3(nodesData,linksData,distcode){
   
   console.log(nodesData);
-  console.log(distcode);
+  //console.log(distcode);
   
   const minDNodes = 3;
   //const h = 1000;

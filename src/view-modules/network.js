@@ -1,4 +1,4 @@
-import {min,max,select,selectAll,scalePow,transition} from 'd3';  
+import {min,max,select,selectAll,scalePow,scaleLinear,transition} from 'd3';  
 
 
   // may add force layout stuff later (I think I can?) to spread stuff if needed, but it seems to not handle what I want specifically enough so doing it by scratch seems right for now. also might not be necessary.
@@ -112,7 +112,85 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
   
   
   
+  // Links
+  
+  const links = plot
+    .selectAll('.link')
+    .data(linksData);
+  const linksEnter = links.enter().append('line').attr('class','link')
+    .style('stroke-opacity',0.05)
+    .style('stroke-width','1px')
+    .style('stroke','black');
+  
+  links.merge(linksEnter)
+    .transition()
+    .duration(1200)
+    .attr('x1', d=> {
+      if(d.target.xyNew){
+          return d.target.xyNew[0];
+      }else{
+          return 0;
+      }
+    })
+    .attr('y1', d=> {
+      if(d.target.xyNew){
+          return d.target.xyNew[1];
+      }else{
+          return 0;
+      }
+    })
+    .attr('x2', d=> {
+      if(d.source.xyNew){
+          return d.source.xyNew[0];
+      }else{
+          return 0;
+      }
+    })
+    .attr('y2', d=> {
+      if(d.source.xyNew){
+          return d.source.xyNew[1];
+      }else{
+          return 0;
+      }
+    })
+    .style('stroke-width', d=>{
+    return ((d.value/4).toString() + 'px');
+    })
+    .style('stroke-opacity',d => {
+      if(d.target.distcode ==distcode){
+        d.value*d.value * 0.03;
+      }else{return '0'}});
+    //.style('stroke', d =>{
+      //if(d.target.distcode == distcode){
+        //return 'green';
+      //}else{return 'white'}
+  //});
+  //.style('stroke-opacity',d => {return scaleWeight(d.value)});
+  
+  console.log(links.merge(linksEnter));
+  
+  links.exit().remove();
+  
+  
+  
   // Nodes
+  
+  
+  //var colorGenerator = 
+    
+  var scaleR = scaleLinear().domain([20,50]).range([234,184]);
+  var scaleG = scaleLinear().domain([20,50]).range([206,115]);
+  var scaleB = scaleLinear().domain([20,50]).range([182,53]);
+  var scaleL = scaleLinear().domain([0,60]).range([95,40]);
+  var scaleS = scaleLinear().domain([0,60]).range([50,100]);
+  
+  //console.log('rgb(' + Math.round(scaleR(75)) + ',' + Math.round(scaleG(75)) + ',' + Math.round(scaleB(75)) + ')');
+  
+  /*var colorGenerator = (d =>
+                        'rgb(' + Math.round(scaleR(d)) + ',' + Math.round(scaleG(d)) + ',' + Math.round(scaleB(d)) + ')');*/
+  var colorGenerator = (d => 'hsl(23,' + Math.round(scaleS(d)) +'%,' + 
+                        Math.round(scaleL(d))
+                          + '%)');
   
   const nodes = plot.selectAll('.node')
     .data(nodesData, d => d.schcode);
@@ -126,11 +204,11 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
     .duration(1500)
     //.attr('r', d=>
          //Math.sqrt(d.totalEnters + 4)*2)
-    .attr('r',d => Math.sqrt(d.adm + 16))
-    .style('fill-opacity', .7)
+    .attr('r',d => Math.sqrt(d.adm + 4))
+    .style('fill-opacity', .9)
     .style('fill', d => {
       if(d.distcode ==distcode){
-        return '#87C3CC'
+        return colorGenerator(d.mobRate);
       }else{return '#DCDCDC'}
     })
     .style('stroke-width', '1px')
@@ -192,68 +270,6 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
     .attr('y', d=>
           {if(d.xyNew){
             return d.xyNew[1]}});
-  
-  
-  // Links
-  
-  const links = plot
-    .selectAll('.link')
-    .data(linksData);
-    //.transition();
-  const linksEnter = links.enter().append('line').attr('class','link')
-    .style('stroke-opacity',0.05)
-    .style('stroke-width','1px')
-    .style('stroke','black');
-  
-  links.merge(linksEnter)
-    .transition()
-    .duration(1200)
-    .attr('x1', d=> {
-      if(d.target.xyNew){
-          return d.target.xyNew[0];
-      }else{
-          return 0;
-      }
-    })
-    .attr('y1', d=> {
-      if(d.target.xyNew){
-          return d.target.xyNew[1];
-      }else{
-          return 0;
-      }
-    })
-    .attr('x2', d=> {
-      if(d.source.xyNew){
-          return d.source.xyNew[0];
-      }else{
-          return 0;
-      }
-    })
-    .attr('y2', d=> {
-      if(d.source.xyNew){
-          return d.source.xyNew[1];
-      }else{
-          return 0;
-      }
-    })
-    .style('stroke-width', d=>{
-    return ((d.value/4).toString() + 'px');
-    })
-    .style('stroke-opacity',d => {
-      if(d.target.distcode ==distcode){
-        d.value*d.value * 0.03;
-      }else{return '0'}});
-    //.style('stroke', d =>{
-      //if(d.target.distcode == distcode){
-        //return 'green';
-      //}else{return 'white'}
-  //});
-  //.style('stroke-opacity',d => {return scaleWeight(d.value)});
-  
-  console.log(links.merge(linksEnter));
-  
-  links.exit().remove();
-  
 
   
 
