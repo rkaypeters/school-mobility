@@ -374,7 +374,7 @@ function adjustProjection2(nodesData,linksData,distcode){
   //var minX, maxX, minY, maxY;
   
   if (filteredNodes.length >= minDNodes){
-    console.log('greater than D');
+    //console.log('greater than D');
     
     /*minX = min(filteredNodes, d => d.xy[0]);
     maxX = max(filteredNodes, d => d.xy[0]);
@@ -405,7 +405,7 @@ function adjustProjection2(nodesData,linksData,distcode){
   
   
   if(yProportion < xProportion){
-    console.log('X is the limitation');
+    //console.log('X is the limitation');
     
     var scaleX = scaleLinear()
       .domain([minX,maxX])
@@ -419,7 +419,7 @@ function adjustProjection2(nodesData,linksData,distcode){
       .range([h/2-3*yNewRange/4,h/2+3*yNewRange/4]);
     
   }else{
-    console.log('Y is the limitation');
+    //console.log('Y is the limitation');
     
     var scaleY = scaleLinear()
       .domain([minY,maxY])

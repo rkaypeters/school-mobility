@@ -85,7 +85,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
 
   //console.log(nodesData);
   
-  const cW = window.innerWidth;
+  /*const cW = window.innerWidth;
   const cH = window.innerHeight;
 
   var w, h;
@@ -95,7 +95,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
   }else{ w = 400;};
   if(cH>=800){
     h = cH-200;
-  }else{h = 600;};
+  }else{h = 600;};*/
   
   
   // Overall svg
@@ -106,9 +106,9 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
   const svgEnter = svg.enter()
     .append('svg');
 
-  const plot = svg.merge(svgEnter)
-    .attr('width', w)
-    .attr('height', h);
+  const plot = svg.merge(svgEnter);
+    //.attr('width', w)
+    //.attr('height', h);
   
   
   
