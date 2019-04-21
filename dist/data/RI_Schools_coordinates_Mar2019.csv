@@ -614,10 +614,10 @@ SCH_CODE,DISTCODE,SCH_NAME,School_address_for_geocode,SCH_CITY,SCH_STATE,SCH_ZIP
 81601,81,Charette Charter School,335 Westminster St.,Providence,RI,02903,1,40,Secondary,6,Charter,place,-71.41426,41.82182,3/22/19,MJJames
 82190,82,Wangari Maathai Community School,10 Dorrance Street,Providence,RI,02903,1,22,Elementary/Middle,1,Public,place,-71.4121,41.82406,3/22/19,MJJames
 82601,82,Wangari Maathai Community School,10 Dorrance Street,Providence,RI,02903,1,22,Elementary/Middle,6,Charter,place,-71.4121,41.82406,3/22/19,MJJames
-96104,96,Guiteras School,35 Washington Street,Bristol,RI,02809,1,20,Elementary,1,Public,place,-71.39756,41.75931,3/22/19,MJJames
-96105,96,Colt Andrews School,570-574 Hope Street,Bristol,RI,02809,1,20,Elementary,1,Public,place,-71.39855,41.84214,3/22/19,MJJames
+96104,96,Guiteras School,35 Washington Street,Bristol,RI,02809,1,20,Elementary,1,Public,place,-71.27683,41.677331,4/21/19,RPeters
+96105,96,Colt Andrews School,574 Hope Street,Bristol,RI,02809,1,20,Elementary,1,Public,place,-71.276238,41.672495,4/21/19,RPeters
 96106,96,Rockwell School,1225 Hope Street,Bristol,RI,02809,1,50,PK-3/Elementary,1,Public,place,-71.27953,41.69871,3/22/19,MJJames
-96107,96,Mt. Hope High School,199 Chestnut Street,Bristol,RI,02809,1,40,Secondary,1,Public,place,-71.43537,41.75038,3/22/19,MJJames
+96107,96,Mt. Hope High School,199 Chestnut Street,Bristol,RI,02809,1,40,Secondary,1,Public,place,-71.268682,41.6874,4/21/19,RPeters
 96112,96,Kickemuit Middle School,525 Child Street,Warren,RI,02885,1,30,Middle,1,Public,place,-71.25981,41.73017,3/22/19,MJJames
 96113,96,Hugh Cole School,50 Asylum Road,Warren,RI,02885,1,50,PK-3/Elementary,1,Public,amenity,-71.25396,41.72563,3/22/19,MJJames
 96114,77,East Bay Educational Collaborative,317 Market Street,Warren,RI,02885,1,54,Elementary/Secondary,1,Public,place,-71.27387,41.73966,3/22/19,MJJames

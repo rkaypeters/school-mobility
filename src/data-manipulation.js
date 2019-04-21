@@ -342,7 +342,8 @@ function adjustProjection(data){
 
 function adjustProjection2(nodesData,linksData,distcode){
   
-  //console.log(nodesData);
+  console.log(nodesData);
+  console.log(distcode);
   
   const minDNodes = 4;
   //const h = 1000;
@@ -481,4 +482,169 @@ function adjustProjection2(nodesData,linksData,distcode){
 }
 
 
-export {networkSetup,myProjection,adjustProjection,adjustProjection2,formatEnters};
+
+
+
+
+function adjustProjection3(nodesData,linksData,distcode){
+  
+  console.log(nodesData);
+  console.log(distcode);
+  
+  const minDNodes = 2;
+  //const h = 1000;
+  //const w = 750;//NEED TO ADJUST FOR FLEXIBILITY!
+  const cW = window.innerWidth;
+  const cH = window.innerHeight;
+
+  var w, h;
+  
+  if(cW>=400){
+     w = cW;
+  }else{ w = 400;};
+  if(cH>=800){
+    h = cH-200;
+  }else{h = 600;};
+  
+  const margin = 20;
+  
+  const nodesDataArray = Array.from(nodesData.values());
+  
+  //console.log(nodesDataArray);
+  
+  var filteredNodes = nodesDataArray.filter(d => d.distcode == distcode);
+  //const filteredLinks = linksData.filter(d => d.target.distcode == distcode);
+  
+  //console.log(filteredNodes);
+  //console.log(filteredLinks);
+  
+  //var minX, maxX, minY, maxY;
+  
+  if (filteredNodes.length >= minDNodes){
+    //console.log('greater than D');
+    
+    /*minX = min(filteredNodes, d => d.xy[0]);
+    maxX = max(filteredNodes, d => d.xy[0]);
+    minY = min(filteredNodes, d => d.xy[1]);
+    maxY = max(filteredNodes, d => d.xy[1]);
+    
+    console.log(minY);
+    console.log(maxY);*/
+    
+  }else{
+    console.log('less than D - edit filtered Nodes now');
+    
+    const filteredLinks = linksData.filter(d => d.target.distcode == distcode);
+    
+    var nodes = [];
+    console.log(filteredLinks);
+    
+    filteredLinks.forEach(d => {
+      //console.log(d.source.schcode);
+      if(!nodes.includes(d.source.schcode)){nodes.push(d.source.schcode)};
+      if(!nodes.includes(d.target.schcode)){nodes.push(d.target.schcode)};
+    });
+    
+    console.log(nodes);
+    filteredNodes = nodesDataArray.filter(d => nodes.includes(d.schcode));
+
+    //filteredNodes = nodesDataArray.filter(d=>)
+    
+  };
+  
+  console.log(filteredNodes);
+  
+  
+  var minX = min(filteredNodes, d => d.xy[0]);
+  var maxX = max(filteredNodes, d => d.xy[0]);
+  var minY = min(filteredNodes, d => d.xy[1]);
+  var maxY = max(filteredNodes, d => d.xy[1]);
+    
+  //console.log(minY);
+  //console.log(maxY);
+  
+  const yProportion = (maxY - minY)/(h - 2*margin);
+  const xProportion = (maxX - minX)/(w - 2*margin);
+  
+  //console.log(yProportion);
+  //console.log(xProportion);
+  
+  
+  if(yProportion < xProportion){
+    //console.log('X is the limitation');
+    
+    var scaleX = scaleLinear()
+      .domain([minX,maxX])
+      .range([w/8,7*w/8]);
+    
+    var yNewRange = (maxY-minY)*3*w/(4*(maxX-minX));
+    //console.log(yNewRange);
+    
+    var scaleY = scaleLinear()
+      .domain([minY,maxY])
+      .range([h/2-3*yNewRange/4,h/2+3*yNewRange/4]);
+    
+  }else{
+    //console.log('Y is the limitation');
+    
+    var scaleY = scaleLinear()
+      .domain([minY,maxY])
+      .range([h/8,7*h/8]);
+    
+    var xNewRange = (maxX-minX)*3*h/(4*(maxY-minY));
+    //console.log(xNewRange);
+    
+    var scaleX = scaleLinear()
+      .domain([minX,maxX])
+      .range([w/2-3*xNewRange/4,w/2+3*xNewRange/4]);
+    
+  }
+  
+  
+  nodesDataArray.forEach(d =>{
+    
+    if(d.xy){
+      const newX = scaleX(d.xy[0]);
+      const newY = scaleY(d.xy[1]);
+      
+      d.xyNew = [newX,newY];
+    }else{
+      d.xyNew = [20,20];
+    };
+    
+  });
+  
+  //console.log(nodesDataArray);
+  
+  const nodes_tmp = nodesDataArray.map(d => {
+    return [d.schcode, d]
+  });
+  const newNodesMap = new Map(nodes_tmp);
+  
+  newNodesMap.set('00000',{xyNew:[20,20]});
+  
+  //console.log(newNodesMap);
+  
+  linksData.map(d =>{
+    if(newNodesMap.get(d.source.schcode)){
+      const mS = newNodesMap.get(d.source.schcode);
+      d.source.xyNew = mS.xyNew;
+      return d;
+    }
+    
+    if(newNodesMap.get(d.target.schcode)){
+      const mT = newNodesMap.get(d.target.schcode);
+      d.target.xyNew = mT.xyNew;
+      return d;
+    }
+    
+  })
+  
+  //console.log(linksData);
+  
+  return([nodesDataArray,linksData]);
+  
+}
+
+
+export {networkSetup,myProjection,adjustProjection,adjustProjection2,adjustProjection3,formatEnters};

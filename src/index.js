@@ -15,6 +15,7 @@ import {networkSetup,
         myProjection,
         adjustProjection,
         adjustProjection2,
+        adjustProjection3,
         formatEnters} from './data-manipulation';
 import renderStream from './view-modules/streamgraph';
 
@@ -179,7 +180,7 @@ globalDispatch.on('change:district', (distcode,nodesData,linksData) => {
 
   //console.log(distcode);
   
-  const [adjNodes,adjLinks] = adjustProjection2(nodesData,linksData,distcode);
+  const [adjNodes,adjLinks] = adjustProjection3(nodesData,linksData,distcode);
   
   //console.log(adjNodes);
   //console.log(adjLinks);
