@@ -17,14 +17,88 @@ function renderStream(data){
 			.key(d => d.origin_type)
 			.entries(data);
   
-  const originDataRollup = nest()
+  var originDataRollup = nest()
     .key(d => d.origin_type)
     .key(d => d.reportID)
     .rollup(function(v) { return sum(v, function(d) { return d.enters; }); })
     .entries(data);
   
-  console.log(originData);
-  console.log(originDataRollup);
+  var originDataRollup2 = nest()
+    .key(d => d.origin_type)
+    .key(d => d.reportID)
+    .rollup(function(v) { return sum(v, function(d) { return d.enters; }); })
+    .object(data);
+  
+  //console.log(originDataRollup2);
+  
+  var geoOptions = ['out of state','out of district','same district'];
+  
+  geoOptions.forEach(d =>{
+    //console.log(d);
+    //console.log(originDataRollup2[d]);
+    var tmp = originDataRollup2[d];
+    var i;
+    for(i = 68; i < 78; i++){
+      //originDataRollup2
+      if(!tmp[i]){
+        originDataRollup2[d][i] = 0;
+      };
+    };
+  });
+  
+  var originDataRollup3;
+  
+  //originDataRollup2.forEach(d=>
+    //return d; 
+  //);
+  
+  
+  //console.log('original');
+  //console.log(originDataRollup2);
+  
+  const originDataRollup3 = Object.entries(originDataRollup2);
+  //const originDataRollup3 = Array.from(originDataRollup2);
+  //const originDataRollup3 = Object.values(originDataRollup2);
+  
+  var originDataRollup3;
+  
+  //console.log('current');
+  //console.log(originDataRollup3);
+  //console.log(originDataRollup3[0][1]);
+  
+  
+  /*originDataRollup.forEach(d =>{
+    
+    var tmp = d.values;
+    console.log(tmp);
+    
+    var i;
+    for(i=68; i< 78; i++){
+      //console.log(i);
+      if(tmp.filter(v=> v.key == i).length ==0){
+        console.log(d.key);
+        var geo = d.key;
+        console.log('missing value');
+        console.log(d[geo]);
+        //d[geo].push({key: toString(i),value: 0});
+      }
+      
+      //console.log(tmp.filter(d=> d.key == i));
+      //console.log(d.values[toString(i)]);
+      //console.log(d.values);
+      //if(!d.values.i){
+        //console.log('missing value');
+      //}
+    };
+    
+  });*/
+  
+  
+  
+  //console.log(originData);
+  //console.log('goal');
+  //console.log(originDataRollup);
+  //console.log(originDataRollup[0].values[0]);
   
   const w = window.innerWidth;
   const h = 200;
@@ -39,21 +113,41 @@ function renderStream(data){
     .attr('width', w)
     .attr('height', h);
   
-  
-  /*const plot = select('.streamgraph')
-    .append('svg')
-    .attr('width', w)
-    .attr('height', h);*/ 
-  
-  
   const scaleX = scaleLinear().domain([68,77]).range([0, w]);
-  const scaleY = scaleLinear().domain([0, 30]).range([h, 0]);
+  const scaleY = scaleLinear().domain([0, 60]).range([h, 0]);
 
-  //take array of xy values, and produce a shape attribute for <path> element
   const lineGenerator = line()
     .curve(curveMonotoneX)
-    .x(d => scaleX(+d.key))
-    .y(d => scaleY(d.value)); //function
+    //.x(d => scaleX(d[]))
+    .x(d => scaleX(+d.key)) //new change
+    .y(d => scaleY(d.value)); //new change
+  
+  //console.log(lineGenerator(originDataRollup[0].values));
+  
+  const streams = plot
+    .selectAll('.stream')
+    .data(originDataRollup);
+    //.data(originDataRollup3);
+  
+  const streamsEnter = streams.enter()
+    .append('path')
+    .attr('class','stream')
+  
+  streams.merge(streamsEnter)
+    .attr('d', data => lineGenerator(data.values))
+    .style('fill','none')
+    .style('stroke','#333')
+    .style('stroke-width','2px');
+  
+  
+  //console.log(streams.merge(streamsEnter));
+  
+  //streams.exit().remove();
+  
+  
+  
+  
+  
   //const areaGenerator = d3.area()
       //.x(d => scaleX(+d.key))
       //.y0(innerHeight)
@@ -67,73 +161,6 @@ function renderStream(data){
       .scale(scaleY)
       .tickSize(-innerWidth)
       .ticks(3)*/
-  
-  //console.log(lineGenerator(originDataRollup[0].values));
-  
-  const streams = plot
-    .selectAll('.stream')
-    .data(originDataRollup);
-  
-  const streamsEnter = streams.enter()
-    .append('path')
-    .attr('class','stream')
-  
-  streams.merge(streamsEnter)
-    .attr('d', data => lineGenerator(data.values))
-    .style('fill','none')
-    .style('stroke','#333')
-    .style('stroke-width','2px');
-  
-  
-  console.log(streams.merge(streamsEnter));
-  
-  //streams.exit().remove();
-  
-  
-    //.enter
-    //.append('svg')
-    //.attr('class','stream')
-  
-  
-    /*const svg = select(rootDom)
-    .selectAll('svg')
-    .data([1]);
-  const svgEnter = svg.enter()
-    .append('svg');
-
-  const plot = svg.merge(svgEnter)
-    .attr('width', w)
-    .attr('height', h);
-
-  const links = plot
-    .selectAll('.link')
-    .data(linksData);
-  const linksEnter = links.enter().append('line').attr('class','link')
-    .style('stroke-opacity',0.05)
-    .style('stroke-width','1px')
-    .style('stroke','black');
-
-  links.merge(linksEnter)
-    .attr('x1', d=> {
-
-    })
-    .attr('y1', d=> {
-
-    })
-    .attr('x2', d=> {
-
-    })
-    .attr('y2', d=> {
-
-    })
-    //.style('stroke-width', d=>{
-    //return (d.value.toString() + 'px');
-    //})
-    .style('stroke-opacity',d => {return (d.value * 0.05)});
-  
-  links.exit().remove();*/
-  
-  
   
   
   
