@@ -4,8 +4,7 @@ import {min, max, geoMercator,scaleLinear,select,nest,key,entries} from 'd3';
 
 function formatEnters(metadataSch,mobstab,geodata,entersdata){
   
-  //console.log(geodata);
-  //console.log(entersdata);
+  const metaFilter = metadataSch.filter(d => d.status ==1).filter(d=> d.adminSite == 'N').filter(d => d.remove ==0);
   
   const meta_tmp = metadataSch.map(d => [d.schcode,d]);
   const metaMap = new Map(meta_tmp);
@@ -20,11 +19,33 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
   const geo_tmp = geodata.map(d => [d.schcode,d]);
   const geoMap = new Map(geo_tmp);
   
-  //console.log(entersdata);
-  
-  const enters1718 = entersdata.filter(d => d.reportID ==77)
+  const enters_tmp = entersdata.filter(d => d.reportID ==77)
     .filter(d => d.schcode_dest != ' ')
-    .filter(d => d.schcode_origin != d.schcode_dest)
+    .filter(d => d.schcode_origin != d.schcode_dest);
+  //console.log(enters_tmp);
+  
+  metaFilter.forEach(d=>{
+    var count = 0;
+    enters_tmp.forEach(e=>{
+      if(d.schcode === e.schcode_dest){
+        count += 1;
+      }
+    });
+    if(count == 0){
+      console.log(d.schcode);
+      enters_tmp.push({
+        reportID: '77',
+        schcode_dest: d.schcode,
+        schcode_origin: '00000',
+        enters: 0});
+    };
+    
+  });
+  
+  console.log(enters_tmp);
+  
+  
+  const enters1718 = enters_tmp
     .map(d => {
       const md = metaMap.get(d.schcode_dest);
       d.adminSite_dest = md.adminSite;
@@ -491,7 +512,7 @@ function adjustProjection3(nodesData,linksData,distcode){
   console.log(nodesData);
   console.log(distcode);
   
-  const minDNodes = 2;
+  const minDNodes = 3;
   //const h = 1000;
   //const w = 750;//NEED TO ADJUST FOR FLEXIBILITY!
   const cW = window.innerWidth;
@@ -513,55 +534,49 @@ function adjustProjection3(nodesData,linksData,distcode){
   //console.log(nodesDataArray);
   
   var filteredNodes = nodesDataArray.filter(d => d.distcode == distcode);
-  //const filteredLinks = linksData.filter(d => d.target.distcode == distcode);
   
-  //console.log(filteredNodes);
-  //console.log(filteredLinks);
-  
-  //var minX, maxX, minY, maxY;
-  
-  if (filteredNodes.length >= minDNodes){
-    //console.log('greater than D');
-    
-    /*minX = min(filteredNodes, d => d.xy[0]);
-    maxX = max(filteredNodes, d => d.xy[0]);
-    minY = min(filteredNodes, d => d.xy[1]);
-    maxY = max(filteredNodes, d => d.xy[1]);
-    
-    console.log(minY);
-    console.log(maxY);*/
-    
-  }else{
-    console.log('less than D - edit filtered Nodes now');
+  if (filteredNodes.length < minDNodes){
     
     const filteredLinks = linksData.filter(d => d.target.distcode == distcode);
+    //.filter(d => d.source.schcode != '00000');
     
-    var nodes = [];
     console.log(filteredLinks);
     
-    filteredLinks.forEach(d => {
-      //console.log(d.source.schcode);
-      if(!nodes.includes(d.source.schcode)){nodes.push(d.source.schcode)};
-      if(!nodes.includes(d.target.schcode)){nodes.push(d.target.schcode)};
-    });
-    
-    console.log(nodes);
-    filteredNodes = nodesDataArray.filter(d => nodes.includes(d.schcode));
+    if(filteredLinks.length >0){
+      var nodes = [];
 
-    //filteredNodes = nodesDataArray.filter(d=>)
+      filteredLinks.forEach(d => {
+        if(!nodes.includes(d.source.schcode) && d.source.schcode != '00000'){nodes.push(d.source.schcode)};
+        if(!nodes.includes(d.target.schcode)){nodes.push(d.target.schcode)};
+      });
+
+      console.log(nodes);
+      filteredNodes = nodesDataArray.filter(d => nodes.includes(d.schcode));
+    };
     
   };
   
   console.log(filteredNodes);
   
   
-  var minX = min(filteredNodes, d => d.xy[0]);
-  var maxX = max(filteredNodes, d => d.xy[0]);
-  var minY = min(filteredNodes, d => d.xy[1]);
-  var maxY = max(filteredNodes, d => d.xy[1]);
+  var minX, maxX, minY, maxY;
+  
+  if(filteredNodes.length > 1){
+    minX = min(filteredNodes, d => d.xy[0]);
+    maxX = max(filteredNodes, d => d.xy[0]);
+    minY = min(filteredNodes, d => d.xy[1]);
+    maxY = max(filteredNodes, d => d.xy[1]);
+  }else{
+    minX = filteredNodes[0].xy[0] - 8;
+    maxX = filteredNodes[0].xy[0] + 8;
+    minY = filteredNodes[0].xy[1] - 8;
+    maxY = filteredNodes[0].xy[1] + 8;
+  };
+  
+  
     
-  //console.log(minY);
-  //console.log(maxY);
+  console.log(minY);
+  console.log(maxY);
   
   const yProportion = (maxY - minY)/(h - 2*margin);
   const xProportion = (maxX - minX)/(w - 2*margin);

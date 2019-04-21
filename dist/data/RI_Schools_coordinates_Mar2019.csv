@@ -172,8 +172,8 @@ SCH_CODE,DISTCODE,SCH_NAME,School_address_for_geocode,SCH_CITY,SCH_STATE,SCH_ZIP
 10344,,East Bay Head Start-Willett Avenue,386 Willett Avenue,Riverside,RI,02915,1,10,PK Only,3,Private,place,-71.35441,41.77378,3/22/19,MJJames
 10406,10,Motoring Technical Training Institute,54 Water Street,East Providence,RI,02914,1,60,Postsecondary,4,Postsecondary,place,-71.38561,41.81758,3/22/19,MJJames
 12101,12,Captain Isaac Paine Elementary School,160 Foster Center Road,Foster,RI,02825,1,20,Elementary,1,Public,place,-71.72771,41.80465,3/22/19,MJJames
-13103,13,Fogarty Memorial School,736 Snake Hill Road,Glocester,RI,02857,1,20,Elementary,1,Public,place,-71.63731,41.87895,3/22/19,MJJames
-13104,13,West Glocester Elementary,111 Reynolds Road,Glocester,RI,02814,1,50,PK-3/Elementary,1,Public,place,-71.77243,41.91246,3/22/19,MJJames
+13103,13,Fogarty Memorial School,736 Snake Hill Road,Glocester,RI,02857,1,20,Elementary,1,Public,place,-71.634239,41.877163,4/21/19,RPeters
+13104,13,West Glocester Elementary,111 Reynolds Road,Glocester,RI,02814,1,50,PK-3/Elementary,1,Public,place,-71.778038,41.91221,4/21/19,RPeters
 13301,13,Harmony Hill School,63 Harmony Hill Road,Glocester,RI,02814,1,54,Elementary/Secondary,3,Private,place,-71.62328,41.9156,3/22/19,MJJames
 13302,13,The Learning Place,21 Terry Lane,Glocester,RI,02814,1,50,PK-Private/Elementary,3,Private,place,-71.64612,41.90226,3/22/19,MJJames
 13903,,Harmony Child Care & Learning Center,185 Putnam Pike,Chepachet,RI,02814,1,10,PK Only,9,Other,highway,-71.67161,41.9153,3/22/19,MJJames

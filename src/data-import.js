@@ -62,7 +62,8 @@ function parseMetadata(d){
         distcode: d.DISTCODE,
         pk12: d.SCH_PK12,
         stateOp: d.SCH_STATE_OPERATED,
-        adminSite: d.SCH_ADMINSITE
+        adminSite: d.SCH_ADMINSITE,
+        remove: d.remove
     }
     
     delete d.SCH_ADD1;
