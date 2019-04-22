@@ -208,14 +208,14 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
       //});
       //.style('stroke-opacity',d => {return scaleWeight(d.value)});
 
-      console.log(links.merge(linksEnter));
+      //console.log(links.merge(linksEnter));
 
       links.exit().remove();
     
     
       // Nodes
     
-      console.log(nodesData);
+      //console.log(nodesData);
 
       const nodes = plot.selectAll('.node')
         .data(nodesData, d => d.schcode);

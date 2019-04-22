@@ -116,12 +116,12 @@ SCH_CODE,DISTCODE,SCH_NAME,School_address_for_geocode,SCH_CITY,SCH_STATE,SCH_ZIP
 08330,08,Emmanuel Nursery School,120 Nate Whipple Highway,Cumberland,RI,02864,1,10,PK Only,3,Private,place,-71.4479,41.97879,3/22/19,MJJames
 08331,08,The Neighborhood Nursery,2550 Diamond Hill Road,Cumberland,RI,02864,1,10,PK Only,3,Private,place,-71.40139,41.95978,3/22/19,MJJames
 08332,,Hand in Hand Christian Preschool,126 Angell Road,Cumberland,RI,02864,1,10,PK Only,3,Private,place,-71.41521,41.9463,3/22/19,MJJames
-08601,47,Blackstone Valley Prep Elementary School,291 Broad Street,Cumberland,RI,02864,1,20,Elementary,6,Charter,place,-71.39221,41.90466,3/22/19,MJJames
-08602,47,Blackstone Valley Prep Middle School,909 Lonsdale,Central Falls,RI,02863,1,30,Middle,6,Charter,place,-71.40199,41.88914,3/22/19,MJJames
-08603,47,Blackstone Valley Prep Elementary 2 School,52 Broad St.,Cumberland,RI,02864,1,20,Elementary,6,Charter,place,-71.39093,41.90113,3/22/19,MJJames
-08604,47,Blackstone Valley Prep High School,65 Macondray Avenue,Cumberland,RI,02864,1,40,Secondary,6,Charter,place,-71.3936,41.9021,3/22/19,MJJames
+08601,47,Blackstone Valley Prep Elementary School,291 Broad Street,Cumberland,RI,02864,1,20,Elementary,6,Charter,place,-71.392225,41.906061,4/22/19,RPeters
+08602,47,Blackstone Valley Prep Middle School,909 Lonsdale,Central Falls,RI,02863,1,30,Middle,6,Charter,place,-71.401986,41.889997,4/22/19,RPeters
+08603,47,Blackstone Valley Prep Elementary 2 School,52 Broad St.,Cumberland,RI,02864,1,20,Elementary,6,Charter,place,-71.391472,41.900904,4/22/19,RPeters
+08604,47,Blackstone Valley Prep High School,65 Macondray Avenue,Cumberland,RI,02864,1,40,Secondary,6,Charter,place,-71.393511,41.90329,4/22/19,RPeters
 08605,47,Blackstone Valley Prep Elementary 3 School,3357 Mendon Rd.,Cumberland,RI,02864,1,20,Elementary,6,Charter,amenity,-71.45824,41.97786,3/22/19,MJJames
-08606,47,Blackstone Valley Prep Middle School 2,3 Fairlawn Way,Lincoln,RI,02865,1,30,Middle,6,Charter,place,-71.41536,41.8874,3/22/19,MJJames
+08606,47,Blackstone Valley Prep Middle School 2,3 Fairlawn Way,Lincoln,RI,02865,1,30,Middle,6,Charter,place,-71.41584,41.886142,4/22/19,Rpeters
 09102,09,James H. Eldredge El. School,101 First Avenue,East Greenwich,RI,02818,1,20,Elementary,1,Public,building,-71.45614,41.65746,3/22/19,MJJames
 09103,09,Archie R. Cole Middle School,100 Cedar Avenue,East Greenwich,RI,02818,1,30,Middle,1,Public,amenity,-71.46305,41.651,3/22/19,MJJames
 09105,09,Frenchtown School,1100 Frenchtown Road,East Greenwich,RI,02818,1,20,Elementary,1,Public,amenity,-71.50449,41.62362,3/22/19,MJJames

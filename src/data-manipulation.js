@@ -509,10 +509,10 @@ function adjustProjection2(nodesData,linksData,distcode){
 
 function adjustProjection3(nodesData,linksData,distcode){
   
-  console.log(nodesData);
+  //console.log(nodesData);
   //console.log(distcode);
   
-  const minDNodes = 3;
+  const minDNodes = 4;
   //const h = 1000;
   //const w = 750;//NEED TO ADJUST FOR FLEXIBILITY!
   const cW = window.innerWidth;
@@ -540,7 +540,7 @@ function adjustProjection3(nodesData,linksData,distcode){
     const filteredLinks = linksData.filter(d => d.target.distcode == distcode);
     //.filter(d => d.source.schcode != '00000');
     
-    console.log(filteredLinks);
+    //console.log(filteredLinks);
     
     if(filteredLinks.length >0){
       var nodes = [];
@@ -550,13 +550,13 @@ function adjustProjection3(nodesData,linksData,distcode){
         if(!nodes.includes(d.target.schcode)){nodes.push(d.target.schcode)};
       });
 
-      console.log(nodes);
+      //console.log(nodes);
       filteredNodes = nodesDataArray.filter(d => nodes.includes(d.schcode));
     };
     
   };
   
-  console.log(filteredNodes);
+  //console.log(filteredNodes);
   
   
   var minX, maxX, minY, maxY;
@@ -575,8 +575,8 @@ function adjustProjection3(nodesData,linksData,distcode){
   
   
     
-  console.log(minY);
-  console.log(maxY);
+  //console.log(minY);
+  //console.log(maxY);
   
   const yProportion = (maxY - minY)/(h - 2*margin);
   const xProportion = (maxX - minX)/(w - 2*margin);

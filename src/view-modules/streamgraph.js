@@ -1,4 +1,4 @@
-import {nest,select,selectAll,sum,scaleLinear,line,curveMonotoneX} from 'd3';
+import {nest,select,selectAll,sum,scaleLinear,line,curveMonotoneX,stack} from 'd3';
 
 function renderStream(data){
   
@@ -54,7 +54,7 @@ function renderStream(data){
   
   
   //console.log('original');
-  //console.log(originDataRollup2);
+  console.log(originDataRollup2);
   
   const originDataRollup3 = Object.entries(originDataRollup2);
   //const originDataRollup3 = Array.from(originDataRollup2);
@@ -95,10 +95,53 @@ function renderStream(data){
   
   
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   //console.log(originData);
   //console.log('goal');
-  //console.log(originDataRollup);
+  console.log(originDataRollup);
   //console.log(originDataRollup[0].values[0]);
+  
+  var streamCoords = [{key:'out of state',values:[]},{key:'out of district',values:[]},{key:'same district',values:[]}];
+  
+  function myStack(d){
+    var i;
+    for(i=68; i<78; i++){
+      //console.log(d['out of state'][i]);
+      var oos = d['out of state'][i];
+      var ood = d['out of district'][i];
+      var sd = d['same district'][i];
+      
+      streamCoords[0].values.push({key:i, y0:0, y1:oos});
+      streamCoords[1].values.push({key:i, y0:oos, y1: oos + ood});
+      streamCoords[2].values.push({key:i, y0:oos + ood, y1: oos + ood + sd});
+    }
+    
+    console.log(d['out of state']);
+    
+  };
+  
+  myStack(originDataRollup2);
+  console.log(streamCoords);
+  
+  //const myStack = stack()
+    //.values(d => d.values);
+  
+  //var stackData = stack(originDataRollup);
+
+  //console.log(stackData);
+  
+  
+  
   
   const w = window.innerWidth;
   const h = 200;
@@ -122,25 +165,32 @@ function renderStream(data){
     .x(d => scaleX(+d.key)) //new change
     .y(d => scaleY(d.value)); //new change
   
+  const lineGenerator2 = line()
+    .curve(curveMonotoneX)
+    //.x(d => scaleX(d[]))
+    .x(d => scaleX(+d.key)) //new change
+    .y(d => scaleY(d.y1)); //new change
+  
   //console.log(lineGenerator(originDataRollup[0].values));
   
   const streams = plot
     .selectAll('.stream')
-    .data(originDataRollup);
-    //.data(originDataRollup3);
+    //.data(originDataRollup);
+    .data(streamCoords);
   
   const streamsEnter = streams.enter()
     .append('path')
     .attr('class','stream')
   
   streams.merge(streamsEnter)
-    .attr('d', data => lineGenerator(data.values))
+    //.attr('d', data => lineGenerator(data.values))
+    .attr('d', data => lineGenerator2(data.values))
     .style('fill','none')
     .style('stroke','#333')
     .style('stroke-width','2px');
   
   
-  //console.log(streams.merge(streamsEnter));
+  console.log(streams.merge(streamsEnter));
   
   //streams.exit().remove();
   
