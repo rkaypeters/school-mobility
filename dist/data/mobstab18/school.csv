@@ -127,8 +127,7 @@ schYear,distcode,distname,schcode,schname,gradelevel,adm,tot_enrolls,enrolls,exi
 2017-18,17,Lincoln,17190,Tuitioned Out,E,10.86,11.00,2.00,0.00,9.00,18.18,18.42,81.82
 2017-18,17,Lincoln,17190,Tuitioned Out,H,14.53,17.00,2.00,5.00,11.00,41.18,48.18,64.71
 2017-18,17,Lincoln,17190,Tuitioned Out,M,10.58,11.00,3.00,0.00,8.00,27.27,28.36,72.73
-2017-18,18,Little Compton,18101,Wilbur and McMahon Schools,E,148.13,156.00,7.00,7.00,142.00,8.97,9.45,91.03
-2017-18,18,Little Compton,18101,Wilbur and McMahon Schools,M,88.75,89.00,0.00,1.00,88.00,1.12,1.13,98.88
+2017-18,18,Little Compton,18101,Wilbur and McMahon Schools,EM,236.88,245.00,7.00,8.00,230.00,6.12,6.33,93.88
 2017-18,19,Middletown,19106,Aquidneck School,E,332.07,348.00,15.00,21.00,315.00,10.34,10.84,90.52
 2017-18,19,Middletown,19107,Forest Avenue School,E,352.51,397.00,28.00,50.00,320.00,19.65,22.13,80.60
 2017-18,19,Middletown,19111,Middletown High School,H,584.22,627.00,26.00,52.00,557.00,12.44,13.35,88.84
@@ -151,9 +150,7 @@ schYear,distcode,distname,schcode,schname,gradelevel,adm,tot_enrolls,enrolls,exi
 2017-18,21,Newport,21190,Tuitioned Out,E,5.43,7.00,2.00,1.00,4.00,42.86,55.24,57.14
 2017-18,21,Newport,21190,Tuitioned Out,H,11.70,17.00,7.00,5.00,7.00,70.59,102.55,41.18
 2017-18,21,Newport,21190,Tuitioned Out,M,10.20,14.00,6.00,3.00,6.00,64.29,88.20,42.86
-2017-18,22,New Shoreham,22101,Block Island School,E,46.90,52.00,3.00,3.00,46.00,11.54,12.79,88.46
-2017-18,22,New Shoreham,22101,Block Island School,H,48.20,53.00,6.00,3.00,44.00,16.98,18.67,83.02
-2017-18,22,New Shoreham,22101,Block Island School,M,24.00,24.00,0.00,0.00,24.00,0.00,0.00,100.00
+2017-18,22,New Shoreham,22101,Block Island School,EMH,119.10,129.00,9.00,6.00,114.00,11.63,12.59,88.37
 2017-18,23,North Kingstown,23105,Wickford Middle School,M,385.79,397.00,8.00,13.00,376.00,5.29,5.44,94.71
 2017-18,23,North Kingstown,23108,North Kingstown Senior High School,H,1381.75,1455.00,36.00,84.00,1342.00,8.25,8.68,92.23
 2017-18,23,North Kingstown,23109,Fishing Cove Elementary School,E,244.57,252.00,4.00,10.00,238.00,5.56,5.72,94.44
@@ -247,9 +244,7 @@ schYear,distcode,distname,schcode,schname,gradelevel,adm,tot_enrolls,enrolls,exi
 2017-18,28,Providence,28163,"Dr. Martin Luther King, Jr. Elementary School",E,518.02,610.00,56.00,96.00,472.00,24.92,29.34,77.38
 2017-18,28,Providence,28164,Classical High School,H,1111.99,1134.00,4.00,37.00,1093.00,3.62,3.69,96.38
 2017-18,28,Providence,28165,Pleasant View School,E,302.34,320.00,14.00,19.00,290.00,10.31,10.91,90.63
-2017-18,28,Providence,28170,Times2 Academy,E,331.62,343.00,10.00,11.00,322.00,6.12,6.33,93.88
-2017-18,28,Providence,28170,Times2 Academy,H,203.67,207.00,1.00,4.00,202.00,2.42,2.45,97.58
-2017-18,28,Providence,28170,Times2 Academy,M,196.42,199.00,6.00,2.00,192.00,4.02,4.07,96.48
+2017-18,28,Providence,28170,Times2 Academy,EMH,731.71,749.00,17.00,17.00,716.00,4.54,4.65,95.59
 2017-18,28,Providence,28178,Academy for Career Exploration (ACES),H,194.48,216.00,12.00,21.00,183.00,15.28,16.97,84.72
 2017-18,28,Providence,28181,Anthony Carnevale Elementary School,E,520.63,579.00,43.00,58.00,485.00,17.44,19.40,83.77
 2017-18,28,Providence,28182,Governor Christopher DelSesto Middle School,M,912.82,1046.00,96.00,152.00,818.00,23.71,27.17,78.20
@@ -367,34 +362,24 @@ schYear,distcode,distname,schcode,schname,gradelevel,adm,tot_enrolls,enrolls,exi
 2017-18,47,"Blackstone Valley Prep, A RI Mayoral Academy",08604,Blackstone Valley Prep High School,H,324.71,345.00,20.00,17.00,309.00,10.72,11.39,89.57
 2017-18,47,"Blackstone Valley Prep, A RI Mayoral Academy",08605,Blackstone Valley Prep Elementary 3 School,E,165.93,168.00,0.00,3.00,165.00,1.79,1.81,98.21
 2017-18,47,"Blackstone Valley Prep, A RI Mayoral Academy",08606,Blackstone Valley Prep Middle School 2,M,165.47,169.00,3.00,4.00,162.00,4.14,4.23,95.86
-2017-18,48,Highlander,28601,Highlander Charter School,E,214.92,223.00,6.00,8.00,210.00,6.28,6.51,94.17
-2017-18,48,Highlander,28601,Highlander Charter School,H,162.06,210.00,31.00,46.00,138.00,36.67,47.51,65.71
-2017-18,48,Highlander,28601,Highlander Charter School,M,154.43,165.00,7.00,12.00,147.00,11.52,12.30,89.09
+2017-18,48,Highlander,28601,Highlander Charter School,EMH,531.41,598.00,44.00,66.00,495.00,18.39,21.10,82.78
 2017-18,49,Urban Collaborative,28167,Urban Collaborative Accelerated Program,M,133.54,156.00,16.00,26.00,115.00,26.92,31.45,73.72
-2017-18,50,R.I. Sch for the Deaf,28702,Rhode Island School for the Deaf,E,29.36,31.00,4.00,0.00,27.00,12.90,13.62,87.10
-2017-18,50,R.I. Sch for the Deaf,28702,Rhode Island School for the Deaf,H,23.00,23.00,0.00,0.00,23.00,0.00,0.00,100.00
-2017-18,50,R.I. Sch for the Deaf,28702,Rhode Island School for the Deaf,M,12.00,12.00,0.00,0.00,12.00,0.00,0.00,100.00
-2017-18,51,Paul Cuffee Charter Sch,28602,Paul Cuffee Charter School,E,360.87,363.00,7.00,0.00,356.00,1.93,1.94,98.07
-2017-18,51,Paul Cuffee Charter Sch,28602,Paul Cuffee Charter School,H,248.77,261.00,21.00,0.00,240.00,8.05,8.44,91.95
-2017-18,51,Paul Cuffee Charter Sch,28602,Paul Cuffee Charter School,M,186.35,189.00,8.00,0.00,181.00,4.23,4.29,95.77
+2017-18,50,R.I. Sch for the Deaf,28702,Rhode Island School for the Deaf,EMH,64.36,66.00,4.00,0.00,62.00,6.06,6.22,93.94
+2017-18,51,Paul Cuffee Charter Sch,28602,Paul Cuffee Charter School,EMH,795.99,813.00,36.00,0.00,777.00,4.43,5.78,95.57
 2017-18,52,Kingston Hill Academy,32601,Kingston Hill Academy,E,189.23,202.00,12.00,14.00,177.00,12.87,13.74,87.62
 2017-18,53,International Charter,26601,International Charter School,E,360.79,368.00,6.00,10.00,352.00,4.35,4.43,95.65
 2017-18,54,Blackstone Academy,26602,Blackstone Academy Charter School,H,344.84,354.00,3.00,8.00,343.00,3.11,3.19,96.89
-2017-18,55,The Compass School,23601,The Compass School,E,111.69,122.00,5.00,6.00,112.00,9.02,9.85,91.80
-2017-18,55,The Compass School,23601,The Compass School,M,56.07,58.00,0.00,0.00,58.00,0.00,0.00,100.00
+2017-18,55,The Compass School,23601,The Compass School,EM,167.76,180.00,5.00,6.00,170.00,6.11,6.56,94.44
 2017-18,58,Beacon Charter School,39601,BEACON Charter School,H,233.76,243.00,7.00,10.00,226.00,7.00,7.27,93.00
 2017-18,58,Beacon Charter School,39603,Founders Academy,M,133.46,143.00,7.00,11.00,126.00,12.59,13.49,88.11
-2017-18,59,Learning Community,04601,The Learning Community Charter School,E,388.24,391.00,0.00,5.00,386.00,1.28,1.29,98.72
-2017-18,59,Learning Community,04601,The Learning Community Charter School,M,179.94,180.00,0.00,0.00,180.00,0.00,0.00,100.00
+2017-18,59,Learning Community,04601,The Learning Community Charter School,EM,568.18,571.00,0.00,5.00,566.00,0.88,0.88,99.12
 2017-18,59,Learning Community,59190,Tuitioned Out,E,2.29,2.00,0.00,0.00,2.00,0.00,0.00,100.00
 2017-18,60,MET Career and Tech,28703,Metropolitan Regional Career and Technical Center,H,779.62,854.00,52.00,69.00,735.00,14.17,15.52,86.07
-2017-18,61,Trinity Academy for the Performing Arts,28606,Trinity Academy for the Performing Arts,H,129.10,136.00,0.00,10.00,126.00,7.35,7.75,92.65
-2017-18,61,Trinity Academy for the Performing Arts,28606,Trinity Academy for the Performing Arts,M,78.40,84.00,2.00,8.00,74.00,11.90,12.76,88.10
+2017-18,61,Trinity Academy for the Performing Arts,28606,Trinity Academy for the Performing Arts,MH,207.50,220.00,2.00,18.00,200.00,9.09,9.64,90.90
 2017-18,62,The Greene School,97601,The Greene School,H,199.69,218.00,14.00,17.00,187.00,14.22,15.52,85.78
 2017-18,63,Rhode Island Nurses Institute Middle College,28607,RI Nurses Institute Middle College Charter High Sc,H,265.03,308.00,41.00,49.00,221.00,29.22,33.96,71.75
 2017-18,64,Village Green Virtual,28608,Village Green Virtual Charter School,H,223.42,243.00,5.00,24.00,215.00,11.93,12.98,88.48
-2017-18,67,DCYF,07702,DCYF Alternative Education Program,H,37.11,222.00,152.00,158.00,8.00,139.64,835.39,3.60
-2017-18,67,DCYF,07702,DCYF Alternative Education Program,M,1.31,7.00,5.00,2.00,1.00,100.00,534.66,14.29
+2017-18,67,DCYF,07702,DCYF Alternative Education Program,MH,38.42,229.00,157.00,160.00,9.00,138.43,534.66,3.93
 2017-18,68,The Hope Academy,28613,The Hope Academy,E,143.45,147.00,3.00,3.00,141.00,4.08,4.18,95.92
 2017-18,79,RISE Prep Mayoral Academy,39602,RISE Prep Mayoral Academy,E,160.68,165.00,4.00,4.00,157.00,4.85,4.98,95.15
 2017-18,96,Bristol Warren,96104,Guiteras School,E,252.47,278.00,12.00,23.00,245.00,12.59,13.86,88.13
@@ -420,9 +405,7 @@ schYear,distcode,distname,schcode,schname,gradelevel,adm,tot_enrolls,enrolls,exi
 2017-18,98,Chariho,98105,Richmond Elementary School,E,394.74,410.00,15.00,11.00,385.00,6.34,6.59,93.90
 2017-18,98,Chariho,98106,Ashaway Elementary School,E,199.89,209.00,7.00,9.00,193.00,7.66,8.00,92.34
 2017-18,98,Chariho,98107,Hope Valley Elementary School,E,194.71,201.00,8.00,6.00,188.00,6.97,7.19,93.53
-2017-18,98,Chariho,98108,The R.Y.S.E. School,E,6.91,10.00,4.00,1.00,5.00,50.00,72.35,50.00
-2017-18,98,Chariho,98108,The R.Y.S.E. School,H,23.16,33.00,5.00,15.00,15.00,60.61,86.35,45.45
-2017-18,98,Chariho,98108,The R.Y.S.E. School,M,15.25,20.00,11.00,1.00,9.00,60.00,78.69,45.00
+2017-18,98,Chariho,98108,The R.Y.S.E. School,EMH,45.32,63.00,20.00,17.00,29.00,58.73,81.64,46.03
 2017-18,98,Chariho,98190,Tuitioned Out,E,1.20,2.00,1.00,0.00,1.00,50.00,83.33,50.00
 2017-18,98,Chariho,98190,Tuitioned Out,H,2.26,2.00,0.00,0.00,2.00,0.00,0.00,100.00
 2017-18,98,Chariho,98190,Tuitioned Out,M,1.07,1.00,0.00,0.00,1.00,0.00,0.00,100.00
