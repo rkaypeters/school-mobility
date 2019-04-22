@@ -1,21 +1,18 @@
-import {nest,select,selectAll,sum,scaleLinear,line,area,curveMonotoneX} from 'd3';
+import {nest,select,selectAll,sum,scaleLinear,line,area,curveMonotoneX,axisBottom,axisLeft,max} from 'd3';
 
 function renderStream(data){
   
   //console.log(data);
   
+  //Add origin_type to group the incoming students based on their district. Then nest by origin_type
   data.map(d =>{
     if(d.distcode_origin == d.distcode_dest){
       d.origin_type = 'same district'
     }else{if(d.distcode_origin == '00'){
       d.origin_type = 'out of state'
     }else{d.origin_type = 'out of district'}};
-    return d
-  })
-  
-  const originData = nest()
-			.key(d => d.origin_type)
-			.entries(data);
+    return d;
+  });
   
   var originDataRollup = nest()
     .key(d => d.origin_type)
@@ -23,11 +20,10 @@ function renderStream(data){
     .rollup(function(v) { return sum(v, function(d) { return d.enters; }); })
     .object(data);
   
+  //Fill in any missing values.
   var geoOptions = ['out of state','out of district','same district'];
   
   geoOptions.forEach(d =>{
-    //console.log(d);
-    //console.log(originDataRollup[d]);
     var tmp = originDataRollup[d];
     var i;
     for(i = 68; i < 78; i++){
@@ -39,7 +35,10 @@ function renderStream(data){
 
   console.log(originDataRollup);
   
-  var streamCoords = [{key:'out of state',color:'#2B7C8F',values:[]},{key:'out of district',color:'#87BFCC',values:[]},{key:'same district',color:'#A8EFFF',values:[]}];
+  //Create stacked data values.
+  
+  //var streamCoords = [{key:'out of state',color:'#2B7C8F',values:[]},{key:'out of district',color:'#87BFCC',values:[]},{key:'same district',color:'#A8EFFF',values:[]}]; //just different colors
+  var streamCoords = [{key:'out of state',color:'#2B7C8F',values:[]},{key:'out of district',color:'#70b3c2',values:[]},{key:'same district',color:'#b8e1ea',values:[]}];
   
   function myStack(d){
     var i;
@@ -52,17 +51,17 @@ function renderStream(data){
       streamCoords[1].values.push({key:i, y0:oos, y1: oos + ood});
       streamCoords[2].values.push({key:i, y0:oos + ood, y1: oos + ood + sd});
     }
-    
-    console.log(d['out of state']);
-    
   };
   
   myStack(originDataRollup);
   console.log(streamCoords);
 
-  
+  //Formatting the format.
   const w = window.innerWidth;
   const h = 200;
+  const margin = {l:40,r:20,t:20,b:20};
+  const innerWidth = w - margin.l - margin.r;
+  const innerHeight = h - margin.t - margin.b;
   
   const svg = select('.streamgraph')
     .selectAll('svg')
@@ -74,13 +73,19 @@ function renderStream(data){
     .attr('width', w)
     .attr('height', h);
   
-  const scaleX = scaleLinear().domain([68,77]).range([0, w]);
-  const scaleY = scaleLinear().domain([0, 60]).range([h, 0]);
-
-  const lineGenerator = line()
-    .curve(curveMonotoneX)
-    .x(d => scaleX(+d.key))
-    .y(d => scaleY(d.value));
+  const maxVal = max(streamCoords[2].values, d => d.y1);
+  
+  var scaleTop;
+  if(maxVal > 40){
+    scaleTop = maxVal;
+  }else{
+    scaleTop = 40;
+  };
+  
+  //console.log(scaleTop);
+  
+  const scaleX = scaleLinear().domain([68,77]).range([0,innerWidth]);
+  const scaleY = scaleLinear().domain([0, scaleTop]).range([innerHeight,0]);
   
   const lineGenerator2 = line()
     .curve(curveMonotoneX)
@@ -102,9 +107,9 @@ function renderStream(data){
   const streamsEnter = streams.enter()
     .append('path')
     .attr('class','stream')
+    .attr('transform', `translate(${margin.l}, ${margin.t})`);
   
   streams.merge(streamsEnter)
-    //.attr('d', data => lineGenerator(data.values))
     //.attr('d', data => lineGenerator2(data.values))
     .attr('d', data => areaGenerator(data.values))
     .style('fill',d => d.color);
@@ -116,23 +121,30 @@ function renderStream(data){
   
   //streams.exit().remove();
   
-  
-  
-  
-  
-  //const areaGenerator = d3.area()
-      //.x(d => scaleX(+d.key))
-      //.y0(innerHeight)
-      //.y1(d => scaleY(d.value));
 
-  /*const axisX = d3.axisBottom()
+  const axisX = axisBottom()
       .scale(scaleX)
-      .tickFormat(function(value){ return "'"+String(value).slice(-2)})
+      .tickFormat(function(value){ return "'"+String(value+40).slice(-2)+ "-" + String(value+41).slice(-2)})
 
-  const axisY = d3.axisLeft()
+  const axisY = axisLeft()
       .scale(scaleY)
-      .tickSize(-innerWidth)
-      .ticks(3)*/
+      //.tickSize(-innerWidth)
+      .ticks(3)
+  
+  const axes = plot
+    .selectAll('.axis').remove();
+  
+  //console.log(axes);
+  
+  plot.append('g')
+		.attr('class','axis')
+		.attr('transform',`translate(${margin.l}, ${innerHeight+margin.t})`)
+		.call(axisX)
+
+  plot.append('g')
+		.attr('class','axis')
+        .attr('transform',`translate(${margin.l},${margin.t})`)
+		.call(axisY);
   
   
   
