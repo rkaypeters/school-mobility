@@ -1,4 +1,4 @@
-import {nest,select,selectAll,sum,scaleLinear,line,curveMonotoneX,stack} from 'd3';
+import {nest,select,selectAll,sum,scaleLinear,line,area,curveMonotoneX} from 'd3';
 
 function renderStream(data){
   
@@ -21,102 +21,29 @@ function renderStream(data){
     .key(d => d.origin_type)
     .key(d => d.reportID)
     .rollup(function(v) { return sum(v, function(d) { return d.enters; }); })
-    .entries(data);
-  
-  var originDataRollup2 = nest()
-    .key(d => d.origin_type)
-    .key(d => d.reportID)
-    .rollup(function(v) { return sum(v, function(d) { return d.enters; }); })
     .object(data);
-  
-  //console.log(originDataRollup2);
   
   var geoOptions = ['out of state','out of district','same district'];
   
   geoOptions.forEach(d =>{
     //console.log(d);
-    //console.log(originDataRollup2[d]);
-    var tmp = originDataRollup2[d];
+    //console.log(originDataRollup[d]);
+    var tmp = originDataRollup[d];
     var i;
     for(i = 68; i < 78; i++){
-      //originDataRollup2
       if(!tmp[i]){
-        originDataRollup2[d][i] = 0;
+        originDataRollup[d][i] = 0;
       };
     };
   });
-  
-  var originDataRollup3;
-  
-  //originDataRollup2.forEach(d=>
-    //return d; 
-  //);
-  
-  
-  //console.log('original');
-  console.log(originDataRollup2);
-  
-  const originDataRollup3 = Object.entries(originDataRollup2);
-  //const originDataRollup3 = Array.from(originDataRollup2);
-  //const originDataRollup3 = Object.values(originDataRollup2);
-  
-  var originDataRollup3;
-  
-  //console.log('current');
-  //console.log(originDataRollup3);
-  //console.log(originDataRollup3[0][1]);
-  
-  
-  /*originDataRollup.forEach(d =>{
-    
-    var tmp = d.values;
-    console.log(tmp);
-    
-    var i;
-    for(i=68; i< 78; i++){
-      //console.log(i);
-      if(tmp.filter(v=> v.key == i).length ==0){
-        console.log(d.key);
-        var geo = d.key;
-        console.log('missing value');
-        console.log(d[geo]);
-        //d[geo].push({key: toString(i),value: 0});
-      }
-      
-      //console.log(tmp.filter(d=> d.key == i));
-      //console.log(d.values[toString(i)]);
-      //console.log(d.values);
-      //if(!d.values.i){
-        //console.log('missing value');
-      //}
-    };
-    
-  });*/
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  //console.log(originData);
-  //console.log('goal');
+
   console.log(originDataRollup);
-  //console.log(originDataRollup[0].values[0]);
   
-  var streamCoords = [{key:'out of state',values:[]},{key:'out of district',values:[]},{key:'same district',values:[]}];
+  var streamCoords = [{key:'out of state',color:'#2B7C8F',values:[]},{key:'out of district',color:'#87BFCC',values:[]},{key:'same district',color:'#A8EFFF',values:[]}];
   
   function myStack(d){
     var i;
     for(i=68; i<78; i++){
-      //console.log(d['out of state'][i]);
       var oos = d['out of state'][i];
       var ood = d['out of district'][i];
       var sd = d['same district'][i];
@@ -130,18 +57,9 @@ function renderStream(data){
     
   };
   
-  myStack(originDataRollup2);
+  myStack(originDataRollup);
   console.log(streamCoords);
-  
-  //const myStack = stack()
-    //.values(d => d.values);
-  
-  //var stackData = stack(originDataRollup);
 
-  //console.log(stackData);
-  
-  
-  
   
   const w = window.innerWidth;
   const h = 200;
@@ -161,17 +79,20 @@ function renderStream(data){
 
   const lineGenerator = line()
     .curve(curveMonotoneX)
-    //.x(d => scaleX(d[]))
-    .x(d => scaleX(+d.key)) //new change
-    .y(d => scaleY(d.value)); //new change
+    .x(d => scaleX(+d.key))
+    .y(d => scaleY(d.value));
   
   const lineGenerator2 = line()
     .curve(curveMonotoneX)
-    //.x(d => scaleX(d[]))
-    .x(d => scaleX(+d.key)) //new change
-    .y(d => scaleY(d.y1)); //new change
+    .x(d => scaleX(+d.key))
+    .y(d => scaleY(d.y1));
   
-  //console.log(lineGenerator(originDataRollup[0].values));
+  const areaGenerator = area()
+    .curve(curveMonotoneX)
+    .x(d => scaleX(+d.key))
+    .y0(d =>scaleY(d.y0))
+    .y1(d => scaleY(d.y1));
+
   
   const streams = plot
     .selectAll('.stream')
@@ -184,10 +105,11 @@ function renderStream(data){
   
   streams.merge(streamsEnter)
     //.attr('d', data => lineGenerator(data.values))
-    .attr('d', data => lineGenerator2(data.values))
-    .style('fill','none')
-    .style('stroke','#333')
-    .style('stroke-width','2px');
+    //.attr('d', data => lineGenerator2(data.values))
+    .attr('d', data => areaGenerator(data.values))
+    .style('fill',d => d.color);
+    //.style('stroke','#333')
+    //.style('stroke-width','2px');
   
   
   console.log(streams.merge(streamsEnter));
