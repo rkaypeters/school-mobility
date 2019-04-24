@@ -1,27 +1,24 @@
 import {min, max, geoMercator,scaleLinear,select,nest,key,entries} from 'd3';    
     
 function formatEnters(metadataSch,mobstab,geodata,entersdata){  
+  //This is the initial formatting; it's merging a bunch of csv's to get all of the needed fields in one place.
   
   const metaFilter = metadataSch.filter(d => d.status ==1).filter(d=> d.adminSite == 'N').filter(d => d.remove ==0);
   
   const meta_tmp = metadataSch.map(d => [d.schcode,d]);
   const metaMap = new Map(meta_tmp);
-  
   const mobstab_tmp = mobstab.map(d => [d.schcode,d]);
   const mobstabMap = new Map(mobstab_tmp);
-
-  
-  myProjection(select('.network').node(),geodata); //still need to set up network DOM dimensions
-    //.push({schcode: '00000',xy: [20,20]});
-
   const geo_tmp = geodata.map(d => [d.schcode,d]);
   const geoMap = new Map(geo_tmp);
+  
+  myProjection(select('.network').node(),geodata);
+    //.push({schcode: '00000',xy: [20,20]});
   
   const enters_tmp = entersdata.filter(d => d.reportID ==77)
     .filter(d => d.schcode_dest != ' ')
     .filter(d => d.schcode_origin != d.schcode_dest);
-  //console.log(enters_tmp);
-  
+
   metaFilter.forEach(d=>{
     var count = 0;
     enters_tmp.forEach(e=>{
@@ -190,14 +187,7 @@ function myProjection(rootDom,data){
   //const h1 = select(rootDom).node().clientHeight;
   const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 200;
   
-  console.log(select('.intro').node().clientHeight);
   console.log(select('.dropdown').node().clientHeight); //need this piece
-  
-  console.log(w1);
-  console.log(h1);
-  
-  //const cW = window.innerWidth;
-  //const cH = window.innerHeight;
 
   var w, h;
   
@@ -209,25 +199,7 @@ function myProjection(rootDom,data){
   }else{h = 600;};
   
   
-  
-  /*const wW = window.innerWidth;
-  const wH = window.innerHeight;
-  
-  var w, h;
-  
-  if(wW>=400){
-     w = wW;
-  }else{ w = 400;};
-  if(wH>=800){
-    h = wH-200;
-  }else{h = 600;};*/
-  
-  
   const myScale = 50*h;
-  
-  //console.log(data);
-  //console.log(w);
-  //console.log(h);
   
   const projection_tm = geoMercator()
 
@@ -267,17 +239,9 @@ function adjustProjection(nodesData,linksData,distcode){
   //console.log(distcode);
   
   const w1 = select('.network').node().clientWidth;
-  //const h1 = select(rootDom).node().clientHeight;
   const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 200;
   
-  console.log(select('.intro').node().clientHeight);
   console.log(select('.dropdown').node().clientHeight); //need this piece
-  
-  console.log(w1);
-  console.log(h1);
-  
-  //const cW = window.innerWidth;
-  //const cH = window.innerHeight;
 
   var w, h;
   
@@ -290,23 +254,8 @@ function adjustProjection(nodesData,linksData,distcode){
   
   
   const minDNodes = 4;
-  /*const cW = window.innerWidth;
-  const cH = window.innerHeight;
-
-  var w, h;
-  
-  if(cW>=400){
-     w = cW;
-  }else{ w = 400;};
-  if(cH>=800){
-    h = cH-200;
-  }else{h = 600;};*/
-  
-  const margin = 20;
   
   const nodesDataArray = Array.from(nodesData.values());
-  
-  //console.log(nodesDataArray);
   
   var filteredNodes = nodesDataArray.filter(d => d.distcode == distcode);
   
@@ -348,21 +297,8 @@ function adjustProjection(nodesData,linksData,distcode){
     maxY = filteredNodes[0].xy[1] + 8;
   };
   
-  
-    
-  console.log(minX);
-  console.log(maxX);
-  console.log(minY);
-  console.log(maxY);
-  console.log(w);
-  console.log(h);
-  
   const yProportion = (maxY - minY)/h;
   const xProportion = (maxX - minX)/w;
-  
-  console.log(yProportion);
-  console.log(xProportion);
-  
   
   if(yProportion < xProportion){
     console.log('X is the limitation');

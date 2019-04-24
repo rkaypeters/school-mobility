@@ -37,7 +37,7 @@ function renderStream(data){
   
   //Create stacked data values.
   
-  //var streamCoords = [{key:'out of state',color:'#2B7C8F',values:[]},{key:'out of district',color:'#87BFCC',values:[]},{key:'same district',color:'#A8EFFF',values:[]}]; //just different colors
+  //var streamCoords = [{key:'out of state',color:'#2B7C8F',values:[]},{key:'out of district',color:'#87BFCC',values:[]},{key:'same district',color:'#A8EFFF',values:[]}];   //just different colors
   var streamCoords = [{key:'out of state',color:'#2B7C8F',values:[]},{key:'out of district',color:'#70b3c2',values:[]},{key:'same district',color:'#b8e1ea',values:[]}];
   
   function myStack(d){
@@ -54,12 +54,14 @@ function renderStream(data){
   };
   
   myStack(originDataRollup);
-  console.log(streamCoords);
+  //console.log(streamCoords);
 
   //Formatting the format.
-  const w = window.innerWidth;
-  const h = 200;
-  const margin = {l:40,r:20,t:20,b:20};
+  //const w = window.innerWidth;
+  const w = select('.streamgraph').node().clientWidth;
+  const h = 150;
+  //const margin = {l:40,r:20,t:20,b:20};
+  const margin = {l:20,r:15,t:20,b:20};
   const innerWidth = w - margin.l - margin.r;
   const innerHeight = h - margin.t - margin.b;
   

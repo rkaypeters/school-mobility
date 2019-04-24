@@ -37,15 +37,23 @@ function renderNetwork(rootDom,nodesData,linksData){
     .attr('width', w)
     .attr('height', h);
 
+  plot.selectAll('.node')
+    .remove();
+  plot.selectAll('.label')
+    .remove();
+  
   const links = plot
     .selectAll('.link')
     .data(linksData);
-  const linksEnter = links.enter().append('line').attr('class','link')
-    .style('stroke-opacity',0.05)
-    .style('stroke-width','1px')
-    .style('stroke','black');
+  const linksEnter = links.enter().append('line').attr('class','link');
+    //.style('stroke-opacity',0.05)
+    //.style('stroke-width','1px')
+    //.style('stroke','#808080');
 
   links.merge(linksEnter)
+    .style('stroke-opacity',0.05)
+    .style('stroke-width','1px')
+    .style('stroke','#404040')
     .attr('x1', d=> {
       if(d.target.xy){
           return d.target.xy[0];
@@ -82,89 +90,6 @@ function renderNetwork(rootDom,nodesData,linksData){
   links.exit().remove();
 
 }
-
-function renderNetwork_backup(rootDom,nodesData,linksData){
-  const w1 = rootDom.clientWidth; // these aren't working out for me; i'm getting much smaller blocks
-  const h1 = rootDom.clientHeight;
-  //console.log(rootDom.clientWidth);
-  //console.log(rootDom);
-  //console.log(w1);
-  //console.log(h1);
-  
-  
-  
-  const cW = window.innerWidth;
-  const cH = window.innerHeight;
-
-  var w, h;
-  
-  if(cW>=400){
-     w = cW;
-  }else{ w = 400;};
-  if(cH>=800){
-    h = cH-200;
-  }else{h = 600;};
-  
-  //console.log(w);
-  //console.log(h);
-  
-  const svg = select(rootDom)
-    .selectAll('svg')
-    .data([1]);
-  const svgEnter = svg.enter()
-    .append('svg');
-
-  const plot = svg.merge(svgEnter)
-    .attr('width', w)
-    .attr('height', h);
-
-  const links = plot
-    .selectAll('.link')
-    .data(linksData);
-  const linksEnter = links.enter().append('line').attr('class','link')
-    .style('stroke-opacity',0.05)
-    .style('stroke-width','1px')
-    .style('stroke','black');
-
-  links.merge(linksEnter)
-    .attr('x1', d=> {
-      if(d.target.xy){
-          return d.target.xy[0];
-      }else{
-          return 0;
-      }
-    })
-    .attr('y1', d=> {
-      if(d.target.xy){
-          return d.target.xy[1];
-      }else{
-          return 0;
-      }
-    })
-    .attr('x2', d=> {
-      if(d.source.xy){
-          return d.source.xy[0];
-      }else{
-          return 0;
-      }
-    })
-    .attr('y2', d=> {
-      if(d.source.xy){
-          return d.source.xy[1];
-      }else{
-          return 0;
-      }
-    })
-    //.style('stroke-width', d=>{
-    //return (d.value.toString() + 'px');
-    //})
-    .style('stroke-opacity',d => {return (d.value * 0.05)});
-  
-  links.exit().remove();
-
-}
-
-
 
 
 function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){

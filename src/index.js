@@ -27,60 +27,45 @@ Promise.all([ mobstabdataPromise,
              leaMetadataPromise])
   .then(([mobstab,metadataSch,geodata,entersdata,metadataLEA]) => {
                                  
-  
-  //console.log(metadataSch);
-  //console.log(mobstab);
-  //console.log(geodata);
-  //console.log(entersdata);
-  //console.log(metadataLEA);
-  
-    
-  const geoFilter = geodata.filter(d => [1,6,7].includes(+d.schType));
-  
-  const enters1718 = formatEnters(metadataSch,mobstab,geoFilter,entersdata);
-  
-  /*const mobstab_sch = mobstab
-      .filter(d => d.schname != '')
-      .map(d => {
-      const md = metaMap.get(d.schcode);
-      d.adminSite = md.adminSite;
+    //console.log(metadataSch);
+    //console.log(mobstab);
+    //console.log(geodata);
+    //console.log(entersdata);
+    //console.log(metadataLEA);
 
-      return d;
-  })
-      .filter(d => d.adminSite == 'N');*/
+    const geoFilter = geodata.filter(d => [1,6,7].includes(+d.schType));
 
-  /*const w = innerWidth;
-  const h = innerHeight;
-  
-  //console.log(w);
-  //console.log(h);
-  
-  select('.network')
-    .attr('width',w)
-    .attr('height',h);*/
-  
+    const enters1718 = formatEnters(metadataSch,mobstab,geoFilter,entersdata);
 
-  const [nodesData,linksData] = networkSetup(enters1718);
-  
-  
-  //console.log(nodesData);
-  //console.log(linksData);
+    const [nodesData,linksData] = networkSetup(enters1718);
 
+    renderNetwork('.network',
+              nodesData,
+              linksData.filter(d => d.target.schcode != '00000')
+                .filter(d => d.source.schcode != '00000')
+             );
+
+    districtDropdown(metadataLEA.filter(d => [1,2,3].includes(+d.leaType)),
+                     '.dropdown',
+                     nodesData,
+                     linksData);
   
-  renderNetwork('.network',
-            nodesData,
-            linksData.filter(d => d.target.schcode != '00000')
-              .filter(d => d.source.schcode != '00000')//.filter(d => d.value != 1)
-           );
+    select('.btn').on('click', function(){
+      console.log('button press');
+      renderNetwork('.network',
+        nodesData,
+        linksData.filter(d => d.target.schcode != '00000')
+          .filter(d => d.source.schcode != '00000')
+      );
+      //dispatch.call(
+		//'ui-event',
+		//null,
+		//'button',
+		//d3.event.type,
+		//d3.event.value)
+    });
   
-  districtDropdown(metadataLEA.filter(d => [1,2,3].includes(+d.leaType)),
-                   '.dropdown',
-                   nodesData,
-                   linksData);
-  
-  
-}
-    
+  } 
 )
 
 

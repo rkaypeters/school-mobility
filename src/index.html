@@ -10,6 +10,11 @@
   </head>
 	<body>
       <script src='bundle.js' type='text/javascript'></script>
+      <style>
+        .row {
+          margin-bottom: 20px;
+        }
+      </style>
       <div class='container'>
         <div class='intro'>
         <h1>Rhode Island School Mobility</h1>
@@ -20,18 +25,25 @@
         </div>
         <div class='main'>
           <div class='row'>
-            <div class='col-md-12'>
-              <div class="dropdown"></div>
+            <div class='col-md-6'>
+              <!--<p>Zoom to a district:</p>-->
+              <div class="dropdown" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select a district:
+              </div>
+            </div>
+            <div class='col-md-6'>
+              <button type="button" class="btn btn-default">Return to state view</button>
             </div>
           </div>
-          <!--<div class='module overview'></div>-->
-          <!--<div class='module map'></div>-->
           <div class='row'>
             <div class='col-md-12' >
               <div class='module network'></div>
             </div>
           </div>
-          <div class='streamgraph'></div>
+          <div class='row'>
+            <div class='col-md-12' >
+              <div class='streamgraph'></div>
+            </div>
+          </div>
         </div>
       </div>
 	</body>
