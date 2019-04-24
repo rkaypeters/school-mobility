@@ -1,8 +1,6 @@
 import {min, max, geoMercator,scaleLinear,select,nest,key,entries} from 'd3';    
     
-    
-
-function formatEnters(metadataSch,mobstab,geodata,entersdata){
+function formatEnters(metadataSch,mobstab,geodata,entersdata){  
   
   const metaFilter = metadataSch.filter(d => d.status ==1).filter(d=> d.adminSite == 'N').filter(d => d.remove ==0);
   
@@ -187,16 +185,33 @@ function networkSetup(data){
 
 
 
-
-// returns xy, added to the objects for an array data, with object property lndLat, based on rootDom specifications
-
 function myProjection(rootDom,data){
+  const w1 = rootDom.clientWidth;
+  //const h1 = select(rootDom).node().clientHeight;
+  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 200;
+  
+  console.log(select('.intro').node().clientHeight);
+  console.log(select('.dropdown').node().clientHeight); //need this piece
+  
+  console.log(w1);
+  console.log(h1);
+  
+  //const cW = window.innerWidth;
+  //const cH = window.innerHeight;
 
-  const wW = window.innerWidth;
+  var w, h;
+  
+  if(w1>=400){
+     w = w1;
+  }else{ w = 400;};
+  if(h1 >= 600){
+    h = h1;
+  }else{h = 600;};
+  
+  
+  
+  /*const wW = window.innerWidth;
   const wH = window.innerHeight;
-
-  //console.log(wW);
-  //console.log(data);
   
   var w, h;
   
@@ -205,7 +220,7 @@ function myProjection(rootDom,data){
   }else{ w = 400;};
   if(wH>=800){
     h = wH-200;
-  }else{h = 600;};
+  }else{h = 600;};*/
   
   
   const myScale = 50*h;
@@ -229,10 +244,12 @@ function myProjection(rootDom,data){
     return d.lngLat[1];
   })
 
+  
+  var shiftVal = w/1500;
+  
   const projection = geoMercator()
     .scale(myScale)
-    .center([(maxLng+minLng-.35)/2,(maxLat+minLat)/2+.2])
-    //.center(289,127)
+    .center([(maxLng+minLng+.35-shiftVal)/2,(maxLat+minLat)/2+.2])
     //.translate([w/2,h/2]);
 
   data.forEach(d => {d.xy = projection(d.lngLat);
@@ -241,281 +258,39 @@ function myProjection(rootDom,data){
   
   return(data);
 
-}
+};
 
 
-
-///such a mess
-
-function adjustProjection(data){
-  
-  const h = 1000;
-  const w = 750;//NEED TO ADJUST FOR FLEXIBILITY!
-  const margin = 20;
-  
-  //console.log(data);
-  //console.log(data.length);
-  
-  var minX;
-  var maxX;
-  var minY;
-  var maxY;
-  
-  if(data.length>=6){
-    
-    //console.log('length GT 6');
-    minX = min(data, d => d.target.xy[0]);
-    maxX = max(data, d => d.target.xy[0]);
-    minY = min(data, d => d.target.xy[1]);
-    maxY = max(data, d => d.target.xy[1]);
-    
-    //console.log(minY);
-    //console.log(maxY);
-    
-  }else{ ///need to fix this; it's not working with undefined sources
-    minX = Math.min(min(data, d=> d.target.xy[0]),min(data,d => d.source.xy[0]));
-    maxX = Math.max(max(data, d=> d.target.xy[0]),max(data,d => d.source.xy[0]));
-    minY = Math.min(min(data, d=> d.target.xy[1]),min(data,d => d.source.xy[1]));
-    maxY = Math.max(max(data, d=> d.target.xy[1]),max(data,d => d.source.xy[1]));
-  };
-  
-  const yProportion = (maxY - minY)/(h - 2*margin);
-  const xProportion = (maxX - minX)/(w - 2*margin);
-  
-  
-  if(yProportion < xProportion){
-    //console.log('X is the limitation');
-    
-    var scaleX = scaleLinear()
-      .domain([minX,maxX])
-      .range([w/8,7*w/8]);
-    
-    var yNewRange = (maxY-minY)*3*w/(4*(maxX-minX));
-    
-    var scaleY = scaleLinear()
-      .domain([minY,maxY])
-      .range([h/2-3*yNewRange/4,h/2+3*yNewRange/4]);
-    
-  }else{
-    //console.log('Y is the limitation');
-    
-    var scaleY = scaleLinear()
-      .domain([minY,maxY])
-      .range([h/8,7*h/8]);
-    
-    var xNewRange = (maxX-minX)*3*h/(4*(maxY-minY));
-    
-    var scaleX = scaleLinear()
-      .domain([minX,maxX])
-      .range([w/2-3*xNewRange/4,w/2+3*xNewRange/4]);
-    
-  }
-  
-  
-  /*var scaleX = scaleLinear()
-      .domain([minX,maxX])
-      .range([w/4,3*w/4]);
-    
-  var yNewRange = (maxY-minY)*w/(2*(maxX-minX));
-    
-  var scaleY = scaleLinear()
-    .domain([minY,maxY])
-      //.range([h/2-yNewRange/2,h/2+yNewRange/2]);
-    .range([h/4,3*h/4]);*/
-  
-  
-  //console.log(minX);
-  //console.log(maxX);
-  //console.log(minY);
-  //console.log(maxY);
-  
-  
-  data.forEach(d => {
-    const newX = scaleX(d.target.xy[0]);
-    const newY = scaleY(d.target.xy[1]);
-    
-    //console.log(scaleX(d.source.xy[0]));
-    
-    d.target.xyNew = [newX,newY];
-    
-    if(d.source.xy){
-      const newSX = scaleX(d.source.xy[0]);
-      const newSY = scaleY(d.source.xy[1]);
-      
-      d.source.xyNew = [newSX,newSY];
-    } else{
-      const newSX = 20;
-      const newSY = 20;
-      
-      d.source.xyNew = [newSX,newSY];
-    };
-    
-  })
-  
-  
-  //console.log(data);
-  
-  return(data);
-  
-  
-}
-
-
-function adjustProjection2(nodesData,linksData,distcode){
-  
-  console.log(nodesData);
-  console.log(distcode);
-  
-  const minDNodes = 4;
-  //const h = 1000;
-  //const w = 750;//NEED TO ADJUST FOR FLEXIBILITY!
-  const cW = window.innerWidth;
-  const cH = window.innerHeight;
-
-  var w, h;
-  
-  if(cW>=400){
-     w = cW;
-  }else{ w = 400;};
-  if(cH>=800){
-    h = cH-200;
-  }else{h = 600;};
-  
-  const margin = 20;
-  
-  const nodesDataArray = Array.from(nodesData.values());
-  
-  //console.log(nodesDataArray);
-  
-  var filteredNodes = nodesDataArray.filter(d => d.distcode == distcode);
-  //const filteredLinks = linksData.filter(d => d.target.distcode == distcode);
-  
-  //console.log(filteredNodes);
-  //console.log(filteredLinks);
-  
-  //var minX, maxX, minY, maxY;
-  
-  if (filteredNodes.length >= minDNodes){
-    //console.log('greater than D');
-    
-    /*minX = min(filteredNodes, d => d.xy[0]);
-    maxX = max(filteredNodes, d => d.xy[0]);
-    minY = min(filteredNodes, d => d.xy[1]);
-    maxY = max(filteredNodes, d => d.xy[1]);
-    
-    console.log(minY);
-    console.log(maxY);*/
-    
-  }else{
-    console.log('less than D - edit filtered Nodes now');
-  };
-  
-  
-  var minX = min(filteredNodes, d => d.xy[0]);
-  var maxX = max(filteredNodes, d => d.xy[0]);
-  var minY = min(filteredNodes, d => d.xy[1]);
-  var maxY = max(filteredNodes, d => d.xy[1]);
-    
-  //console.log(minY);
-  //console.log(maxY);
-  
-  const yProportion = (maxY - minY)/(h - 2*margin);
-  const xProportion = (maxX - minX)/(w - 2*margin);
-  
-  //console.log(yProportion);
-  //console.log(xProportion);
-  
-  
-  if(yProportion < xProportion){
-    //console.log('X is the limitation');
-    
-    var scaleX = scaleLinear()
-      .domain([minX,maxX])
-      .range([w/8,7*w/8]);
-    
-    var yNewRange = (maxY-minY)*3*w/(4*(maxX-minX));
-    //console.log(yNewRange);
-    
-    var scaleY = scaleLinear()
-      .domain([minY,maxY])
-      .range([h/2-3*yNewRange/4,h/2+3*yNewRange/4]);
-    
-  }else{
-    //console.log('Y is the limitation');
-    
-    var scaleY = scaleLinear()
-      .domain([minY,maxY])
-      .range([h/8,7*h/8]);
-    
-    var xNewRange = (maxX-minX)*3*h/(4*(maxY-minY));
-    //console.log(xNewRange);
-    
-    var scaleX = scaleLinear()
-      .domain([minX,maxX])
-      .range([w/2-3*xNewRange/4,w/2+3*xNewRange/4]);
-    
-  }
-  
-  
-  nodesDataArray.forEach(d =>{
-    
-    if(d.xy){
-      const newX = scaleX(d.xy[0]);
-      const newY = scaleY(d.xy[1]);
-      
-      d.xyNew = [newX,newY];
-    }else{
-      d.xyNew = [20,20];
-    };
-    
-  });
-  
-  //console.log(nodesDataArray);
-  
-  const nodes_tmp = nodesDataArray.map(d => {
-    return [d.schcode, d]
-  });
-  const newNodesMap = new Map(nodes_tmp);
-  
-  newNodesMap.set('00000',{xyNew:[20,20]});
-  
-  //console.log(newNodesMap);
-  
-  linksData.map(d =>{
-    if(newNodesMap.get(d.source.schcode)){
-      const mS = newNodesMap.get(d.source.schcode);
-      d.source.xyNew = mS.xyNew;
-      return d;
-    }
-    
-    if(newNodesMap.get(d.target.schcode)){
-      const mT = newNodesMap.get(d.target.schcode);
-      d.target.xyNew = mT.xyNew;
-      return d;
-    }
-    
-  })
-  
-  //console.log(linksData);
-  
-  return([nodesDataArray,linksData]);
-  
-}
-
-
-
-
-
-
-function adjustProjection3(nodesData,linksData,distcode){
+function adjustProjection(nodesData,linksData,distcode){
   
   //console.log(nodesData);
   //console.log(distcode);
   
+  const w1 = select('.network').node().clientWidth;
+  //const h1 = select(rootDom).node().clientHeight;
+  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 200;
+  
+  console.log(select('.intro').node().clientHeight);
+  console.log(select('.dropdown').node().clientHeight); //need this piece
+  
+  console.log(w1);
+  console.log(h1);
+  
+  //const cW = window.innerWidth;
+  //const cH = window.innerHeight;
+
+  var w, h;
+  
+  if(w1>=400){
+     w = w1;
+  }else{ w = 400;};
+  if(h1 >= 600){
+    h = h1;
+  }else{h = 600;};
+  
+  
   const minDNodes = 4;
-  //const h = 1000;
-  //const w = 750;//NEED TO ADJUST FOR FLEXIBILITY!
-  const cW = window.innerWidth;
+  /*const cW = window.innerWidth;
   const cH = window.innerHeight;
 
   var w, h;
@@ -525,7 +300,7 @@ function adjustProjection3(nodesData,linksData,distcode){
   }else{ w = 400;};
   if(cH>=800){
     h = cH-200;
-  }else{h = 600;};
+  }else{h = 600;};*/
   
   const margin = 20;
   
@@ -556,7 +331,7 @@ function adjustProjection3(nodesData,linksData,distcode){
     
   };
   
-  //console.log(filteredNodes);
+  console.log(filteredNodes);
   
   
   var minX, maxX, minY, maxY;
@@ -575,29 +350,34 @@ function adjustProjection3(nodesData,linksData,distcode){
   
   
     
-  //console.log(minY);
-  //console.log(maxY);
+  console.log(minX);
+  console.log(maxX);
+  console.log(minY);
+  console.log(maxY);
+  console.log(w);
+  console.log(h);
   
-  const yProportion = (maxY - minY)/(h - 2*margin);
-  const xProportion = (maxX - minX)/(w - 2*margin);
+  const yProportion = (maxY - minY)/h;
+  const xProportion = (maxX - minX)/w;
   
-  //console.log(yProportion);
-  //console.log(xProportion);
+  console.log(yProportion);
+  console.log(xProportion);
   
   
   if(yProportion < xProportion){
-    //console.log('X is the limitation');
+    console.log('X is the limitation');
     
     var scaleX = scaleLinear()
       .domain([minX,maxX])
       .range([w/8,7*w/8]);
     
     var yNewRange = (maxY-minY)*3*w/(4*(maxX-minX));
-    //console.log(yNewRange);
+    console.log(yNewRange);
     
     var scaleY = scaleLinear()
       .domain([minY,maxY])
-      .range([h/2-3*yNewRange/4,h/2+3*yNewRange/4]);
+      //.range([h/2-3*yNewRange/4,h/2+3*yNewRange/4]);
+      .range([(h-yNewRange)/2,(h+yNewRange)/2]);
     
   }else{
     //console.log('Y is the limitation');
@@ -611,7 +391,8 @@ function adjustProjection3(nodesData,linksData,distcode){
     
     var scaleX = scaleLinear()
       .domain([minX,maxX])
-      .range([w/2-3*xNewRange/4,w/2+3*xNewRange/4]);
+      .range([(w-xNewRange)/2,(w+xNewRange)/2]);
+      //.range([w/2-3*xNewRange/4,w/2+3*xNewRange/4]);
     
   }
   
@@ -662,4 +443,4 @@ function adjustProjection3(nodesData,linksData,distcode){
 }
 
 
-export {networkSetup,myProjection,adjustProjection,adjustProjection2,adjustProjection3,formatEnters};
+export {networkSetup,myProjection,adjustProjection,formatEnters};

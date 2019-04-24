@@ -14,8 +14,6 @@ import MakeDropdown from './view-modules/dropdowns';
 import {networkSetup,
         myProjection,
         adjustProjection,
-        adjustProjection2,
-        adjustProjection3,
         formatEnters} from './data-manipulation';
 import renderStream from './view-modules/streamgraph';
 
@@ -35,62 +33,6 @@ Promise.all([ mobstabdataPromise,
   //console.log(geodata);
   //console.log(entersdata);
   //console.log(metadataLEA);
-  
-  
-  
-  //// Testing stream ////
-  
-  const meta_tmp = metadataSch.map(d => [d.schcode,d]);
-  const metaMap = new Map(meta_tmp);
-  
-  const lea_tmp = metadataLEA.map(d => [d.distcode,d]);
-  const leaMetaMap = new Map(lea_tmp);
-  
-  const entersDataSch = entersdata
-      .filter(d => d.schcode_dest == '96107')
-      .filter(d => d.schcode_origin != '96107')
-      .map(d => {
-        const md = metaMap.get(d.schcode_dest);
-        d.adminSite_dest = md.adminSite;
-        d.distcode_dest = md.distcode;
-        d.schname30_dest = md.schname30;
-        return d;
-      })
-      .map(d => {
-        //if (d.schcode_origin != '00000' && d.schcode_origin != ' '){
-        if (metaMap.get(d.schcode_origin)){
-          //console.log('step 1!');
-          const md = metaMap.get(d.schcode_origin);
-          if(md.distcode){
-            d.adminSite_origin = md.adminSite;
-            d.distcode_origin = md.distcode;
-            d.schname30_origin = md.schname30;
-            d.gradeCfg_origin = md.gradeCfg;
-          }
-          //return d;
-          //console.log(md);
-        } return d;
-      })
-      .map(d => {
-        const md = leaMetaMap.get(d.distcode_dest);
-        d.distname_dest = md.distname;
-        return d;
-      })
-      .map(d => {
-        if(d.schcode_origin === '00000'){
-          d.distcode_origin = '00';
-        };
-        return d;
-      });
-    
-  //console.log(entersDataSch);
-    
-  renderStream(entersDataSch);
-  
-  
-  /////end of testing///
-  
-  
   
     
   const geoFilter = geodata.filter(d => [1,6,7].includes(+d.schType));
@@ -180,7 +122,7 @@ globalDispatch.on('change:district', (distcode,nodesData,linksData) => {
 
   //console.log(distcode);
   
-  const [adjNodes,adjLinks] = adjustProjection3(nodesData,linksData,distcode);
+  const [adjNodes,adjLinks] = adjustProjection(nodesData,linksData,distcode);
   
   //console.log(adjNodes);
   //console.log(adjLinks);
