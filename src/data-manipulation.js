@@ -278,7 +278,8 @@ function networkSetupLea(data){
         totalEnters: newLink.value,
         adm: +d.adm,
         mobRate: +d.mobRate,
-        distname: d.distname_dest
+        distname: d.distname_dest,
+        distname16: d.distname16_dest
       }; 
 
       nodesData.set(d.distcode_dest,newNode);
@@ -299,6 +300,7 @@ function networkSetupLea(data){
           newNode.adm = +d.adm_origin;
           newNode.mobRate = +d.mobRate_origin;
           newNode.distname = d.distname_origin;
+          newNode.distname16 = d.distname16_origin;
       };
       nodesData.set(d.distcode_origin,newNode);
       newLink.source = newNode;

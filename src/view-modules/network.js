@@ -1,4 +1,4 @@
-import {min,max,select,selectAll,scalePow,scaleLinear,transition,forceSimulation,forceCollide,forceX,forceY} from 'd3';  
+import {min,max,select,selectAll,scalePow,scaleLinear,transition,forceSimulation,forceCollide,forceX,forceY,mouse} from 'd3';  
 
 
 function renderNetwork(rootDom,nodesData,linksData){
@@ -398,8 +398,9 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
     .alpha([.0005])  
     .on('end',function(){
   
+    
       // Links
-
+    
       //var activeSch;
       const links = plot
         .selectAll('.link')
@@ -407,65 +408,34 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
       const linksEnter = links.enter()
         .append('line')
         .attr('class','link');
+        //.attr('class',d => 'link'+d.target.distcode);
     
       links.merge(linksEnter)
         .transition()
         .duration(500)
         .style('stroke-width','1px')
         .attr('x1', d=> {
-          if(d.target.x){
-            return d.target.x;
-          }else{
-            return 20;
-          }
-        })
+          if(d.target.x){return d.target.x;
+            }else{return 20;}})
         .attr('y1', d=> {
-          if(d.target.y){
-            return d.target.y;
-          }else{
-            return 20;
-          }
-        })
+          if(d.target.y){return d.target.y;
+            }else{return 20;}})
         .attr('x2', d=> {
-          if(d.source.x){
-            return d.source.x;
-          }else{
-            return 20;
-          }
-        })
+          if(d.source.x){return d.source.x;
+            }else{return 20;}})
         .attr('y2', d=> {
-          if(d.source.y){
-            return d.source.y;
-          }else{
-            return 20;
-          }
-        })
+          if(d.source.y){return d.source.y;
+          }else{return 20;}})
         .style('stroke','#A9A9A9')
         .style('stroke-opacity',d => {
           if(d.source.distcode === '00'){
             return 0;
           }else{return d.value*d.value *0.03;}});
-  //});
-    
-      //links.merge(linksEnter).on('click', console.log('mouse!');
-            //linkMouseOver)
-        //.on('mouseout', linkMouseOut);;
-        //.style('stroke', d =>{
-          //if(d.target.distcode == distcode){
-            //return 'green';
-          //}else{return 'white'}
-      //});
-      //.style('stroke-opacity',d => {return scaleWeight(d.value)});
-
-      //console.log(links.merge(linksEnter));
 
       links.exit().remove();
     
     
       // Nodes
-    
-      //console.log(nodesData);
-      //console.log(nodesDataArray);
 
       const nodes = plot.selectAll('.node')
         .data(nodesDataArray, d => d.distcode);
@@ -491,125 +461,108 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
         .transition()
         .duration(500)
         .attr('r',function(d){
-          if(d.adm){
-            return Math.cbrt(d.adm+64);
-          }else{return 5;}
-        })
+          if(d.adm){return Math.cbrt(d.adm+64);
+          }else{return 5;}})
         .style('fill-opacity', .95)
         .style('fill', d => {
-          if(d.mobRate){
-            return colorGenerator(d.mobRate);
-          }else{return '#DCDCDC'}
-        })
+          if(d.mobRate){return colorGenerator(d.mobRate);
+          }else{return '#DCDCDC'}})
         .attr('cx',d => {if(d.x){
-          return d.x
-        }})
+          return d.x}})
         .attr('cy',d => {if(d.y){
-          return d.y
-        }});
-    
+          return d.y}});
     
       console.log(nodes.merge(nodesEnter));
       //console.log(linksData);
     
       //plot.selectAll('.node').on('mouseover',console.log('mouse!'));
+
     
-      //nodes.merge(nodesEnter).on('click', d=>{
-          //dispatch.call('select:district',null,d.distcode);
-      //});
-    
-    
-    //console.log(plot.selectAll('circle'));
-    
-       /*plot.selectAll('circle')
-         .on('mouseover',
-          console.log('mousy')
-             /*function(d) {		
-            div.transition()		
-                .duration(200)		
-                .style("opacity", .9);		
-            div	.html(formatTime(d.date) + "<br/>"  + d.close)	
-                .style("left", (d3.event.pageX) + "px")		
-                .style("top", (d3.event.pageY - 28) + "px");	
-            }*/
-        /*)					
-        .on('mouseout', 
-            /*function(d) {		
-            div.transition()		
-                .duration(500)		
-                .style("opacity", 0);	
-        });*/
-    
+      //Highlighting functionality when a node is clicked
       nodes.merge(nodesEnter).on('click', d=>{
         dispatch.call('select:district',null,d.distcode);
-        
-        //if(activeSch != d.schcode){
+      
         var activeDist = d.distcode;
-        //console.log(activeDist);
 
         plot.selectAll('.link')
-        //links.merge(links.enter)
           .style('stroke', e=>{
             if(e.target.distcode == activeDist){
               return '#40848F'
               console.log('highlight');
-            }else{return '#F6F6F6'}
-          })
+            }else{return '#F6F6F6'}})
           .style('stroke-width', e=>{
-            //return (String(Math.sqrt(d.value)/4+.5) + 'px');
             if(e.target.distcode == activeDist){
-              return 2;
-            }
-          //else{return '#F6F6F6'}
-
-          })
+              return 2;}})
           .style('stroke-opacity', e =>{
             if(e.target.distcode ==activeDist){
               return e.value*e.value * 0.06
             }else{if(e.source.distcode =='00'){
               return 0
-            }else{return e.value*e.value * 0.03}}
-          });
-          //.style('stroke-opacity',d => {
-            //if(d.target.schcode ==activeSch){
-              //1;
-            //}else{if(d.target.distcode ==distcode){
-              //d.value*d.value * 0.03;
-            //}else{return '0'}};
-          //});
-        //}else{console.log('second click')};
-      })
-      .on('mouseenter',d =>{
-        //console.log('mouseover node!');
-        /*plot.selectAll('.label')
-          .attr('opacity',e=>{
-            if(e.distcode == d.distcode){return 1};
-          })*/
+            }else{return e.value*e.value * 0.03}}});
+        
+        plot.selectAll('.clickLabel').remove();
         
         plot.append('text')
-          //.attr({
-               //id: "t" + d.x + "-" + d.y + "-" + i,  // Create an id for text so we can select it later for removing on mouseout
-                //x: function() { return 50; },
-                //y: function() { return 50; }
-            //})
+            //.transition()
+            //.duration(1000)
+            .attr('class','clickLabel')
+            .text(d.distname16 + ', mobility rate: ' + Math.round(+d.mobRate*10)/10)
+            .attr('x',d.x)
+            .attr('y',d.y+3)
+            .attr('opacity',1);
+        
+        //Hover functionality when a relevant link is entered
+        links.merge(linksEnter)
+          .on('mouseenter',e=>{
+            if(e.target.distcode == activeDist){
+              plot.append('text')
+                .attr('class','linkMouseOverLabel')
+                .text(f =>{
+                  var myString = e.value + ' student';
+                  if(e.value!=1){myString += 's'};
+                  myString += ' moved from ';
+                  if(e.source.distname){
+                    myString += e.source.distname + '.'
+                  }else{myString += 'out of state.'};
+                  return(myString);
+                })
+                .attr('x',(e.source.x+e.target.x)/2)
+                      //e=>{
+                  //var point = mouse(this);
+                  //return(point[0])
+                  //return((e.source.x+e.target.x)/2)
+                //})
+                .attr('y',(e.source.y+e.target.y)/2)
+                .attr('opacity',1);
+            }
+          })
+          .on('mouseleave', d=>{
+            plot.selectAll('.linkMouseOverLabel')
+              .transition()
+              .duration(400)
+              .remove();
+          })
+      })
+      //Hover functionality for entering a node
+      .on('mouseenter',d =>{
+        plot.append('text')
             //.transition()
             //.duration(1000)
             .attr('class','mouseOverLabel')
-            .text(d.distname)
+            .text(d.distname16 + ', mobility rate: ' + Math.round(+d.mobRate*10)/10)
             .attr('x',d.x)
-            .attr('y',d.y)
+            .attr('y',d.y+3)
             .attr('opacity',1);
       })
       .on('mouseleave',d =>{
-        //console.log('mouseout node!');
         plot.selectAll('.mouseOverLabel')
           .transition()
           .duration(200)
           .remove();
-          //.attr('opacity',0);
       });
     
     console.log(nodesDataArray);
+    console.log(linksData);
     
     
     
