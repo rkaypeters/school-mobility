@@ -59,8 +59,8 @@ function renderStream(data){
   
   //Formatting the format
   const w = select('.streamgraph').node().clientWidth;
-  const h = 150;
-  const margin = {l:25,r:15,t:20,b:20};
+  const h = 130;
+  const margin = {l:25,r:15,t:0,b:20};
   const innerWidth = w - margin.l - margin.r;
   const innerHeight = h - margin.t - margin.b;
   

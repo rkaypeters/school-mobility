@@ -320,14 +320,12 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
 }
 
 function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
-  const w1 = select(rootDom).node().clientWidth;
-  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 235;
   
-  //console.log(select('.intro').node().clientHeight);
-  //console.log(select('.dropdown').node().clientHeight); //need this piece
+  //Format dimensions
+  const w1 = select(rootDom).node().clientWidth;
+  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 275;
 
   var w, h;
-  
   if(w1>=400){
      w = w1;
   }else{ w = 400;};
@@ -339,7 +337,6 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
   
   
   // Overall svg
-  
   const svg = select(rootDom)
     .selectAll('svg')
     .data([1]);
@@ -355,7 +352,6 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
   
   
   // Node colors
-    
   var scaleR = scaleLinear().domain([20,50]).range([234,184]);
   var scaleG = scaleLinear().domain([20,50]).range([206,115]);
   var scaleB = scaleLinear().domain([20,50]).range([182,53]);
@@ -378,7 +374,6 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
           {if(d.xy){
             return d.xy[1]
           }}))
-    //.force('collide',forceCollide().radius(d => {if(d.adm){Math.cbrt(d.adm+8);}else{5;}}))
     .force('collide',forceCollide().radius(function(d){
       if(d.adm){
         return Math.cbrt(d.adm+64);
@@ -394,13 +389,14 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
       const links = plot
         .selectAll('.link')
         .data(linksData);
-      const linksEnter = links.enter().append('line').attr('class','link')
-        .style('stroke-opacity',0.05)
-        .style('stroke-width','1px');
+      const linksEnter = links.enter().append('line').attr('class','link');
 
+      console.log(linksData);
+    
       links.merge(linksEnter)
-        //.transition()
-        //.duration(1000)
+        .transition()
+        .duration(500)
+        .style('stroke-width','1px')
         .attr('x1', d=> {
           if(d.target.x){
               return d.target.x;
@@ -429,15 +425,11 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
               return 20;
           }
         })
-        //.style('stroke-width', d=>{
-        //return ((d.value/4+.5).toString() + 'px');
-        //})
-        .style('stroke','black')
-        //.style('stroke-opacity',d => d.value *0.03);
+        .style('stroke','#A9A9A9')
         .style('stroke-opacity',d => {
           if(d.source.distcode === '00'){
             return 0;
-          }else{return d => d.value*d.value *0.05}});
+          }else{return d.value*d.value *0.03;}});
   //});
     
       //links.merge(linksEnter).on('click', console.log('mouse!');
@@ -468,8 +460,8 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
         .attr('class','node');
 
       nodes.merge(nodesEnter)
-        //.transition()
-        //.duration(1000)
+        .transition()
+        .duration(500)
         .attr('r',function(d){
           if(d.adm){
             return Math.cbrt(d.adm+64);
@@ -521,33 +513,39 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
         }*/);
     
       nodes.merge(nodesEnter).on('click', d=>{
-        //console.log(d);
-        //console.log(d.distcode);
-        //console.log(dispatch);
         
         dispatch.call('select:district',null,d.distcode);
-        //console.log(activeSch);
-        //console.log(d.schcode);
         
         //if(activeSch != d.schcode){
           var activeDist = d.distcode;
-          console.log(activeDist);
-          //console.log(activeSch);
+          //console.log(activeDist);
           //dispatch.call('select:school',null,d.schcode);
           //console.log(plot.selectAll('.link'));
 
           plot.selectAll('.link')
           //links.merge(links.enter)
-            .style('stroke', d=>{
-              if(d.target.distcode == activeDist){
+            .style('stroke', e=>{
+              if(e.target.distcode == activeDist){
                 return '#40848F'
                 console.log('highlight');
               }else{return '#F6F6F6'}
               //console.log(d.target.schcode);
             })
-            .style('stroke-width', d=>{
+            .style('stroke-width', e=>{
               //console.log(d.value);
-              return (String(Math.sqrt(d.value)/4+.5) + 'px');
+              //return (String(Math.sqrt(d.value)/4+.5) + 'px');
+              if(e.target.distcode == activeDist){
+                return 2;
+              }
+            //else{return '#F6F6F6'}
+            
+            })
+            .style('stroke-opacity', e =>{
+              if(e.target.distcode ==activeDist){
+                return e.value*e.value * 0.06
+              }else{if(e.source.distcode =='00'){
+                return 0
+              }else{return e.value*e.value * 0.03}}
             });
             //.style('stroke-opacity',d => {
               //if(d.target.schcode ==activeSch){

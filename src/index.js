@@ -192,7 +192,7 @@ globalDispatch.on('select:school', (schcode,nodesData,linksData) => {
 
 globalDispatch.on('select:district',(distcode) => {
 
-  console.log(distcode);
+  //console.log(distcode);
   
   Promise.all([leaMetadataPromise,leaEntersPromise])
     .then(([metadataLEA,entersdata]) => {
