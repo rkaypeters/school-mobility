@@ -11,7 +11,8 @@ import {mobstabdataPromise,
         leaMobstabdataPromise} from './data-import';
 
 import {renderNetwork,
-        renderNetworkUpdate} from './view-modules/network';
+        renderNetworkUpdate,
+        renderLeaNetwork} from './view-modules/network';
 import MakeDropdown from './view-modules/dropdowns';
 import {networkSetup,
         networkSetupLea,
@@ -51,11 +52,13 @@ Promise.all([ mobstabdataPromise,
     const leaEnters1718 = formatLeaEnters(metadataLEA,mobstabLEA,geodata,metadataSch,entersdataLEA);
     const [nodesDataLea,linksDataLea] = networkSetupLea(leaEnters1718);
 
-    renderNetwork('.network',
-              nodesData,
-              linksData.filter(d => d.target.schcode != '00000')
-                .filter(d => d.source.schcode != '00000')
-             );
+    //renderNetwork('.network',
+              //nodesData,
+              //linksData.filter(d => d.target.schcode != '00000')
+                //.filter(d => d.source.schcode != '00000')
+             //);
+  
+  renderLeaNetwork('.network',nodesDataLea,linksDataLea.filter(d => d.source.distcode != d.target.distcode));
 
     districtDropdown(metadataLEA.filter(d => [1,2,3].includes(+d.leaType)),
                      '.dropdown',

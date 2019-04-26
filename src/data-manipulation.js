@@ -238,7 +238,7 @@ function networkSetup(data){
           newNode.adm = d.adm_origin;
           newNode.schname = d.schname30_dest;
       };
-      nodesData.set(d.shcode_origin,newNode); //what is this bug??
+      //nodesData.set(d.shcode_origin,newNode); //what is this bug??
       newLink.source = newNode;
     }else{
       const existingNode = nodesData.get(d.schcode_origin);
@@ -327,7 +327,7 @@ function myProjection(rootDom,data){
   }else{h = 600;};
   
   
-  const myScale = 50*h;
+  const myScale = 57*h;
   
   const projection_tm = geoMercator()
 
@@ -349,7 +349,7 @@ function myProjection(rootDom,data){
   
   const projection = geoMercator()
     .scale(myScale)
-    .center([(maxLng+minLng+.35-shiftVal)/2,(maxLat+minLat)/2+.2])
+    .center([(maxLng+minLng+.35-shiftVal)/2,(maxLat+minLat)/2+.175])
     //.translate([w/2,h/2]);
 
   data.forEach(d => {d.xy = projection(d.lngLat);
