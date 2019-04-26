@@ -198,8 +198,8 @@ function formatLeaEnters(metadataLEA,mobstabLEA,geodata,metadataSch,entersdataLE
 
 
 function networkSetup(data){
-
-  //console.log(data);
+  //Takes the formatted enters data and makes it into nodes and links
+  
   const nodesData = new Map();
   const linksData = [];
 
@@ -238,7 +238,7 @@ function networkSetup(data){
           newNode.adm = d.adm_origin;
           newNode.schname = d.schname30_dest;
       };
-      nodesData.set(d.shcode_origin,newNode);
+      nodesData.set(d.shcode_origin,newNode); //what is this bug??
       newLink.source = newNode;
     }else{
       const existingNode = nodesData.get(d.schcode_origin);
@@ -248,17 +248,15 @@ function networkSetup(data){
     linksData.push(newLink);  
   })
 
-  //console.log(nodesData);
-  //console.log(linksData);
-
   return[nodesData,linksData];
 
-}
+};
 
 
-function networkSetupLEA(data){
+function networkSetupLea(data){
 
   //console.log(data);
+  
   const nodesData = new Map();
   const linksData = [];
 
@@ -267,40 +265,39 @@ function networkSetupLEA(data){
       value: d.enters
     };
 
-    if(!nodesData.get(d.schcode_dest)){
+    if(!nodesData.get(d.distcode_dest)){
       const newNode = {
-        schcode: d.schcode_dest,
         distcode: d.distcode_dest,
         xy: d.xy_dest,
         totalEnters: newLink.value,
         adm: +d.adm,
         mobRate: +d.mobRate,
-        schname: d.schname30_dest
+        distname: d.distname_dest
       }; 
 
-      nodesData.set(d.schcode_dest,newNode);
+      nodesData.set(d.distcode_dest,newNode);
       newLink.target = newNode;
     }else{
-      const existingNode = nodesData.get(d.schcode_dest);
+      const existingNode = nodesData.get(d.distcode_dest);
         existingNode.totalEnters += newLink.value;
         newLink.target = existingNode;
     };
 
-    if(!nodesData.get(d.schcode_origin)){
+    if(!nodesData.get(d.distcode_origin)){
       const newNode = {
-        schcode: d.schcode_origin,
+        distcode: d.distcode_origin,
         xy: d.xy_origin,
         totalEnters: 0
       }
-      if(d.distcode_origin){
-          newNode.distcode = d.distcode_origin;
+      if(d.distname){
           newNode.adm = d.adm_origin;
-          newNode.schname = d.schname30_dest;
+          newNode.mobRate = +d.mobRate;
+          newNode.distname = d.distname_dest;
       };
-      nodesData.set(d.shcode_origin,newNode);
+      nodesData.set(d.distcode_origin,newNode);
       newLink.source = newNode;
     }else{
-      const existingNode = nodesData.get(d.schcode_origin);
+      const existingNode = nodesData.get(d.distcode_origin);
       newLink.source = existingNode;
     }
     
@@ -510,4 +507,4 @@ function adjustProjection(nodesData,linksData,distcode){
 }
 
 
-export {networkSetup,networkSetupLEA,myProjection,adjustProjection,formatEnters,formatLeaEnters};
+export {networkSetup,networkSetupLea,myProjection,adjustProjection,formatEnters,formatLeaEnters};

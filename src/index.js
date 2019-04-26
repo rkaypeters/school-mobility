@@ -43,13 +43,13 @@ Promise.all([ mobstabdataPromise,
 
     const geoFilter = geodata.filter(d => [1,6,7].includes(+d.schType));
   
+    //School data formatting
     const enters1718 = formatEnters(metadataSch,mobstab,geoFilter,entersdata);
-    //console.log(enters1718);
-
     const [nodesData,linksData] = networkSetup(enters1718);
   
+    //Lea (local education agency/'district') data formatting
     const leaEnters1718 = formatLeaEnters(metadataLEA,mobstabLEA,geodata,metadataSch,entersdataLEA);
-    //console.log(leaEnters1718);
+    const [nodesDataLea,linksDataLea] = networkSetupLea(leaEnters1718);
 
     renderNetwork('.network',
               nodesData,
