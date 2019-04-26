@@ -6,15 +6,19 @@ import {mobstabdataPromise,
         metadataPromise,
         geodataPromise,
         schEntersPromise,
-        leaMetadataPromise} from './data-import';
+        leaMetadataPromise,
+        leaEntersPromise,
+        leaMobstabdataPromise} from './data-import';
 
 import {renderNetwork,
         renderNetworkUpdate} from './view-modules/network';
 import MakeDropdown from './view-modules/dropdowns';
 import {networkSetup,
+        networkSetupLea,
         myProjection,
         adjustProjection,
-        formatEnters} from './data-manipulation';
+        formatEnters,
+        formatLeaEnters} from './data-manipulation';
 import renderStream from './view-modules/streamgraph';
 
 
@@ -24,20 +28,28 @@ Promise.all([ mobstabdataPromise,
              metadataPromise,
              geodataPromise,
              schEntersPromise,
-             leaMetadataPromise])
-  .then(([mobstab,metadataSch,geodata,entersdata,metadataLEA]) => {
+             leaMetadataPromise,
+             leaEntersPromise,
+             leaMobstabdataPromise])
+  .then(([mobstab,metadataSch,geodata,entersdata,metadataLEA,entersdataLEA,mobstabLEA]) => {
                                  
-    //console.log(metadataSch);
+    //console.log(metadataSch);  //for troubleshooting
     //console.log(mobstab);
     //console.log(geodata);
     //console.log(entersdata);
     //console.log(metadataLEA);
+    //console.log(entersdataLEA);
+    //console.log(mobstabLEA);
 
     const geoFilter = geodata.filter(d => [1,6,7].includes(+d.schType));
-
+  
     const enters1718 = formatEnters(metadataSch,mobstab,geoFilter,entersdata);
+    //console.log(enters1718);
 
     const [nodesData,linksData] = networkSetup(enters1718);
+  
+    const leaEnters1718 = formatLeaEnters(metadataLEA,mobstabLEA,geodata,metadataSch,entersdataLEA);
+    //console.log(leaEnters1718);
 
     renderNetwork('.network',
               nodesData,
@@ -81,7 +93,9 @@ function districtDropdown(leaData,rootDom,nodes,links){
   //console.log(leaData);
   
   const districtList = select(rootDom)
-    .append('select');
+    .append('select')
+    .attr('class','form-control form-control-sm')
+    .attr('width',300);
   districtList.selectAll('option')
     .data(leaData)
     .enter()

@@ -4,15 +4,14 @@ My next steps (I think) as of 4/7:
         b. consider altering weight of links to match percentage of students rather than count
         c. title and whatnot
         d. css
-        e. consider repsentation of overall mobility rate in a channel in this chart 
+        done - e. consider repsentation of overall mobility rate in a channel in this chart 
         f. improve labelling
-    5. streamgraph of students by school over time
+    DONE - 5. streamgraph of students by school over time
     6. school information (mobility and stability rate, % economicaly disadvantaged, english learners, nonwhite, proficiency, etc; consider what makes sense)
-    7. fix data errors on comses chools and districts
-    8. check funky geocoding
-    9. adjust zoom/panning
-    10. add option to return to full state.
-    11. (optional if time) - try panning and zooming user features on map. d3 has funcationality such that users can move around if I want to go that way
+    mostly done - 7. fix data errors on comses chools and districts
+    DONE - 8. check funky geocoding
+    DONE - 9. adjust zoom/panning
+    DONE - 10. add option to return to full state.
     
 
 

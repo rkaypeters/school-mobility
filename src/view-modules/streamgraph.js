@@ -2,7 +2,8 @@ import {nest,select,selectAll,sum,scaleLinear,line,area,curveMonotoneX,axisBotto
 
 function renderStream(data){
   
-  //console.log(data);
+  //console.log(data); //For troubleshooting
+  
   
   //Add origin_type to group the incoming students based on their district. Then nest by origin_type
   data.map(d =>{
@@ -20,10 +21,14 @@ function renderStream(data){
     .rollup(function(v) { return sum(v, function(d) { return d.enters; }); })
     .object(data);
   
+  
   //Fill in any missing values.
   var geoOptions = ['out of state','out of district','same district'];
   
   geoOptions.forEach(d =>{
+    if(!originDataRollup[d]){
+      originDataRollup[d]=[];
+    }
     var tmp = originDataRollup[d];
     var i;
     for(i = 68; i < 78; i++){
@@ -33,10 +38,10 @@ function renderStream(data){
     };
   });
 
-  console.log(originDataRollup);
+  //console.log(originDataRollup); //For troubleshooting
+  
   
   //Create stacked data values.
-  
   //var streamCoords = [{key:'out of state',color:'#2B7C8F',values:[]},{key:'out of district',color:'#87BFCC',values:[]},{key:'same district',color:'#A8EFFF',values:[]}];   //just different colors
   var streamCoords = [{key:'out of state',color:'#2B7C8F',values:[]},{key:'out of district',color:'#70b3c2',values:[]},{key:'same district',color:'#b8e1ea',values:[]}];
   
@@ -54,27 +59,17 @@ function renderStream(data){
   };
   
   myStack(originDataRollup);
-  //console.log(streamCoords);
 
-  //Formatting the format.
-  //const w = window.innerWidth;
+  
+  //Formatting the format
   const w = select('.streamgraph').node().clientWidth;
   const h = 150;
-  //const margin = {l:40,r:20,t:20,b:20};
-  const margin = {l:20,r:15,t:20,b:20};
+  const margin = {l:25,r:15,t:20,b:20};
   const innerWidth = w - margin.l - margin.r;
   const innerHeight = h - margin.t - margin.b;
   
-  const svg = select('.streamgraph')
-    .selectAll('svg')
-    .data([1]);
-  const svgEnter = svg.enter()
-    .append('svg');
 
-  const plot = svg.merge(svgEnter)
-    .attr('width', w)
-    .attr('height', h);
-  
+  //Scales for axes
   const maxVal = max(streamCoords[2].values, d => d.y1);
   
   var scaleTop;
@@ -84,11 +79,11 @@ function renderStream(data){
     scaleTop = 40;
   };
   
-  //console.log(scaleTop);
-  
   const scaleX = scaleLinear().domain([68,77]).range([0,innerWidth]);
   const scaleY = scaleLinear().domain([0, scaleTop]).range([innerHeight,0]);
   
+  
+  //Line and area generators (currently only using area)
   const lineGenerator2 = line()
     .curve(curveMonotoneX)
     .x(d => scaleX(+d.key))
@@ -101,9 +96,19 @@ function renderStream(data){
     .y1(d => scaleY(d.y1));
 
   
+  //Applying to svg
+  const svg = select('.streamgraph')
+    .selectAll('svg')
+    .data([1]);
+  const svgEnter = svg.enter()
+    .append('svg');
+
+  const plot = svg.merge(svgEnter)
+    .attr('width', w)
+    .attr('height', h);
+  
   const streams = plot
     .selectAll('.stream')
-    //.data(originDataRollup);
     .data(streamCoords);
   
   const streamsEnter = streams.enter()
@@ -115,14 +120,8 @@ function renderStream(data){
     //.attr('d', data => lineGenerator2(data.values))
     .attr('d', data => areaGenerator(data.values))
     .style('fill',d => d.color);
-    //.style('stroke','#333')
+    //.style('stroke','#333') //optios if using line instead of area
     //.style('stroke-width','2px');
-  
-  
-  console.log(streams.merge(streamsEnter));
-  
-  //streams.exit().remove();
-  
 
   const axisX = axisBottom()
       .scale(scaleX)
@@ -130,13 +129,11 @@ function renderStream(data){
 
   const axisY = axisLeft()
       .scale(scaleY)
-      //.tickSize(-innerWidth)
+      //.tickSize(-innerWidth) //option to extend ticks across chart
       .ticks(3)
   
   const axes = plot
     .selectAll('.axis').remove();
-  
-  //console.log(axes);
   
   plot.append('g')
 		.attr('class','axis')
@@ -147,8 +144,6 @@ function renderStream(data){
 		.attr('class','axis')
         .attr('transform',`translate(${margin.l},${margin.t})`)
 		.call(axisY);
-  
-  
   
 };
 

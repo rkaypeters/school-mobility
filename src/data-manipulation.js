@@ -1,4 +1,5 @@
-import {min, max, geoMercator,scaleLinear,select,nest,key,entries} from 'd3';    
+import {min,max,geoMercator,scaleLinear,select,nest,key,entries,mean} from 'd3';    
+
     
 function formatEnters(metadataSch,mobstab,geodata,entersdata){  
   //This is the initial formatting; it's merging a bunch of csv's to get all of the needed fields in one place.
@@ -19,6 +20,8 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
     .filter(d => d.schcode_dest != ' ')
     .filter(d => d.schcode_origin != d.schcode_dest);
 
+  
+  //Filling in blanks for schools that have no enters, so they still show up
   metaFilter.forEach(d=>{
     var count = 0;
     enters_tmp.forEach(e=>{
@@ -27,19 +30,16 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
       }
     });
     if(count == 0){
-      //console.log(d.schcode);
       enters_tmp.push({
         reportID: '77',
         schcode_dest: d.schcode,
         schcode_origin: '00000',
         enters: 0});
     };
-    
   });
   
-  //console.log(enters_tmp);
   
-  
+  //Now lots of merging and such
   const enters1718 = enters_tmp
     .map(d => {
       const md = metaMap.get(d.schcode_dest);
@@ -56,9 +56,7 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
       return d;
     })
     .map(d => {
-      //if (d.schcode_origin != '00000' && d.schcode_origin != ' '){
       if (metaMap.get(d.schcode_origin)){
-        //console.log('step 1!');
         const md = metaMap.get(d.schcode_origin);
         if(md.distcode){
           d.adminSite_origin = md.adminSite;
@@ -66,60 +64,137 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
           d.schname30_origin = md.schname30;
           d.gradeCfg_origin = md.gradeCfg;
         }
-        //return d;
-        //console.log(md);
       } return d;
       })
-      .filter(d => d.adminSite_dest == 'N')
-      .map(d => {
-          const gd = geoMap.get(d.schcode_dest);
-          if(gd){
-              d.lngLat_dest = gd.lngLat;
-              d.xy_dest = gd.xy;
-              //console.log('geoMap!');
-          }else{//console.log('no geoMap!');
-            if(d.schcode_dest === '00000'){
-               d.xy_dest = [20,20];
-                console.log('out of state');
-               //};
-               //if(d.schcode === /190$/){
-                  //console.log('190 school');
-                  //d.xy_dest = [20,700];
-               //}
-                }else{d.xy_dest = [20,700];
-                     console.log('other');}
-               }
-          const go = geoMap.get(d.schcode_origin);
-          if(go){
-              d.lngLat_origin = go.lngLat;
-              d.xy_origin = go.xy;
-          }else{if(d.schcode_origin === '00000'){
-               d.xy_origin = [20,20];
-                //console.log('out of state');
-               //};
-               //if(d.schcode === /190$/){
-                  //console.log('190 school');
-                  //d.xy_dest = [20,700];
-               //}
-                }else{d.xy_origin = [20,700];}
-               }
-        //else{
-          //  d.xy_origin = [20,700];
-          //}
-          return d;
-          });
-  
-  //console.log(enters1718);
-  
-  const entersBySch = nest()
-    .key(d => d.schcode_dest)
-    .entries(enters1718);
-  
-  //console.log(entersBySch);
+    .filter(d => d.adminSite_dest == 'N')
+    .map(d => {
+        const gd = geoMap.get(d.schcode_dest);
+        if(gd){
+            d.lngLat_dest = gd.lngLat;
+            d.xy_dest = gd.xy;
+        }else{
+          if(d.schcode_dest === '00000'){
+             d.xy_dest = [20,20];
+              console.log('out of state');
+              }else{d.xy_dest = [20,700];
+                   console.log('other');}
+             }
+        const go = geoMap.get(d.schcode_origin);
+        if(go){
+            d.lngLat_origin = go.lngLat;
+            d.xy_origin = go.xy;
+        }else{if(d.schcode_origin === '00000'){
+             d.xy_origin = [20,20];
+             //};
+             //if(d.schcode === /190$/){
+                //d.xy_dest = [20,700];
+             //}
+              }else{d.xy_origin = [20,700];}
+             }
+        return d;
+        });
   
   return(enters1718);
   
 }
+
+
+function formatLeaEnters(metadataLEA,mobstabLEA,geodata,metadataSch,entersdataLEA){  
+  //Formatting data for LEA view
+  
+  const meta_tmp = metadataLEA.filter(d => d.remove != 1)
+    .map(d => [d.distcode,d]);
+  const metaMap = new Map(meta_tmp);
+  const meta_tmpSch = metadataSch.map(d => [d.schcode,d]);
+  const metaMapSch = new Map(meta_tmpSch);
+  const mobstab_tmp = mobstabLEA.map(d => [d.distcode,d]);
+  const mobstabMap = new Map(mobstab_tmp);
+  
+  
+  //I don't have coordinates for districts so I'm making them the average of the schools.
+  const geodataMeta = geodata.filter(d => [1,6,7].includes(+d.schType))
+    .map(d => {
+      const md = metaMapSch.get(d.schcode);
+      if(md){
+        d.distcode = md.distcode;
+      };
+      return d;
+    }).filter(d => d.distcode);
+  
+  const geodataDist = nest()
+    .key(d => d.distcode)
+    .rollup(function(v){ return{
+      lngLat: [mean(v, w => w.lngLat[0]),mean(v, w => w.lngLat[1])],
+      xy: [mean(v, w => w.xy[0]),mean(v, w => w.xy[1])]
+    }})
+    .entries(geodataMeta);
+  
+  const geo_tmp = geodataDist.map(d => [d.key,d.value]);
+  const geoMap = new Map(geo_tmp);
+  
+  
+  //Now formatting the enters data, merging everything
+  const enters_tmp = entersdataLEA.filter(d => d.reportID ==77);
+  
+  metadataLEA.filter(d => d.remove != 1).forEach(d=>{
+    var count = 0;
+    enters_tmp.forEach(e=>{
+      if(d.distcode === e.distcode_dest){
+        count += 1;
+      }
+    });
+    if(count == 0){
+      enters_tmp.push({
+        reportID: '77',
+        distcode_dest: d.distcode,
+        distcode_origin: '00',
+        enters: 0});
+    };
+    
+  });
+  
+  const enters1718 = enters_tmp
+    .map(d => {
+      const md = metaMap.get(d.distcode_dest);
+      d.distname_dest = md.distname;
+      d.distname16_dest = md.distname16;
+      return d;
+    })
+    .map( d =>{
+      const msd = mobstabMap.get(d.distcode_dest);
+      d.adm = msd.adm;
+      d.mobRate = msd.mobRate1;
+      return d;
+    })
+    .map(d => {
+      if (metaMap.get(d.distcode_origin)){
+        const md = metaMap.get(d.distcode_origin);
+        if(md.distcode){
+          d.distname_origin = md.distname;
+          d.distname16_origin = md.distname16;
+        }
+      } return d;
+    })
+    .map(d => {
+      const gd = geoMap.get(d.distcode_dest);
+      if(gd){
+          d.lngLat_dest = gd.lngLat;
+          d.xy_dest = gd.xy;
+      }
+      const go = geoMap.get(d.distcode_origin);
+      if(go){
+          d.lngLat_origin = go.lngLat;
+          d.xy_origin = go.xy;
+      }else{if(d.distcode_origin === '00'){
+           d.xy_origin = [20,20];
+            }else{d.xy_origin = [20,700];}
+           }
+      return d;
+    });
+  
+  return(enters1718);
+  
+};
 
 
 function networkSetup(data){
@@ -181,13 +256,69 @@ function networkSetup(data){
 }
 
 
+function networkSetupLEA(data){
+
+  //console.log(data);
+  const nodesData = new Map();
+  const linksData = [];
+
+  data.forEach(d => {
+    const newLink = {
+      value: d.enters
+    };
+
+    if(!nodesData.get(d.schcode_dest)){
+      const newNode = {
+        schcode: d.schcode_dest,
+        distcode: d.distcode_dest,
+        xy: d.xy_dest,
+        totalEnters: newLink.value,
+        adm: +d.adm,
+        mobRate: +d.mobRate,
+        schname: d.schname30_dest
+      }; 
+
+      nodesData.set(d.schcode_dest,newNode);
+      newLink.target = newNode;
+    }else{
+      const existingNode = nodesData.get(d.schcode_dest);
+        existingNode.totalEnters += newLink.value;
+        newLink.target = existingNode;
+    };
+
+    if(!nodesData.get(d.schcode_origin)){
+      const newNode = {
+        schcode: d.schcode_origin,
+        xy: d.xy_origin,
+        totalEnters: 0
+      }
+      if(d.distcode_origin){
+          newNode.distcode = d.distcode_origin;
+          newNode.adm = d.adm_origin;
+          newNode.schname = d.schname30_dest;
+      };
+      nodesData.set(d.shcode_origin,newNode);
+      newLink.source = newNode;
+    }else{
+      const existingNode = nodesData.get(d.schcode_origin);
+      newLink.source = existingNode;
+    }
+    
+    linksData.push(newLink);  
+  })
+
+  //console.log(nodesData);
+  //console.log(linksData);
+
+  return[nodesData,linksData];
+
+}
+
+
 
 function myProjection(rootDom,data){
   const w1 = rootDom.clientWidth;
-  //const h1 = select(rootDom).node().clientHeight;
-  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 200;
-  
-  console.log(select('.dropdown').node().clientHeight); //need this piece
+  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 220;
 
   var w, h;
   
@@ -379,4 +510,4 @@ function adjustProjection(nodesData,linksData,distcode){
 }
 
 
-export {networkSetup,myProjection,adjustProjection,formatEnters};
+export {networkSetup,networkSetupLEA,myProjection,adjustProjection,formatEnters,formatLeaEnters};

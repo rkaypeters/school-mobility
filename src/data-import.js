@@ -7,15 +7,42 @@ const metadataPromise = csv('./data/sch_metadata.csv',parseMetadata);
 const geodataPromise = csv('./data/RI_Schools_coordinates_Mar2019.csv',parseGeodata);
 const schEntersPromise = csv('./data/sch_enters_data_0809_1718.csv',parseEnterdata);
 const leaMetadataPromise = csv('./data/lea_metadata.csv',parseLeaMetadata);
+const leaEntersPromise = csv('./data/dist_enters_data_0809_1718.csv',parseLeaEnterdata);
+const leaMobstabdataPromise = csv('./data/mobstab18/dist_mobstab1718.csv',parseLeaMobstab);
 
 
 export {mobstabdataPromise,
   metadataPromise,
   geodataPromise,
   schEntersPromise,
-  leaMetadataPromise};
+  leaMetadataPromise,
+  leaEntersPromise,
+  leaMobstabdataPromise};
 
 //// Parse functions
+
+function parseLeaEnterdata(d){
+    return{
+        reportID: d.reportID,
+        distcode_origin: d.distcode_origin_enter,
+        distcode_dest: d.distcode_dest_enter,
+        enters: +d.enters
+    }
+}
+
+function parseLeaMobstab(d){
+    return{
+        distcode: d.distcode,
+        adm: d.adm,
+        tot_enrolls: d.tot_enrolls,
+        enrolls: d.enrolls,
+        exits: d.exits,
+        enrolls_yr: d.enrolls_yr,
+        mobRate: d.mobRate,
+        mobRate1: d.mobRate1,
+        stabRate: d.stabRate
+    }
+}
 
 function parseEnterdata(d){
     return{
@@ -85,7 +112,8 @@ function parseLeaMetadata(d){
     distname8: d.LEA_NAME8,
     leaLowGrade: d.LEA_LOW_GRADE,
     leaHighGrade: d.LEA_HIGH_GRADE,
-    leaType: d.LEA_TYPE
+    leaType: d.LEA_TYPE,
+    remove: d.remove
   }
   
   delete d.SUPTADDRL1;

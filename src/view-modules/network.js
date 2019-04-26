@@ -4,13 +4,13 @@ import {min,max,select,selectAll,scalePow,scaleLinear,transition,forceSimulation
 function renderNetwork(rootDom,nodesData,linksData){
   const w1 = select(rootDom).node().clientWidth;
   //const h1 = select(rootDom).node().clientHeight;
-  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 200;
+  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 235;
   
   console.log(select('.intro').node().clientHeight);
   console.log(select('.dropdown').node().clientHeight); //need this piece
   
-  console.log(w1);
-  console.log(h1);
+  //console.log(w1);
+  //console.log(h1);
   
   //const cW = window.innerWidth;
   //const cH = window.innerHeight;
@@ -349,7 +349,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
     // Select text by id and then remove
     d3.select("#t" + d.x + "-" + d.y + "-" + i).remove();  // Remove text location*/
     
-    console.log('linke mouseout!');
+    console.log('link mouseout!');
     
   }
   
