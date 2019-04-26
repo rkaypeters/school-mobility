@@ -13,7 +13,7 @@ import {mobstabdataPromise,
 import {renderNetwork,
         renderNetworkUpdate,
         renderLeaNetwork} from './view-modules/network';
-import MakeDropdown from './view-modules/dropdowns';
+//import MakeDropdown from './view-modules/dropdowns';
 import {networkSetup,
         networkSetupLea,
         myProjection,
@@ -41,7 +41,7 @@ Promise.all([ mobstabdataPromise,
     //console.log(metadataLEA);
     //console.log(entersdataLEA);
     //console.log(mobstabLEA);
-
+  
     const geoFilter = geodata.filter(d => [1,6,7].includes(+d.schType));
   
     //School data formatting
@@ -59,7 +59,7 @@ Promise.all([ mobstabdataPromise,
                 //.filter(d => d.source.schcode != '00000')
              //);
   
-  renderLeaNetwork('.network',nodesDataLea,linksDataLea.filter(d => d.source.distcode != d.target.distcode));
+  renderLeaNetwork('.network',nodesDataLea,linksDataLea.filter(d => d.source.distcode != d.target.distcode),globalDispatch);
 
     districtDropdown(metadataLEA.filter(d => [1,2,3].includes(+d.leaType)),
                      '.dropdown',
@@ -74,8 +74,12 @@ Promise.all([ mobstabdataPromise,
         //linksData.filter(d => d.target.schcode != '00000')
           //.filter(d => d.source.schcode != '00000')
       //);
-      renderLeaNetwork('.network',nodesDataLea,linksDataLea.filter(d => d.source.distcode != d.target.distcode));
+      renderLeaNetwork('.network',
+                       nodesDataLea,
+                       linksDataLea.filter(d => d.source.distcode != d.target.distcode),
+                       globalDispatch);
     });
+
   
   } 
 )
@@ -84,14 +88,16 @@ Promise.all([ mobstabdataPromise,
 /// Dropdown
 
 function districtDropdown(leaData,rootDom,nodes,links){
+  //This creates the dropdown.
   
+  //Sort LEA names in alphabetical order for the drop down
   leaData.sort(function(a,b){
     if(a.distname < b.distname) {return -1;}
     if(a.firstname > b.firstname) {return 1;}
   })
+
   
-  //console.log(leaData);
-  
+  //Create the necessary dom elements
   const districtList = select(rootDom)
     .append('select')
     .attr('class','form-control form-control-sm')
@@ -103,29 +109,25 @@ function districtDropdown(leaData,rootDom,nodes,links){
     .attr('value',d=> d.distcode)
     .html(d => d.distname);
   
+  //Call the 'change:district' dispatch when a new district is chosen.
   districtList.on('change',function(){
     const distcode = this.value;
     globalDispatch.call('change:district',null,distcode,nodes,links);
+    globalDispatch.call('select:district',null,distcode);
     
   });
-
   
 }
 
 
 /// Global Dispatches
 
-const globalDispatch = dispatch('change:district','select:school');
+const globalDispatch = dispatch('change:district','select:school','select:district');
 
 globalDispatch.on('change:district', (distcode,nodesData,linksData) => {
-
-  //console.log(distcode);
+  //This updates the network view when a district is chosen from the dropdown.
   
   const [adjNodes,adjLinks] = adjustProjection(nodesData,linksData,distcode);
-  
-  //console.log(adjNodes);
-  //console.log(adjLinks);
-  
   
   renderNetworkUpdate('.network',adjNodes,adjLinks,distcode,globalDispatch);
   
@@ -133,15 +135,80 @@ globalDispatch.on('change:district', (distcode,nodesData,linksData) => {
 
 
 globalDispatch.on('select:school', (schcode,nodesData,linksData) => {
-
-  console.log(schcode);
+  //This function updates the streamgraph when a school is selected.
   
+  //First the original data need to be formatted and filtered differently than we've been using in the map view to get all years of data
   Promise.all([ metadataPromise,
              schEntersPromise,
              leaMetadataPromise])
   .then(([metadataSch,entersdata,metadataLEA]) => {
   
-  //const entersData = schEntersPromise.then(result =>{
+    const meta_tmp = metadataSch.map(d => [d.schcode,d]);
+    const metaMap = new Map(meta_tmp);
+    const lea_tmp = metadataLEA.map(d => [d.distcode,d]);
+    const leaMetaMap = new Map(lea_tmp);
+
+    const entersDataSch = entersdata
+        .filter(d => d.schcode_dest == schcode)
+        .filter(d => d.schcode_origin != schcode)
+        .map(d => {
+          const md = metaMap.get(d.schcode_dest);
+          d.adminSite_dest = md.adminSite;
+          d.distcode_dest = md.distcode;
+          d.schname30_dest = md.schname30;
+          return d;
+        })
+        .map(d => {
+          if (metaMap.get(d.schcode_origin)){
+            const md = metaMap.get(d.schcode_origin);
+            if(md.distcode){
+              d.adminSite_origin = md.adminSite;
+              d.distcode_origin = md.distcode;
+              d.schname30_origin = md.schname30;
+              d.gradeCfg_origin = md.gradeCfg;
+            }
+          } return d;
+        })
+        .map(d => {
+          const md = leaMetaMap.get(d.distcode_dest);
+          d.distname_dest = md.distname;
+          return d;
+        })
+        .map(d => {
+          if(d.schcode_origin === '00000'){
+            d.distcode_origin = '00';
+          };
+          return d;
+        });  
+    
+    //Now call renderStream
+    renderStream(entersDataSch);
+    window.scrollTo({top:500, behavior: 'smooth' });
+    
+  });
+  
+});
+
+
+globalDispatch.on('select:district',(distcode) => {
+
+  console.log(distcode);
+  
+  Promise.all([leaMetadataPromise,leaEntersPromise])
+    .then(([metadataLEA,entersdata]) => {
+  
+    //console.log(metadataLEA);
+    //console.log(entersdata);
+    
+    const entersDataDist = entersdata
+      .filter(d => d.distcode_dest == distcode);
+    
+    //console.log(entersDataDist);
+    
+    renderStream(entersDataDist);
+    window.scrollTo({top:500, behavior: 'smooth' });
+    
+  /*/
   
     const meta_tmp = metadataSch.map(d => [d.schcode,d]);
     const metaMap = new Map(meta_tmp);
@@ -195,57 +262,10 @@ globalDispatch.on('select:school', (schcode,nodesData,linksData) => {
     
     console.log(entersDataSch);
     
-    renderStream(entersDataSch,schcode);
+    renderStream(entersDataSch);*/
     
   });
   
   
 });
-
-
-
-
-
-
-
-
-/////////// OLD STUFF //////////////
-
-//This isn't actually the bar chart; it's just the dots to practicing displaying this for now.
-//retired this, but leaving the code for now in case it helps later when/if I want circles for the nodes.
-
-function drawBarChart(rootDom,data){
-    
-    const w = rootDom.clientWidth;
-    //const h = rootDom.clientHeight;
-    
-    const plot = select(rootDom)
-        .append('svg')
-        .attr('width', w)
-        .attr('height', 100)
-        .append('g'); //adds g element in svg
-    
-    const nodes = plot.selectAll('.node')
-        .data(data,d => d.key); //what is this
-    const nodesEnter = nodes.enter().append ('g')
-        .attr('class','node')
-    nodes.merge(nodesEnter)
-		.attr('transform', d => {
-			//const xy = projection(d.origin_lngLat);
-			return `translate(${d.mobRate1*w/100}, 50)`;
-		})//not sure what this does
-    nodesEnter.append('circle');
-    nodes.merge(nodesEnter)
-        .attr('x', d => d.mobRate1)
-        .select('circle')
-		//.attr('r', d => scaleSize(d.total))
-        .attr('r', 10)
-		.style('fill-opacity', .03)
-		.style('stroke', '#000')
-		.style('stroke-width', '1px')
-		.style('stroke-opacity', .2) ;
-    
-    //console.loge(nodes);
-    
-}
 

@@ -1,9 +1,7 @@
 import {nest,select,selectAll,sum,scaleLinear,line,area,curveMonotoneX,axisBottom,axisLeft,max} from 'd3';
 
 function renderStream(data){
-  
-  //console.log(data); //For troubleshooting
-  
+  //This function displays the streamgraph
   
   //Add origin_type to group the incoming students based on their district. Then nest by origin_type
   data.map(d =>{
@@ -20,7 +18,7 @@ function renderStream(data){
     .key(d => d.reportID)
     .rollup(function(v) { return sum(v, function(d) { return d.enters; }); })
     .object(data);
-  
+
   
   //Fill in any missing values.
   var geoOptions = ['out of state','out of district','same district'];
@@ -37,8 +35,6 @@ function renderStream(data){
       };
     };
   });
-
-  //console.log(originDataRollup); //For troubleshooting
   
   
   //Create stacked data values.
@@ -146,5 +142,6 @@ function renderStream(data){
 		.call(axisY);
   
 };
+
 
 export default renderStream;

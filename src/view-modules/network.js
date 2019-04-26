@@ -319,7 +319,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
 
 }
 
-function renderLeaNetwork(rootDom,nodesData,linksData){
+function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
   const w1 = select(rootDom).node().clientWidth;
   const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 235;
   
@@ -381,7 +381,7 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
     //.force('collide',forceCollide().radius(d => {if(d.adm){Math.cbrt(d.adm+8);}else{5;}}))
     .force('collide',forceCollide().radius(function(d){
       if(d.adm){
-        return Math.cbrt(d.adm+8);
+        return Math.cbrt(d.adm+64);
       }else{return 5;}
     }))
     .tick([100])
@@ -472,7 +472,7 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
         //.duration(1000)
         .attr('r',function(d){
           if(d.adm){
-            return Math.cbrt(d.adm+8);
+            return Math.cbrt(d.adm+64);
           }else{return 5;}
         })
         .style('fill-opacity', .95)
@@ -494,7 +494,38 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
     
       plot.selectAll('.node').on('mouseover',console.log('mouse!'));
     
+      //nodes.merge(nodesEnter).on('click', d=>{
+          //dispatch.call('select:district',null,d.distcode);
+      //});
+    
+    
+    console.log(plot.selectAll('circle'));
+    
+       plot.selectAll('circle')
+         .on('mouseover',
+          console.log('mousy')
+             /*function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div	.html(formatTime(d.date) + "<br/>"  + d.close)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            }*/
+        )					
+        .on('mouseout', 
+            /*function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        }*/);
+    
       nodes.merge(nodesEnter).on('click', d=>{
+        //console.log(d);
+        //console.log(d.distcode);
+        //console.log(dispatch);
+        
+        dispatch.call('select:district',null,d.distcode);
         //console.log(activeSch);
         //console.log(d.schcode);
         
@@ -553,6 +584,27 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
         .attr('y',d => {if(d.y){
                 return d.y
           }})*/
+    
+    console.log(plot.selectAll('circle'));
+    
+       plot.selectAll('circle')
+         .on('mouseenter',
+          console.log('mousy')
+             /*function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div	.html(formatTime(d.date) + "<br/>"  + d.close)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            }*/
+        )					
+        .on('mouseout', 
+            /*function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        }*/)
     
     nodes.exit().remove();
     links.exit().remove();

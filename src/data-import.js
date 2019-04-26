@@ -131,8 +131,6 @@ function parseGeodata(d){
         schname: d.SCH_NAME,
         city: d.SCH_CITY,
         zip: d.SCH_ZIP,
-        //lng: d.Longitude_geocode,
-        //lat: d.Latitude_geocode
         lngLat: [+d.Longitude_geocode, +d.Latitude_geocode],
         schType: d.School_type_code
     }
