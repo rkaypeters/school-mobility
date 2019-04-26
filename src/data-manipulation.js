@@ -372,7 +372,7 @@ function adjustProjection(nodesData,linksData,distcode){
   const w1 = select('.network').node().clientWidth;
   const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 200;
   
-  console.log(select('.dropdown').node().clientHeight); //need this piece
+  //console.log(select('.dropdown').node().clientHeight); //need this piece
 
   var w, h;
   
@@ -408,7 +408,7 @@ function adjustProjection(nodesData,linksData,distcode){
     
   };
   
-  console.log(filteredNodes);
+  //console.log(filteredNodes);
   
   
   var minX, maxX, minY, maxY;
