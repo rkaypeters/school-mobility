@@ -2,18 +2,14 @@ import {min,max,select,selectAll,scalePow,scaleLinear,transition,forceSimulation
 
 
 function renderNetwork(rootDom,nodesData,linksData){
+  //This is the original state-level view with all schools. It's no longer in use as I switched to a district aggregation.
+  
+  //Setting svg dimensions
   const w1 = select(rootDom).node().clientWidth;
-  //const h1 = select(rootDom).node().clientHeight;
   const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 235;
   
   console.log(select('.intro').node().clientHeight);
   console.log(select('.dropdown').node().clientHeight); //need this piece
-  
-  //console.log(w1);
-  //console.log(h1);
-  
-  //const cW = window.innerWidth;
-  //const cH = window.innerHeight;
 
   var w, h;
   
@@ -24,9 +20,8 @@ function renderNetwork(rootDom,nodesData,linksData){
     h = h1;
   }else{h = 600;};
   
-  //console.log(w);
-  //console.log(h);
   
+  //Set up full svg
   const svg = select(rootDom)
     .selectAll('svg')
     .data([1]);
@@ -42,13 +37,11 @@ function renderNetwork(rootDom,nodesData,linksData){
   plot.selectAll('.label')
     .remove();
   
+  //Display links
   const links = plot
     .selectAll('.link')
     .data(linksData);
   const linksEnter = links.enter().append('line').attr('class','link');
-    //.style('stroke-opacity',0.05)
-    //.style('stroke-width','1px')
-    //.style('stroke','#808080');
 
   links.merge(linksEnter)
     .style('stroke-opacity',0.05)
@@ -82,68 +75,39 @@ function renderNetwork(rootDom,nodesData,linksData){
           return 0;
       }
     })
-    //.style('stroke-width', d=>{
-    //return (d.value.toString() + 'px');
-    //})
     .style('stroke-opacity',d => {return (d.value * 0.05)});
   
   links.exit().remove();
 
-}
+};
 
 
 function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
-  //const w = rootDom.clientWidth; // these aren't working out for me; i'm getting much smaller blocks
-  //const h = rootDom.clientHeight;
-  //console.log(w);
-  //console.log(h);
 
-  //console.log(nodesData);
-  //console.log(linksData);
-  
-  /*const cW = window.innerWidth;
-  const cH = window.innerHeight;
-
-  var w, h;
-  
-  if(cW>=400){
-     w = cW;
-  }else{ w = 400;};
-  if(cH>=800){
-    h = cH-200;
-  }else{h = 600;};*/
-  
-  console.log(nodesData);
-  
-  
   // Overall svg
-  
   const svg = select(rootDom)
     .selectAll('svg')
     .data([1]);
   const svgEnter = svg.enter()
     .append('svg');
-
   const plot = svg.merge(svgEnter);
-    //.attr('width', w)
-    //.attr('height', h);
-  
   
   
   // Node colors
-    
   var scaleR = scaleLinear().domain([20,50]).range([234,184]);
   var scaleG = scaleLinear().domain([20,50]).range([206,115]);
   var scaleB = scaleLinear().domain([20,50]).range([182,53]);
   var scaleL = scaleLinear().domain([0,60]).range([95,40]);
   var scaleS = scaleLinear().domain([0,60]).range([50,100]);
 
-  var colorGenerator = (d => 'hsl(23,' + Math.round(scaleS(d)) +'%,' + 
-                        Math.round(scaleL(d))
-                          + '%)');
+  var colorGenerator = (d => 'hsl(23,' +
+    Math.round(scaleS(d)) +'%,' + 
+    Math.round(scaleL(d)) + '%)');
 
   //var activeSch;
   
+  
+  //Force simulation - to avoid overlapping schools
   forceSimulation(nodesData)
     .force('x',forceX(d=>
           {if(d.xyNew){
@@ -159,7 +123,6 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
     .on('end',function(){
   
       // Links
-
       var activeSch;
       const links = plot
         .selectAll('.link')
@@ -167,7 +130,6 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
       const linksEnter = links.enter().append('line').attr('class','link')
         .style('stroke-opacity',0.05)
         .style('stroke-width','1px');
-        //.style('stroke','green');
 
       links.merge(linksEnter)
         .transition()
@@ -234,6 +196,8 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
       const nodesEnter = nodes.enter()
         .append('circle')
         .attr('class','node');
+      
+      nodes.exit().remove();
 
       nodes.merge(nodesEnter)
         .transition()
@@ -292,7 +256,6 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
     
     
       // Labels
-  
       const labels = plot.selectAll('.label')
         .data(nodesData, d=> d.schcode);
 
@@ -309,10 +272,10 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
           }
         })
         .attr('x',d => {if(d.x){
-                return d.x
+                return d.x +Math.sqrt(d.adm + 4)/4
               }})
         .attr('y',d => {if(d.y){
-                return d.y
+                return d.y+3
           }})
   
   });
@@ -358,17 +321,10 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
 
 function renderLeaNetwork(rootDom,nodesData,linksData){
   const w1 = select(rootDom).node().clientWidth;
-  //const h1 = select(rootDom).node().clientHeight;
   const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 235;
   
   console.log(select('.intro').node().clientHeight);
   console.log(select('.dropdown').node().clientHeight); //need this piece
-  
-  //console.log(w1);
-  //console.log(h1);
-  
-  //const cW = window.innerWidth;
-  //const cH = window.innerHeight;
 
   var w, h;
   
@@ -380,11 +336,6 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
   }else{h = 600;};
   
   const nodesDataArray = Array.from(nodesData.values());
-  
-  console.log(nodesDataArray);
-  
-  console.log(nodesData);
-  console.log(linksData);
   
   
   // Overall svg
@@ -399,6 +350,8 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
     .attr('width', w)
     .attr('height', h);
   
+  plot.selectAll('.label')
+    .remove();
   
   
   // Node colors
@@ -415,23 +368,20 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
 
   //var activeSch;
   
-  /*forceSimulation(nodesData)
+  //Force simulation to keep nodes from overlapping... a little odd in the state view, but I think helfpul.
+  forceSimulation(nodesDataArray)
     .force('x',forceX(d=>
           {if(d.xy){
             return d.xy[0]
-            console.log(d.xy[0]);
           }}))
     .force('y',forceY(d=>
-          {if(d.value.xy){
-            return d.value.xy[1]
+          {if(d.xy){
+            return d.xy[1]
           }}))
-    .force('collide',forceCollide().radius(d => Math.sqrt(d.adm + 4)))
+    .force('collide',forceCollide().radius(d => Math.cbrt(d.adm+8)))
     .tick([100])
-    .alpha([.0005]);
-  
-  console.log(nodesData);
-  
-    .on('end',function(){*/
+    .alpha([.0005])  
+    .on('end',function(){
   
       // Links
 
@@ -442,35 +392,34 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
       const linksEnter = links.enter().append('line').attr('class','link')
         .style('stroke-opacity',0.05)
         .style('stroke-width','1px');
-        //.style('stroke','green');
 
       links.merge(linksEnter)
         //.transition()
         //.duration(1000)
         .attr('x1', d=> {
-          if(d.target.xy[0]){
-              return d.target.xy[0];
+          if(d.target.x){
+              return d.target.x;
           }else{
               return 20;
           }
         })
         .attr('y1', d=> {
-          if(d.target.xy[1]){
-              return d.target.xy[1];
+          if(d.target.y){
+              return d.target.y;
           }else{
               return 20;
           }
         })
         .attr('x2', d=> {
-          if(d.source.xy[0]){
-              return d.source.xy[0];
+          if(d.source.x){
+              return d.source.x;
           }else{
               return 20;
           }
         })
         .attr('y2', d=> {
-          if(d.source.xy[1]){
-              return d.source.xy[1];
+          if(d.source.y){
+              return d.source.y;
           }else{
               return 20;
           }
@@ -522,49 +471,51 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
             return colorGenerator(d.mobRate);
           }else{return '#DCDCDC'}
         })
-        //.style('fill','orange')
-        .style('stroke-width', '1px')
-        .style('stroke-opacity', .2)
-        .attr('cx',d => {if(d.xy){
-                return d.xy[0]
+        .attr('cx',d => {if(d.x){
+                return d.x
               }})
-        .attr('cy',d => {if(d.xy){
-                return d.xy[1]
+        .attr('cy',d => {if(d.y){
+                return d.y
           }});
     
     
-      console.log(nodes.merge(nodesEnter));
+      //console.log(nodes.merge(nodesEnter));
+      console.log(linksData);
     
       plot.selectAll('.node').on('mouseover',console.log('mouse!'));
     
-      /*nodes.merge(nodesEnter).on('click', d=>{
+      nodes.merge(nodesEnter).on('click', d=>{
         //console.log(activeSch);
         //console.log(d.schcode);
         
-        if(activeSch != d.schcode){
-          var activeSch = d.schcode;  
-          console.log(activeSch);
-          dispatch.call('select:school',null,d.schcode);
-          console.log(plot.selectAll('.link'));
+        //if(activeSch != d.schcode){
+          var activeDist = d.distcode;
+          console.log(activeDist);
+          //console.log(activeSch);
+          //dispatch.call('select:school',null,d.schcode);
+          //console.log(plot.selectAll('.link'));
 
           plot.selectAll('.link')
           //links.merge(links.enter)
             .style('stroke', d=>{
-              if(d.target.schcode == activeSch){
+              if(d.target.distcode == activeDist){
                 return '#40848F'
                 console.log('highlight');
               }else{return '#F6F6F6'}
               //console.log(d.target.schcode);
-
             })
-            .style('stroke-opacity',d => {
-              if(d.target.schcode ==activeSch){
-                1;
-              }else{if(d.target.distcode ==distcode){
-                d.value*d.value * 0.03;
-              }else{return '0'}};
+            .style('stroke-width', d=>{
+              //console.log(d.value);
+              return (String(Math.sqrt(d.value)/4+.5) + 'px');
             });
-        }else{console.log('second click')};
+            //.style('stroke-opacity',d => {
+              //if(d.target.schcode ==activeSch){
+                //1;
+              //}else{if(d.target.distcode ==distcode){
+                //d.value*d.value * 0.03;
+              //}else{return '0'}};
+            //});
+        //}else{console.log('second click')};
       });
     
     
@@ -591,9 +542,12 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
               }})
         .attr('y',d => {if(d.y){
                 return d.y
-          }})
+          }})*/
+    
+    nodes.exit().remove();
+    links.exit().remove();
   
-  });*/
+  });
   
   function linkMouseOver(d, i) {  // Add interactivity
 

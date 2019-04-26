@@ -52,6 +52,7 @@ Promise.all([ mobstabdataPromise,
     const leaEnters1718 = formatLeaEnters(metadataLEA,mobstabLEA,geodata,metadataSch,entersdataLEA);
     const [nodesDataLea,linksDataLea] = networkSetupLea(leaEnters1718);
 
+    //Commented out old view with all schools in the state
     //renderNetwork('.network',
               //nodesData,
               //linksData.filter(d => d.target.schcode != '00000')
@@ -67,17 +68,13 @@ Promise.all([ mobstabdataPromise,
   
     select('.btn').on('click', function(){
       console.log('button press');
-      renderNetwork('.network',
-        nodesData,
-        linksData.filter(d => d.target.schcode != '00000')
-          .filter(d => d.source.schcode != '00000')
-      );
-      //dispatch.call(
-		//'ui-event',
-		//null,
-		//'button',
-		//d3.event.type,
-		//d3.event.value)
+      //Commented out old view with all schools in the state
+      //renderNetwork('.network',
+        //nodesData,
+        //linksData.filter(d => d.target.schcode != '00000')
+          //.filter(d => d.source.schcode != '00000')
+      //);
+      renderLeaNetwork('.network',nodesDataLea,linksDataLea.filter(d => d.source.distcode != d.target.distcode));
     });
   
   } 
