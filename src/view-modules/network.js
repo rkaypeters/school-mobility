@@ -376,7 +376,7 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
           }}))
     .force('collide',forceCollide().radius(function(d){
       if(d.adm){
-        return Math.cbrt(d.adm+64);
+        return (Math.cbrt(d.adm+64)+3);
       }else{return 5;}
     }))
     .tick([100])

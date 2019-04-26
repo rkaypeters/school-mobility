@@ -67,7 +67,6 @@ Promise.all([ mobstabdataPromise,
                      linksData);
   
     select('.btn').on('click', function(){
-      console.log('button press');
       //Commented out old view with all schools in the state
       //renderNetwork('.network',
         //nodesData,
@@ -78,6 +77,8 @@ Promise.all([ mobstabdataPromise,
                        nodesDataLea,
                        linksDataLea.filter(d => d.source.distcode != d.target.distcode),
                        globalDispatch);
+      select('.streamgraph')
+        .selectAll('svg').remove();
     });
 
   

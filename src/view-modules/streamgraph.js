@@ -60,7 +60,7 @@ function renderStream(data){
   //Formatting the format
   const w = select('.streamgraph').node().clientWidth;
   const h = 130;
-  const margin = {l:25,r:15,t:0,b:20};
+  const margin = {l:25,r:15,t:10,b:20};
   const innerWidth = w - margin.l - margin.r;
   const innerHeight = h - margin.t - margin.b;
   
@@ -113,10 +113,10 @@ function renderStream(data){
     .attr('transform', `translate(${margin.l}, ${margin.t})`);
   
   streams.merge(streamsEnter)
-    //.attr('d', data => lineGenerator2(data.values))
+    //.attr('d', data => lineGenerator2(data.values)) //if using line instead of area
     .attr('d', data => areaGenerator(data.values))
     .style('fill',d => d.color);
-    //.style('stroke','#333') //optios if using line instead of area
+    //.style('stroke','#333') //options if using line instead of area
     //.style('stroke-width','2px');
 
   const axisX = axisBottom()
