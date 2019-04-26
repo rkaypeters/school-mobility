@@ -323,8 +323,8 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
   const w1 = select(rootDom).node().clientWidth;
   const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 235;
   
-  console.log(select('.intro').node().clientHeight);
-  console.log(select('.dropdown').node().clientHeight); //need this piece
+  //console.log(select('.intro').node().clientHeight);
+  //console.log(select('.dropdown').node().clientHeight); //need this piece
 
   var w, h;
   
@@ -378,7 +378,12 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
           {if(d.xy){
             return d.xy[1]
           }}))
-    .force('collide',forceCollide().radius(d => Math.cbrt(d.adm+8)))
+    //.force('collide',forceCollide().radius(d => {if(d.adm){Math.cbrt(d.adm+8);}else{5;}}))
+    .force('collide',forceCollide().radius(function(d){
+      if(d.adm){
+        return Math.cbrt(d.adm+8);
+      }else{return 5;}
+    }))
     .tick([100])
     .alpha([.0005])  
     .on('end',function(){
@@ -453,6 +458,7 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
       // Nodes
     
       //console.log(nodesData);
+      //console.log(nodesDataArray);
 
       const nodes = plot.selectAll('.node')
         .data(nodesDataArray, d => d.distcode);
@@ -464,7 +470,11 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
       nodes.merge(nodesEnter)
         //.transition()
         //.duration(1000)
-        .attr('r',d => Math.cbrt(d.adm+8))
+        .attr('r',function(d){
+          if(d.adm){
+            return Math.cbrt(d.adm+8);
+          }else{return 5;}
+        })
         .style('fill-opacity', .95)
         .style('fill', d => {
           if(d.mobRate){
@@ -480,7 +490,7 @@ function renderLeaNetwork(rootDom,nodesData,linksData){
     
     
       //console.log(nodes.merge(nodesEnter));
-      console.log(linksData);
+      //console.log(linksData);
     
       plot.selectAll('.node').on('mouseover',console.log('mouse!'));
     

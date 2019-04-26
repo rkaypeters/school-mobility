@@ -14,7 +14,6 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
   const geoMap = new Map(geo_tmp);
   
   myProjection(select('.network').node(),geodata);
-    //.push({schcode: '00000',xy: [20,20]});
   
   const enters_tmp = entersdata.filter(d => d.reportID ==77)
     .filter(d => d.schcode_dest != ' ')
@@ -86,7 +85,7 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
         }else{if(d.schcode_origin === '00000'){
              d.xy_origin = [20,20];
              //};
-             //if(d.schcode === /190$/){
+             //if(d.schcode === /190$/){ //considered separating out '190' schools, outplacements often for students with disabilities or health issues requiring a specialized school
                 //d.xy_dest = [20,700];
              //}
               }else{d.xy_origin = [20,700];}
@@ -111,7 +110,7 @@ function formatLeaEnters(metadataLEA,mobstabLEA,geodata,metadataSch,entersdataLE
   const mobstabMap = new Map(mobstab_tmp);
   
   
-  //I don't have coordinates for districts so I'm making them the average of the schools.
+  //I don't have coordinates for districts (LEAs) so I'm making them the average of the schools.
   const geodataMeta = geodata.filter(d => [1,6,7].includes(+d.schType))
     .map(d => {
       const md = metaMapSch.get(d.schcode);
@@ -174,6 +173,14 @@ function formatLeaEnters(metadataLEA,mobstabLEA,geodata,metadataSch,entersdataLE
           d.distname16_origin = md.distname16;
         }
       } return d;
+    })
+    .map( d =>{
+      if (mobstabMap.get(d.distcode_origin)){
+        const msd = mobstabMap.get(d.distcode_origin);
+        d.adm_origin = msd.adm;
+        d.mobRate_origin = msd.mobRate1;
+      }
+      return d;
     })
     .map(d => {
       const gd = geoMap.get(d.distcode_dest);
@@ -238,7 +245,7 @@ function networkSetup(data){
           newNode.adm = d.adm_origin;
           newNode.schname = d.schname30_dest;
       };
-      //nodesData.set(d.shcode_origin,newNode); //what is this bug??
+      //nodesData.set(d.schcode_origin,newNode); //The way I wrote this, this step doens't work because I don't ahve a mobRate_dest, but it's mostly handled elsewhere.
       newLink.source = newNode;
     }else{
       const existingNode = nodesData.get(d.schcode_origin);
@@ -254,8 +261,7 @@ function networkSetup(data){
 
 
 function networkSetupLea(data){
-
-  //console.log(data);
+  //Take the formatted LEA data and make it into nodes and links. if I had more time I would combine this and networkSetup into one function. I realize they are very similar!
   
   const nodesData = new Map();
   const linksData = [];
@@ -279,8 +285,8 @@ function networkSetupLea(data){
       newLink.target = newNode;
     }else{
       const existingNode = nodesData.get(d.distcode_dest);
-        existingNode.totalEnters += newLink.value;
-        newLink.target = existingNode;
+      existingNode.totalEnters += newLink.value;
+      newLink.target = existingNode;
     };
 
     if(!nodesData.get(d.distcode_origin)){
@@ -289,10 +295,10 @@ function networkSetupLea(data){
         xy: d.xy_origin,
         totalEnters: 0
       }
-      if(d.distname){
-          newNode.adm = d.adm_origin;
-          newNode.mobRate = +d.mobRate;
-          newNode.distname = d.distname_dest;
+      if(d.distname_origin){
+          newNode.adm = +d.adm_origin;
+          newNode.mobRate = +d.mobRate_origin;
+          newNode.distname = d.distname_origin;
       };
       nodesData.set(d.distcode_origin,newNode);
       newLink.source = newNode;
@@ -303,9 +309,6 @@ function networkSetupLea(data){
     
     linksData.push(newLink);  
   })
-
-  //console.log(nodesData);
-  //console.log(linksData);
 
   return[nodesData,linksData];
 
@@ -390,9 +393,6 @@ function adjustProjection(nodesData,linksData,distcode){
   if (filteredNodes.length < minDNodes){
     
     const filteredLinks = linksData.filter(d => d.target.distcode == distcode);
-    //.filter(d => d.source.schcode != '00000');
-    
-    //console.log(filteredLinks);
     
     if(filteredLinks.length >0){
       var nodes = [];
