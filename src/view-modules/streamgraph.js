@@ -3,6 +3,12 @@ import {nest,select,selectAll,sum,scaleLinear,line,area,curveMonotoneX,axisBotto
 function renderStream(data){
   //This function displays the streamgraph
   
+  /*console.log(data);
+  console.log(select('.flowText').node());
+  var hey = 'heyo';
+  
+  select('.flowText').html(`<strong>${hey} Student Flow:</strong> Comparing <font color='#2B7C8F'>out-of-state</font>, <font color = '#70b3c2'>in-state</font>, and <font color='#a5cad2'>in-district</font> transfers over time. <br><i>[Select a school or district above. Y-axis is total entering students.]</i>`);*/
+  
   //Add origin_type to group the incoming students based on their district. Then nest by origin_type
   data.map(d =>{
     if(d.distcode_origin == d.distcode_dest){

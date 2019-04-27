@@ -79,6 +79,8 @@ Promise.all([ mobstabdataPromise,
                        globalDispatch);
       select('.streamgraph')
         .selectAll('svg').remove();
+      select('.flowText').html(`<strong>Student Flow:</strong> Comparing <font color='#2B7C8F'>out-of-state</font>, <font color = '#70b3c2'>in-state</font>, and <font color='#a5cad2'>in-district</font> transfers over time. <i>[Select a school or district above. Y-axis is total entering students.]</i>`);
+      
     });
 
   
@@ -148,6 +150,10 @@ globalDispatch.on('select:school', (schcode,nodesData,linksData) => {
     const metaMap = new Map(meta_tmp);
     const lea_tmp = metadataLEA.map(d => [d.distcode,d]);
     const leaMetaMap = new Map(lea_tmp);
+    
+    const schname = metaMap.get(schcode).schname;
+
+    select('.flowText').html(`<strong>${schname} Student Flow:</strong> Comparing <font color='#2B7C8F'>out-of-state</font>, <font color = '#70b3c2'>in-state</font>, and <font color='#a5cad2'>in-district</font> transfers over time.<br><i>&nbsp;&nbsp;&nbsp;&nbsp;[Select a school or district above. Y-axis is total entering students. Bands represent the three types of transfers.]</i>`);
 
     const entersDataSch = entersdata
         .filter(d => d.schcode_dest == schcode)
@@ -198,8 +204,17 @@ globalDispatch.on('select:district',(distcode) => {
   Promise.all([leaMetadataPromise,leaEntersPromise])
     .then(([metadataLEA,entersdata]) => {
   
-    //console.log(metadataLEA);
+    const meta_tmp = metadataLEA.map(d => [d.distcode,d]);
+    const metaMap = new Map(meta_tmp);
+    
+    const distname = metaMap.get(distcode).distname;
+
+    select('.flowText').html(`<strong>${distname} Student Flow:</strong> Comparing <font color='#2B7C8F'>out-of-state</font>, <font color = '#70b3c2'>in-state</font>, and <font color='#a5cad2'>in-district</font> transfers over time.<br><i>&nbsp;&nbsp;&nbsp;&nbsp;[Select a school or district above. Y-axis is total entering students. Bands represent the three types of transfers.]</i>`);
+    
+    
     //console.log(entersdata);
+    
+    //const distname = 
     
     const entersDataDist = entersdata
       .filter(d => d.distcode_dest == distcode);

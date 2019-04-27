@@ -362,8 +362,8 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
     .attr('width', w)
     .attr('height', h);
   
-  plot.selectAll('.label')
-    .remove();
+  plot.selectAll('.label').remove();
+  plot.selectAll('.clickLabel').remove();
   
   
   // Node colors
@@ -520,7 +520,7 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
                 .text(f =>{
                   var myString = e.value + ' student';
                   if(e.value!=1){myString += 's'};
-                  myString += ' moved from ';
+                  myString += ' entered from ';
                   if(e.source.distname){
                     myString += e.source.distname + '.'
                   }else{myString += 'out of state.'};
