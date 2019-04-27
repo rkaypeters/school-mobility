@@ -250,7 +250,7 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
   
   //Format dimensions
   const w1 = select(rootDom).node().clientWidth;
-  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 275;
+  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 325;
 
   var w, h;
   if(w1>=400){
@@ -320,7 +320,6 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
       const linksEnter = links.enter()
         .append('line')
         .attr('class','link');
-        //.attr('class',d => 'link'+d.target.distcode);
     
       links.merge(linksEnter)
         .transition()
@@ -355,19 +354,6 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
       const nodesEnter = nodes.enter()
         .append('circle')
         .attr('class','node');
-      
-      /*const nodeLabelsEnter = nodesEnter.append('text')
-        .attr('class','label')
-        //.transition()
-        //.duration(500)
-        .text(d => d.distname)
-        .attr('x',d => {if(d.x){
-                return d.x
-              }})
-        .attr('y',d => {if(d.y){
-                return d.y
-          }})
-        .attr('opacity',1);*/
 
       nodes.merge(nodesEnter)
         .transition()
@@ -383,11 +369,6 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
           return d.x}})
         .attr('cy',d => {if(d.y){
           return d.y}});
-    
-      console.log(nodes.merge(nodesEnter));
-      //console.log(linksData);
-    
-      //plot.selectAll('.node').on('mouseover',console.log('mouse!'));
 
     
       //Highlighting functionality when a node is clicked
@@ -415,8 +396,6 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
         plot.selectAll('.clickLabel').remove();
         
         plot.append('text')
-            //.transition()
-            //.duration(1000)
             .attr('class','clickLabel')
             .text(d.distname16 + ', mobility rate: ' + Math.round(+d.mobRate*10)/10)
             .attr('x',d.x)
@@ -439,11 +418,6 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
                   return(myString);
                 })
                 .attr('x',(e.source.x+e.target.x)/2)
-                      //e=>{
-                  //var point = mouse(this);
-                  //return(point[0])
-                  //return((e.source.x+e.target.x)/2)
-                //})
                 .attr('y',(e.source.y+e.target.y)/2)
                 .attr('opacity',1);
             }
@@ -458,13 +432,20 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
       //Hover functionality for entering a node
       .on('mouseenter',d =>{
         plot.append('text')
-            //.transition()
-            //.duration(1000)
-            .attr('class','mouseOverLabel')
-            .text(d.distname16 + ', mobility rate: ' + Math.round(+d.mobRate*10)/10)
-            .attr('x',d.x)
-            .attr('y',d.y+3)
-            .attr('opacity',1);
+          //.transition()
+          //.duration(1000)
+          .attr('class','mouseOverLabel')
+          .text(e =>{
+            var myString;
+            if(d.distname16){myString = d.distname16
+              + ', mobility rate: '
+              + Math.round(+d.mobRate*10)/10
+            }else{myString = 'Out of state'}
+            return myString;
+          })
+          .attr('x',d.x)
+          .attr('y',d.y+4)
+          .attr('opacity',1);
       })
       .on('mouseleave',d =>{
         plot.selectAll('.mouseOverLabel')
@@ -473,94 +454,13 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
           .remove();
       });
     
-    console.log(nodesDataArray);
-    console.log(linksData);
-    
-    
-    
-      // Labels
-  
-      /*const labels = plot.selectAll('.label')
-        .data(nodesDataArray, d=> d.distcode);
-
-      const labelsEnter = labels.enter()
-        .append('text')
-        .attr('class','label');
-
-      labels.merge(labelsEnter)
-        .transition()
-        .duration(500)
-        .text(d => d.distname)
-        .attr('x',d => {if(d.x){
-                return d.x
-              }})
-        .attr('y',d => {if(d.y){
-                return d.y
-          }})
-        .attr('opacity',0);/*
-    
-    //console.log(plot.selectAll('circle'));
-    
-       /*plot.selectAll('circle')
-         .on('mouseenter',
-          console.log('mousy')
-             /*function(d) {		
-            div.transition()		
-                .duration(200)		
-                .style("opacity", .9);		
-            div	.html(formatTime(d.date) + "<br/>"  + d.close)	
-                .style("left", (d3.event.pageX) + "px")		
-                .style("top", (d3.event.pageY - 28) + "px");	
-            }*
-        )					
-        .on('mouseout', 
-            console.log('mousemouse')
-            /*function(d) {		
-            div.transition()		
-                .duration(500)		
-                .style("opacity", 0);	
-        })*/
+    //console.log(nodesDataArray);
+    //console.log(linksData);
     
     nodes.exit().remove();
     links.exit().remove();
   
   });
-  
-  function linkMouseOver(d, i) {  // Add interactivity
-
-    // Use D3 to select element, change color and size
-    //select(this).attr({
-      //fill: "orange",
-      //r: radius * 2
-    //});
-
-    // Specify where to put label of text
-    /*svg.append("text").attr({
-       id: "t" + d.x + "-" + d.y + "-" + i,  // Create an id for text so we can select it later for removing on mouseout
-        x: function() { return xScale(d.x) - 30; },
-        y: function() { return yScale(d.y) - 15; }
-    })
-    .text(function() {
-      return [d.x, d.y];  // Value of the text
-    });*/
-    
-    console.log('link mouseover!');
-    
-  };
-
-  function handleMouseOut(d, i) {
-    // Use D3 to select element, change color back to normal
-    /*d3.select(this).attr({
-      fill: "black",
-      r: radius
-    });
-
-    // Select text by id and then remove
-    d3.select("#t" + d.x + "-" + d.y + "-" + i).remove();  // Remove text location*/
-    
-    console.log('link mouseout!');
-    
-  }
   
 
 }

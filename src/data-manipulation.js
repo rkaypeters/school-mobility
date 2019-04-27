@@ -336,7 +336,7 @@ function myProjection(rootDom,data){
   }else{h = 600;};
   
   
-  const myScale = 56*h;
+  const myScale = 54*h;
   
   const projection_tm = geoMercator()
 
@@ -358,7 +358,7 @@ function myProjection(rootDom,data){
   
   const projection = geoMercator()
     .scale(myScale)
-    .center([(maxLng+minLng+.4-shiftVal)/2,(maxLat+minLat)/2+.175])
+    .center([(maxLng+minLng+.4-shiftVal)/2,(maxLat+minLat)/2+.172])
     //.translate([w/2,h/2]);
 
   data.forEach(d => {d.xy = projection(d.lngLat);
