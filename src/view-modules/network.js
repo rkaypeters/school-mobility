@@ -3,9 +3,19 @@ import {min,max,select,selectAll,scalePow,scaleLinear,transition,forceSimulation
 function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
   //Creates the network graph for the district level (schools displayed, filtered by district) zoom
   
-  //console.log(nodesData);
+  nodesData.forEach(d =>{
+    d.sort = 0;
+    if(d.distcode==distcode){
+      d.sort = 1;
+    }
+  });
+  
+  //Help current district data get to the front
+  nodesData.sort(function(a, b){return a.sort - b.sort});
+  
+  //For experimenting with dropping force layout in small cases
   var numSch = nodesData.filter(d => d.distcode ==distcode).length;
-  //console.log(numSch);
+  var minSch = 4;
   
   
   // Overall svg
@@ -41,7 +51,8 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
           {if(d.xyNew){
             return d.xyNew[1]
           }}))
-    .force('collide',forceCollide().radius(d => Math.sqrt(d.adm + 4)+2))
+    //.force('collide',forceCollide().radius(d => Math.sqrt(d.adm + 4)+2))//I liked the extra spread from this but it pushed some small schools off the page and I wasn't able to handle that in time to submit.
+    .force('collide',forceCollide().radius(d => Math.sqrt(d.adm + 4)))
     .tick([100])
     .alpha([.0005])
     .on('end',function(){
@@ -54,7 +65,28 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
       const linksEnter = links.enter().append('line').attr('class','link')
         .style('stroke-opacity',0.05)
         .style('stroke-width','1px');
+    
+      //Change to allow overlaps if there is a very small number of schools in the district; charter schools were getting pushed out of the fram with the force layout since they pull from such far away places. It much more like a bubble chart than a map.
+      //I was experimenting with this, but didn't get far enough to keep it. There are some issues with small chartesr than have two schools in one building.
+      /*if(numSch<minSch){
+        nodesData.forEach(d=>{
+          if(d.xyNew){
+            d.x=d.xyNew[0];
+            d.y=d.xyNew[1];}
+        });
+        linksData.forEach(d=>{
+          if(d.target.xyNew){
+            d.target.x=d.target.xyNew[0];
+            d.target.y=d.target.xyNew[1];
+          };
+          if(d.source.xyNew){
+            d.source.x=d.source.xyNew[0];
+            d.source.y=d.source.xyNew[1];
+          };
+        });
+      };*/
 
+    
       links.merge(linksEnter)
         .transition()
         .duration(1000)
@@ -66,6 +98,8 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
           }else{return 20;}})
         .attr('y2', d=> {if(d.source.y){return d.source.y;
           }else{return 20;}})
+    
+      links.merge(linksEnter)
         .style('stroke-width', d=>{return ((d.value/4+.5).toString() + 'px');
         })
         .style('stroke','#A9A9A9')
@@ -90,6 +124,8 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
       nodes.merge(nodesEnter)
         .transition()
         .duration(1000)
+        .attr('cx',d => {if(d.x){return d.x}})
+        .attr('cy',d => {if(d.y){return d.y}})
         .attr('r',d => Math.sqrt(d.adm + 4))
         .style('fill-opacity', .95)
         .style('fill', d => {
@@ -98,22 +134,16 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
           }else{return '#DCDCDC'}
         })
         .style('stroke-width', '1px')
-        .style('stroke-opacity', .2)
-        .attr('cx',d => {if(d.x){return d.x}})
-        .attr('cy',d => {if(d.y){return d.y}});
+        .style('stroke-opacity', .2);
     
     
       nodes.merge(nodesEnter).on('click', d=>{
-        //console.log(activeSch);
-        //console.log(d.schcode);
         
         plot.selectAll('.clickLabel').remove();
         
         if(activeSch != d.schcode){
           var activeSch = d.schcode;  
-          console.log(activeSch);
           dispatch.call('select:school',null,d.schcode);
-          console.log(plot.selectAll('.link'));
 
           plot.selectAll('.link')
             .style('stroke', d=>{
@@ -127,7 +157,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
             });
         }else{console.log('second click')};
         
-        if(numSch>12 && (d.adm <= 800 && d.mobRate <=35) && d.distcode ==distcode){
+        if(numSch>12 && (d.adm <= 850 && d.mobRate <=35) && d.distcode ==distcode){
           plot.append('text')
             .attr('class','clickLabel')
             .text(d.schname15 + ', mobility rate: ' + Math.round(+d.mobRate*10)/10)
@@ -137,6 +167,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
         };
         
         //Hover functionality when a relevant link is entered
+        //I wanted to add this, but with so many nodes going off the page, I needed to adjust the location of the display and did not have time for that... So many features I'd like to add or small changes I'd like to make.
         /*links.merge(linksEnter)
           .on('mouseenter',e=>{
             if(e.target.schcode == activeSch){
@@ -288,8 +319,6 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
   var colorGenerator = (d => 'hsl(23,' + Math.round(scaleS(d)) +'%,' + 
                         Math.round(scaleL(d))
                           + '%)');
-
-  //var activeSch;
   
   //Force simulation to keep nodes from overlapping... a little odd in the state view, but I think helfpul.
   forceSimulation(nodesDataArray)
@@ -313,7 +342,6 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
     
       // Links
     
-      //var activeSch;
       const links = plot
         .selectAll('.link')
         .data(linksData);
@@ -453,9 +481,6 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
           .duration(200)
           .remove();
       });
-    
-    //console.log(nodesDataArray);
-    //console.log(linksData);
     
     nodes.exit().remove();
     links.exit().remove();

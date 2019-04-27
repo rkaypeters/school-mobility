@@ -97,7 +97,7 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
   
   return(enters1718);
   
-}
+};
 
 
 function formatLeaEnters(metadataLEA,mobstabLEA,geodata,metadataSch,entersdataLEA){  
@@ -249,7 +249,7 @@ function networkSetup(data){
           newNode.schname = d.schname30_dest;
           newNode.schname15 = d.schname15_dest;
       };
-      //nodesData.set(d.schcode_origin,newNode); //The way I wrote this, this step doens't work because I don't ahve a mobRate_dest, but it's mostly handled elsewhere.
+      //nodesData.set(d.schcode_origin,newNode); //The way I wrote this, this step doens't work because I don't have a mobRate_dest, but it's mostly handled elsewhere.
       newLink.source = newNode;
     }else{
       const existingNode = nodesData.get(d.schcode_origin);
@@ -265,7 +265,7 @@ function networkSetup(data){
 
 
 function networkSetupLea(data){
-  //Take the formatted LEA data and make it into nodes and links. if I had more time I would combine this and networkSetup into one function. I realize they are very similar!
+  //Take the formatted LEA data and make it into nodes and links. If I had more time I would combine this and networkSetup into one function. I realize they are very similar!
   
   const nodesData = new Map();
   const linksData = [];
@@ -318,16 +318,15 @@ function networkSetupLea(data){
 
   return[nodesData,linksData];
 
-}
-
+};
 
 
 function myProjection(rootDom,data){
+  //Get xy coordinates based on lnglat
   const w1 = rootDom.clientWidth;
-  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 220;
+  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 325;//Having this value hard coded in multiple files is not great.
 
   var w, h;
-  
   if(w1>=400){
      w = w1;
   }else{ w = 400;};
@@ -336,8 +335,10 @@ function myProjection(rootDom,data){
   }else{h = 600;};
   
   
+  //Set map scale
   const myScale = 54*h;
   
+  //Choose geoMercator projection
   const projection_tm = geoMercator()
 
   const minLng = min(data, function(d){
@@ -353,17 +354,15 @@ function myProjection(rootDom,data){
     return d.lngLat[1];
   })
 
-  
+  //Allignment was weird, but this along with the values below seems to help center it
   var shiftVal = w/1500;
   
   const projection = geoMercator()
     .scale(myScale)
-    .center([(maxLng+minLng+.4-shiftVal)/2,(maxLat+minLat)/2+.172])
+    .center([(maxLng+minLng+.4-shiftVal)/2,(maxLat+minLat)/2+.172]);
     //.translate([w/2,h/2]);
 
-  data.forEach(d => {d.xy = projection(d.lngLat);
-                    }
-  );
+  data.forEach(d => {d.xy = projection(d.lngLat);});
   
   return(data);
 
@@ -371,17 +370,12 @@ function myProjection(rootDom,data){
 
 
 function adjustProjection(nodesData,linksData,distcode){
-  
-  //console.log(nodesData);
-  //console.log(distcode);
+  //Get the xy coordinates to zoom and center on the selected district
   
   const w1 = select('.network').node().clientWidth;
-  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 200;
-  
-  //console.log(select('.dropdown').node().clientHeight); //need this piece
+  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 325;//This is hard coded in three places. Good god.
 
   var w, h;
-  
   if(w1>=400){
      w = w1;
   }else{ w = 400;};
@@ -390,12 +384,13 @@ function adjustProjection(nodesData,linksData,distcode){
   }else{h = 600;};
   
   
+  //Minimum number of nodes for focusing only on district versus district plus connecting schools
   const minDNodes = 4;
   
   const nodesDataArray = Array.from(nodesData.values());
-  
   var filteredNodes = nodesDataArray.filter(d => d.distcode == distcode);
   
+  //Get filteredNodes, the nodes we'll focus on, when that's more than just one district
   if (filteredNodes.length < minDNodes){
     
     const filteredLinks = linksData.filter(d => d.target.distcode == distcode);
@@ -408,15 +403,12 @@ function adjustProjection(nodesData,linksData,distcode){
         if(!nodes.includes(d.target.schcode)){nodes.push(d.target.schcode)};
       });
 
-      //console.log(nodes);
       filteredNodes = nodesDataArray.filter(d => nodes.includes(d.schcode));
     };
     
   };
   
-  //console.log(filteredNodes);
-  
-  
+  //Find the edges of the nodes reach
   var minX, maxX, minY, maxY;
   
   if(filteredNodes.length > 1){
@@ -431,42 +423,37 @@ function adjustProjection(nodesData,linksData,distcode){
     maxY = filteredNodes[0].xy[1] + 8;
   };
   
+  //Use these edges to see which direction (horizontal or vertical is the limiting factor)
   const yProportion = (maxY - minY)/h;
   const xProportion = (maxX - minX)/w;
   
+  //If the xProportion is larger than y, scale the x to desired margins, and handle y according to the same proportions; If yProportion is larger, do the opposite
   if(yProportion < xProportion){
-    console.log('X is the limitation');
-    
     var scaleX = scaleLinear()
       .domain([minX,maxX])
       .range([w/8,7*w/8]);
     
     var yNewRange = (maxY-minY)*3*w/(4*(maxX-minX));
-    console.log(yNewRange);
     
     var scaleY = scaleLinear()
       .domain([minY,maxY])
-      //.range([h/2-3*yNewRange/4,h/2+3*yNewRange/4]);
       .range([(h-yNewRange)/2,(h+yNewRange)/2]);
     
   }else{
-    //console.log('Y is the limitation');
-    
     var scaleY = scaleLinear()
       .domain([minY,maxY])
       .range([h/8,7*h/8]);
     
     var xNewRange = (maxX-minX)*3*h/(4*(maxY-minY));
-    //console.log(xNewRange);
     
     var scaleX = scaleLinear()
       .domain([minX,maxX])
       .range([(w-xNewRange)/2,(w+xNewRange)/2]);
-      //.range([w/2-3*xNewRange/4,w/2+3*xNewRange/4]);
     
-  }
+  };
   
   
+  //Apply the scaling to the coordinates
   nodesDataArray.forEach(d =>{
     
     if(d.xy){
@@ -480,8 +467,6 @@ function adjustProjection(nodesData,linksData,distcode){
     
   });
   
-  //console.log(nodesDataArray);
-  
   const nodes_tmp = nodesDataArray.map(d => {
     return [d.schcode, d]
   });
@@ -489,8 +474,7 @@ function adjustProjection(nodesData,linksData,distcode){
   
   newNodesMap.set('00000',{xyNew:[20,20]});
   
-  //console.log(newNodesMap);
-  
+  //Links data needs the coordinates too
   linksData.map(d =>{
     if(newNodesMap.get(d.source.schcode)){
       const mS = newNodesMap.get(d.source.schcode);
@@ -505,8 +489,6 @@ function adjustProjection(nodesData,linksData,distcode){
     }
     
   })
-  
-  //console.log(linksData);
   
   return([nodesDataArray,linksData]);
   

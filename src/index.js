@@ -30,15 +30,8 @@ Promise.all([ mobstabdataPromise,
              leaEntersPromise,
              leaMobstabdataPromise])
   .then(([mobstab,metadataSch,geodata,entersdata,metadataLEA,entersdataLEA,mobstabLEA]) => {
-                                 
-    //console.log(metadataSch);  //for troubleshooting
-    //console.log(mobstab);
-    //console.log(geodata);
-    //console.log(entersdata);
-    //console.log(metadataLEA);
-    //console.log(entersdataLEA);
-    //console.log(mobstabLEA);
   
+    //Filter to only the necessary geogrpahic data
     const geoFilter = geodata.filter(d => [1,6,7].includes(+d.schType));
   
     //School data formatting
@@ -56,7 +49,9 @@ Promise.all([ mobstabdataPromise,
                 //.filter(d => d.source.schcode != '00000')
              //);
   
-  renderLeaNetwork('.network',nodesDataLea,linksDataLea.filter(d => d.source.distcode != d.target.distcode),globalDispatch);
+    renderLeaNetwork('.network',
+                   nodesDataLea,
+                   linksDataLea.filter(d => d.source.distcode != d.target.distcode),globalDispatch);
 
     districtDropdown(metadataLEA.filter(d => [1,2,3].includes(+d.leaType)),
                      '.dropdown',
