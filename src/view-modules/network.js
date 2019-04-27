@@ -26,7 +26,14 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
     .append('svg');
   const plot = svg.merge(svgEnter);
   
+
   plot.selectAll('.clickLabel').remove();
+  plot.selectAll('.linkMouseOverLabel').remove();
+  //This keeps the mouseover from the state view from persisting and throwing errors.
+  plot.selectAll('.link')
+          .on('mouseenter',e=>{
+            
+          });
   
   
   // Node colors
@@ -305,6 +312,7 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
     .attr('width', w)
     .attr('height', h);
   
+  var activeDist ='';
   plot.selectAll('.label').remove();
   plot.selectAll('.clickLabel').remove();
   
@@ -403,7 +411,7 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
       nodes.merge(nodesEnter).on('click', d=>{
         dispatch.call('select:district',null,d.distcode);
       
-        var activeDist = d.distcode;
+        activeDist = d.distcode;
 
         plot.selectAll('.link')
           .style('stroke', e=>{
