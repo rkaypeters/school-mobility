@@ -1,86 +1,12 @@
 import {min,max,select,selectAll,scalePow,scaleLinear,transition,forceSimulation,forceCollide,forceX,forceY,mouse} from 'd3';  
 
-
-function renderNetwork(rootDom,nodesData,linksData){
-  //This is the original state-level view with all schools. It's no longer in use as I switched to a district aggregation.
-  
-  //Setting svg dimensions
-  const w1 = select(rootDom).node().clientWidth;
-  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 235;
-
-  var w, h;
-  
-  if(w1>=400){
-     w = w1;
-  }else{ w = 400;};
-  if(h1 >= 600){
-    h = h1;
-  }else{h = 600;};
-  
-  
-  //Set up full svg
-  const svg = select(rootDom)
-    .selectAll('svg')
-    .data([1]);
-  const svgEnter = svg.enter()
-    .append('svg');
-
-  const plot = svg.merge(svgEnter)
-    .attr('width', w)
-    .attr('height', h);
-
-  plot.selectAll('.node')
-    .remove();
-  plot.selectAll('.label')
-    .remove();
-  
-  //Display links
-  const links = plot
-    .selectAll('.link')
-    .data(linksData);
-  const linksEnter = links.enter().append('line').attr('class','link');
-
-  links.merge(linksEnter)
-    .style('stroke-opacity',0.05)
-    .style('stroke-width','1px')
-    .style('stroke','#404040')
-    .attr('x1', d=> {
-      if(d.target.xy){
-          return d.target.xy[0];
-      }else{
-          return 0;
-      }
-    })
-    .attr('y1', d=> {
-      if(d.target.xy){
-          return d.target.xy[1];
-      }else{
-          return 0;
-      }
-    })
-    .attr('x2', d=> {
-      if(d.source.xy){
-          return d.source.xy[0];
-      }else{
-          return 0;
-      }
-    })
-    .attr('y2', d=> {
-      if(d.source.xy){
-          return d.source.xy[1];
-      }else{
-          return 0;
-      }
-    })
-    .style('stroke-opacity',d => {return (d.value * 0.05)});
-  
-  links.exit().remove();
-
-};
-
-
 function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
   //Creates the network graph for the district level (schools displayed, filtered by district) zoom
+  
+  //console.log(nodesData);
+  var numSch = nodesData.filter(d => d.distcode ==distcode).length;
+  //console.log(numSch);
+  
   
   // Overall svg
   const svg = select(rootDom)
@@ -89,6 +15,9 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
   const svgEnter = svg.enter()
     .append('svg');
   const plot = svg.merge(svgEnter);
+  
+  plot.selectAll('.clickLabel').remove();
+  
   
   // Node colors
   var scaleR = scaleLinear().domain([20,50]).range([234,184]);
@@ -100,8 +29,6 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
   var colorGenerator = (d => 'hsl(23,' +
     Math.round(scaleS(d)) +'%,' + 
     Math.round(scaleL(d)) + '%)');
-
-  //var activeSch;
   
   
   //Force simulation - to avoid overlapping schools
@@ -114,7 +41,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
           {if(d.xyNew){
             return d.xyNew[1]
           }}))
-    .force('collide',forceCollide().radius(d => Math.sqrt(d.adm + 4)))
+    .force('collide',forceCollide().radius(d => Math.sqrt(d.adm + 4)+2))
     .tick([100])
     .alpha([.0005])
     .on('end',function(){
@@ -131,62 +58,26 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
       links.merge(linksEnter)
         .transition()
         .duration(1000)
-        .attr('x1', d=> {
-          if(d.target.x){
-              return d.target.x;
-          }else{
-              return 20;
-          }
-        })
-        .attr('y1', d=> {
-          if(d.target.y){
-              return d.target.y;
-          }else{
-              return 20;
-          }
-        })
-        .attr('x2', d=> {
-          if(d.source.x){
-              return d.source.x;
-          }else{
-              return 20;
-          }
-        })
-        .attr('y2', d=> {
-          if(d.source.y){
-              return d.source.y;
-          }else{
-              return 20;
-          }
-        })
-        .style('stroke-width', d=>{
-        return ((d.value/4+.5).toString() + 'px');
+        .attr('x1', d=> {if(d.target.x){return d.target.x;
+          }else{return 20;}})
+        .attr('y1', d=> {if(d.target.y){return d.target.y;
+          }else{return 20;}})
+        .attr('x2', d=> {if(d.source.x){return d.source.x;
+          }else{return 20;}})
+        .attr('y2', d=> {if(d.source.y){return d.source.y;
+          }else{return 20;}})
+        .style('stroke-width', d=>{return ((d.value/4+.5).toString() + 'px');
         })
         .style('stroke','#A9A9A9')
         .style('stroke-opacity',d => {
           if(d.target.distcode ==distcode){
             d.value*d.value * 0.03;
           }else{return '0'}});
-    
-      //links.merge(linksEnter).on('click', console.log('mouse!');
-            //linkMouseOver)
-        //.on('mouseout', linkMouseOut);;
-        //.style('stroke', d =>{
-          //if(d.target.distcode == distcode){
-            //return 'green';
-          //}else{return 'white'}
-      //});
-      //.style('stroke-opacity',d => {return scaleWeight(d.value)});
-
-      //console.log(links.merge(linksEnter));
 
       links.exit().remove();
     
     
       // Nodes
-    
-      //console.log(nodesData);
-
       const nodes = plot.selectAll('.node')
         .data(nodesData, d => d.schcode);
 
@@ -208,21 +99,15 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
         })
         .style('stroke-width', '1px')
         .style('stroke-opacity', .2)
-        .attr('cx',d => {if(d.x){
-                return d.x
-              }})
-        .attr('cy',d => {if(d.y){
-                return d.y
-          }});
+        .attr('cx',d => {if(d.x){return d.x}})
+        .attr('cy',d => {if(d.y){return d.y}});
     
-    
-      //console.log(nodes.merge(nodesEnter));
-    
-      plot.selectAll('.node').on('mouseover',console.log('mouse!'));
     
       nodes.merge(nodesEnter).on('click', d=>{
         //console.log(activeSch);
         //console.log(d.schcode);
+        
+        plot.selectAll('.clickLabel').remove();
         
         if(activeSch != d.schcode){
           var activeSch = d.schcode;  
@@ -231,28 +116,106 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
           console.log(plot.selectAll('.link'));
 
           plot.selectAll('.link')
-          //links.merge(links.enter)
             .style('stroke', d=>{
-              if(d.target.schcode == activeSch){
-                return '#40848F'
-                console.log('highlight');
-              }else{return '#F6F6F6'}
-              //console.log(d.target.schcode);
-
-            })
+              if(d.target.schcode == activeSch){return '#40848F'
+              }else{return '#F6F6F6'}})
             .style('stroke-opacity',d => {
-              if(d.target.schcode ==activeSch){
-                1;
+              if(d.target.schcode ==activeSch){1;
               }else{if(d.target.distcode ==distcode){
-                d.value*d.value * 0.03;
-              }else{return '0'}};
+                  d.value*d.value * 0.03;
+                }else{return '0'}};
             });
         }else{console.log('second click')};
+        
+        if(numSch>12 && (d.adm <= 800 && d.mobRate <=35) && d.distcode ==distcode){
+          plot.append('text')
+            .attr('class','clickLabel')
+            .text(d.schname15 + ', mobility rate: ' + Math.round(+d.mobRate*10)/10)
+            .attr('x',d.x)
+            .attr('y',d.y+3)
+            .attr('opacity',1);
+        };
+        
+        //Hover functionality when a relevant link is entered
+        /*links.merge(linksEnter)
+          .on('mouseenter',e=>{
+            if(e.target.schcode == activeSch){
+              
+              var yDist, xDist, yMove, xMove;
+              if(e.source.y){yDist = e.source.y - e.target.y}else{yDist = 0};
+              if(e.source.x){xDist = e.source.x - e.target.x}else{xDist = 0};
+              //if(yDist>(e.target.y)
+              
+              console.log(plot.clientHeight);
+              console.log(plot.cleintWidth);
+              
+              console.log(xDist,yDist);
+              
+              plot.append('text')
+                .attr('class','linkMouseOverLabel')
+                .text(f =>{
+                  var myString = e.value + ' student';
+                  if(e.value!=1){myString += 's'};
+                  myString += ' entered from ';
+                  if(e.source.schname){
+                    myString += e.source.schname + '.'
+                  }else{myString += 'out of state.'};
+                  return(myString);
+                })
+                .attr('x',(e.source.x+e.target.x)/2)
+                      //e=>{
+                  //var point = mouse(this);
+                  //return(point[0])
+                  //return((e.source.x+e.target.x)/2)
+                //})
+                .attr('y',(e.source.y+e.target.y)/2)
+                .attr('opacity',1);
+            }
+          })
+          .on('mouseleave', d=>{
+            plot.selectAll('.linkMouseOverLabel')
+              .transition()
+              .duration(400)
+              .remove();
+          })*/
+        
+      })
+    
+      //Hover labels just for cases in large districts that aren't alreayd labelled
+      .on('mouseenter',d =>{
+        if(numSch>12){
+          if((d.adm <= 800 && d.mobRate <=35) && d.distcode ==distcode){
+          
+            plot.append('text')
+              .attr('class','mouseOverLabel')
+              .text(d.schname15 + ', mobility rate: ' + Math.round(+d.mobRate*10)/10)
+              .attr('x',d.x)
+              .attr('y',d.y+3)
+              .attr('opacity',1);
+            
+            labels.merge(labelsEnter)
+              .transition()
+              .duration(200)
+              .attr('opacity', d=> 0);
+          }
+        };
+      })
+      .on('mouseleave',d =>{
+        plot.selectAll('.mouseOverLabel')
+          .transition()
+          .duration(400)
+          .remove();
+        
+        labels.merge(labelsEnter)
+          .transition()
+          .duration(400)
+          .attr('opacity', d=> {if(numSch>12){
+            if(d.adm > 800 || d.mobRate >35){return 1}else{return 0}
+          }else{return 1}});
       });
     
     
-    
-      // Labels
+      // Labels - overall
       const labels = plot.selectAll('.label')
         .data(nodesData, d=> d.schcode);
 
@@ -263,10 +226,8 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
       labels.merge(labelsEnter)
         .transition()
         .duration(1000)
-        .text(d => 
-              {if(d.distcode ==distcode){
-            return d.schname
-          }
+        .text(d => {if(d.distcode ==distcode){
+            return (d.schname15 + ', mobility rate: ' + d.mobRate)}
         })
         .attr('x',d => {if(d.x){
                 return d.x +Math.sqrt(d.adm + 4)/4
@@ -274,60 +235,11 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
         .attr('y',d => {if(d.y){
                 return d.y+3
           }})
+        .attr('opacity', d=> {if(numSch>12){
+          if(d.adm > 800 || d.mobRate >35){return 1}else{return 0}
+        }else{return 1}});
   
   });
-  
-  console.log(plot.selectAll('.link'));
-  console.log(plot.selectAll('.node'));
-  
-  //plot.selectAll('.link').on('click', console.log('clicked a link!'));
-            //linkMouseOver)
-        //.on('mouseout', linkMouseOut);;
-        //.style('stroke', d =>{
-          //if(d.target.distcode == distcode){
-            //return 'green';
-          //}else{return 'white'}
-      //});
-      //.style('stroke-opacity',d => {return scaleWeight(d.value)});
-
-      //console.log(links.merge(linksEnter));
-  
-  function linkMouseOver(d, i) {  // Add interactivity
-
-    // Use D3 to select element, change color and size
-    //select(this).attr({
-      //fill: "orange",
-      //r: radius * 2
-    //});
-
-    // Specify where to put label of text
-    /*svg.append("text").attr({
-       id: "t" + d.x + "-" + d.y + "-" + i,  // Create an id for text so we can select it later for removing on mouseout
-        x: function() { return xScale(d.x) - 30; },
-        y: function() { return yScale(d.y) - 15; }
-    })
-    .text(function() {
-      return [d.x, d.y];  // Value of the text
-    });*/
-    
-    console.log('link mouseover!');
-    
-  };
-
-  function handleMouseOut(d, i) {
-    // Use D3 to select element, change color back to normal
-    /*d3.select(this).attr({
-      fill: "black",
-      r: radius
-    });
-
-    // Select text by id and then remove
-    d3.select("#t" + d.x + "-" + d.y + "-" + i).remove();  // Remove text location*/
-    
-    console.log('link mouseout!');
-    
-  }
-  
 
 }
 
@@ -653,6 +565,81 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
 
 }
 
+function renderNetwork(rootDom,nodesData,linksData){
+  //This is the original state-level view with all schools. It's no longer in use as I switched to a district aggregation.
+  
+  //Setting svg dimensions
+  const w1 = select(rootDom).node().clientWidth;
+  const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 235;
 
+  var w, h;
+  
+  if(w1>=400){
+     w = w1;
+  }else{ w = 400;};
+  if(h1 >= 600){
+    h = h1;
+  }else{h = 600;};
+  
+  
+  //Set up full svg
+  const svg = select(rootDom)
+    .selectAll('svg')
+    .data([1]);
+  const svgEnter = svg.enter()
+    .append('svg');
+
+  const plot = svg.merge(svgEnter)
+    .attr('width', w)
+    .attr('height', h);
+
+  plot.selectAll('.node')
+    .remove();
+  plot.selectAll('.label')
+    .remove();
+  
+  //Display links
+  const links = plot
+    .selectAll('.link')
+    .data(linksData);
+  const linksEnter = links.enter().append('line').attr('class','link');
+
+  links.merge(linksEnter)
+    .style('stroke-opacity',0.05)
+    .style('stroke-width','1px')
+    .style('stroke','#404040')
+    .attr('x1', d=> {
+      if(d.target.xy){
+          return d.target.xy[0];
+      }else{
+          return 0;
+      }
+    })
+    .attr('y1', d=> {
+      if(d.target.xy){
+          return d.target.xy[1];
+      }else{
+          return 0;
+      }
+    })
+    .attr('x2', d=> {
+      if(d.source.xy){
+          return d.source.xy[0];
+      }else{
+          return 0;
+      }
+    })
+    .attr('y2', d=> {
+      if(d.source.xy){
+          return d.source.xy[1];
+      }else{
+          return 0;
+      }
+    })
+    .style('stroke-opacity',d => {return (d.value * 0.05)});
+  
+  links.exit().remove();
+
+};
 
 export {renderNetwork,renderNetworkUpdate,renderLeaNetwork};

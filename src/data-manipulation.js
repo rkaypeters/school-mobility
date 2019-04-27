@@ -45,6 +45,7 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
       d.adminSite_dest = md.adminSite;
       d.distcode_dest = md.distcode;
       d.schname30_dest = md.schname30;
+      d.schname15_dest = md.schname15;
       d.gradeCfg_dest = md.gradeCfg;
       return d;
     })
@@ -61,6 +62,7 @@ function formatEnters(metadataSch,mobstab,geodata,entersdata){
           d.adminSite_origin = md.adminSite;
           d.distcode_origin = md.distcode;
           d.schname30_origin = md.schname30;
+          d.schname15_origin = md.schname15;
           d.gradeCfg_origin = md.gradeCfg;
         }
       } return d;
@@ -223,7 +225,8 @@ function networkSetup(data){
         totalEnters: newLink.value,
         adm: +d.adm,
         mobRate: +d.mobRate,
-        schname: d.schname30_dest
+        schname: d.schname30_dest,
+        schname15: d.schname15_dest
       }; 
 
       nodesData.set(d.schcode_dest,newNode);
@@ -244,6 +247,7 @@ function networkSetup(data){
           newNode.distcode = d.distcode_origin;
           newNode.adm = d.adm_origin;
           newNode.schname = d.schname30_dest;
+          newNode.schname15 = d.schname15_dest;
       };
       //nodesData.set(d.schcode_origin,newNode); //The way I wrote this, this step doens't work because I don't ahve a mobRate_dest, but it's mostly handled elsewhere.
       newLink.source = newNode;
@@ -332,7 +336,7 @@ function myProjection(rootDom,data){
   }else{h = 600;};
   
   
-  const myScale = 57*h;
+  const myScale = 56*h;
   
   const projection_tm = geoMercator()
 
@@ -354,7 +358,7 @@ function myProjection(rootDom,data){
   
   const projection = geoMercator()
     .scale(myScale)
-    .center([(maxLng+minLng+.35-shiftVal)/2,(maxLat+minLat)/2+.175])
+    .center([(maxLng+minLng+.4-shiftVal)/2,(maxLat+minLat)/2+.175])
     //.translate([w/2,h/2]);
 
   data.forEach(d => {d.xy = projection(d.lngLat);

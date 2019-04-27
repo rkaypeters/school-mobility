@@ -1,7 +1,6 @@
 /// Imports
 
 import {select,min,max,geoMercator,dispatch} from 'd3';
-
 import {mobstabdataPromise,
         metadataPromise,
         geodataPromise,
@@ -9,11 +8,9 @@ import {mobstabdataPromise,
         leaMetadataPromise,
         leaEntersPromise,
         leaMobstabdataPromise} from './data-import';
-
 import {renderNetwork,
         renderNetworkUpdate,
         renderLeaNetwork} from './view-modules/network';
-//import MakeDropdown from './view-modules/dropdowns';
 import {networkSetup,
         networkSetupLea,
         myProjection,
@@ -91,7 +88,7 @@ Promise.all([ mobstabdataPromise,
 /// Dropdown
 
 function districtDropdown(leaData,rootDom,nodes,links){
-  //This creates the dropdown.
+  //This creates the district (or LEA) dropdown.
   
   //Sort LEA names in alphabetical order for the drop down
   leaData.sort(function(a,b){
@@ -130,8 +127,10 @@ const globalDispatch = dispatch('change:district','select:school','select:distri
 globalDispatch.on('change:district', (distcode,nodesData,linksData) => {
   //This updates the network view when a district is chosen from the dropdown.
   
+  //Call adjustProjection to get new 'zoomed in' coordinates
   const [adjNodes,adjLinks] = adjustProjection(nodesData,linksData,distcode);
   
+  //Then render the network
   renderNetworkUpdate('.network',adjNodes,adjLinks,distcode,globalDispatch);
   
 });
@@ -151,8 +150,8 @@ globalDispatch.on('select:school', (schcode,nodesData,linksData) => {
     const lea_tmp = metadataLEA.map(d => [d.distcode,d]);
     const leaMetaMap = new Map(lea_tmp);
     
+    //Change the labelling while we're at it
     const schname = metaMap.get(schcode).schname;
-
     select('.flowText').html(`<strong>${schname} Student Flow:</strong> Comparing <font color='#2B7C8F'>out-of-state</font>, <font color = '#70b3c2'>in-state</font>, and <font color='#a5cad2'>in-district</font> transfers over time.<br><i>&nbsp;&nbsp;&nbsp;&nbsp;[Select a school or district above. Y-axis is total entering students. Bands represent the three types of transfers.]</i>`);
 
     const entersDataSch = entersdata
@@ -198,8 +197,7 @@ globalDispatch.on('select:school', (schcode,nodesData,linksData) => {
 
 
 globalDispatch.on('select:district',(distcode) => {
-
-  //console.log(distcode);
+  //This function updates the streamgraph when a district is selected.
   
   Promise.all([leaMetadataPromise,leaEntersPromise])
     .then(([metadataLEA,entersdata]) => {
@@ -207,81 +205,19 @@ globalDispatch.on('select:district',(distcode) => {
     const meta_tmp = metadataLEA.map(d => [d.distcode,d]);
     const metaMap = new Map(meta_tmp);
     
+    //Change the labelling
     const distname = metaMap.get(distcode).distname;
-
     select('.flowText').html(`<strong>${distname} Student Flow:</strong> Comparing <font color='#2B7C8F'>out-of-state</font>, <font color = '#70b3c2'>in-state</font>, and <font color='#a5cad2'>in-district</font> transfers over time.<br><i>&nbsp;&nbsp;&nbsp;&nbsp;[Select a school or district above. Y-axis is total entering students. Bands represent the three types of transfers.]</i>`);
     
-    
-    //console.log(entersdata);
-    
-    //const distname = 
-    
+    //Only minor filtering for data structure
     const entersDataDist = entersdata
       .filter(d => d.distcode_dest == distcode);
     
-    //console.log(entersDataDist);
-    
+    //Call renderStream
     renderStream(entersDataDist);
     window.scrollTo({top:500, behavior: 'smooth' });
     
-  /*/
-  
-    const meta_tmp = metadataSch.map(d => [d.schcode,d]);
-    const metaMap = new Map(meta_tmp);
-
-    const lea_tmp = metadataLEA.map(d => [d.distcode,d]);
-    const leaMetaMap = new Map(lea_tmp);
-
-    const entersDataSch = entersdata
-        .filter(d => d.schcode_dest == schcode)
-        .filter(d => d.schcode_origin != schcode)
-        .map(d => {
-          const md = metaMap.get(d.schcode_dest);
-          d.adminSite_dest = md.adminSite;
-          d.distcode_dest = md.distcode;
-          d.schname30_dest = md.schname30;
-          return d;
-        })
-        .map(d => {
-          //if (d.schcode_origin != '00000' && d.schcode_origin != ' '){
-          if (metaMap.get(d.schcode_origin)){
-            //console.log('step 1!');
-            const md = metaMap.get(d.schcode_origin);
-            if(md.distcode){
-              d.adminSite_origin = md.adminSite;
-              d.distcode_origin = md.distcode;
-              d.schname30_origin = md.schname30;
-              d.gradeCfg_origin = md.gradeCfg;
-            }
-            //return d;
-            //console.log(md);
-          } return d;
-        })
-        .map(d => {
-          const md = leaMetaMap.get(d.distcode_dest);
-          d.distname_dest = md.distname;
-          return d;
-        })
-        .map(d => {
-          if(d.schcode_origin === '00000'){
-            d.distcode_origin = '00';
-          };
-          return d;
-        });  
-
-
-
-
-    //const entersDataSch = entersdata
-      //.filter(d => d.schcode_dest == schcode)
-      //.filter(d => d.schcode_origin != schcode)
-    
-    console.log(entersDataSch);
-    
-    renderStream(entersDataSch);*/
-    
   });
-  
   
 });
 
