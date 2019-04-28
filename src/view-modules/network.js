@@ -3,6 +3,7 @@ import {min,max,select,selectAll,scalePow,scaleLinear,transition,forceSimulation
 function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
   //Creates the network graph for the district level (schools displayed, filtered by district) zoom
   
+  //Help current district data get to the front with sort
   nodesData.forEach(d =>{
     d.sort = 0;
     if(d.distcode==distcode){
@@ -10,11 +11,11 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
     }
   });
   
-  //Help current district data get to the front
   nodesData.sort(function(a, b){return a.sort - b.sort});
   
-  //For experimenting with dropping force layout in small cases
-  var numSch = nodesData.filter(d => d.distcode ==distcode).length;
+  //For adjusting force layour in small n cases
+  const nodesMain = nodesData.filter(d => d.distcode ==distcode);
+  var numSch = nodesMain.length;
   var minSch = 4;
   
   
@@ -58,11 +59,16 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
           {if(d.xyNew){
             return d.xyNew[1]
           }}))
-    //.force('collide',forceCollide().radius(d => Math.sqrt(d.adm + 4)+2))//I liked the extra spread from this but it pushed some small schools off the page and I wasn't able to handle that in time to submit.
-    .force('collide',forceCollide().radius(d => Math.sqrt(d.adm + 4)))
-    .tick([100])
-    .alpha([.0005])
+    .force('collide',forceCollide().radius(d => Math.sqrt(d.adm + 4)+3))
+    //.force('collide',forceCollide().radius(d => Math.sqrt(d.adm + 4)))//Direct neighbors option
+    .tick([200])
+    .alpha([.002])
     .on('end',function(){
+    
+      //Check if any nodes go off the fram and if so, shift everything in the frame to get them back in; simplified function, doesn't handle all possible cases, bu handles what I need
+      var edgeShift = checkEdges(nodesMain,plot.node());
+      shiftEdges(edgeShift,nodesData);
+    
   
       // Links
       var activeSch;
@@ -73,8 +79,8 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
         .style('stroke-opacity',0.05)
         .style('stroke-width','1px');
     
-      //Change to allow overlaps if there is a very small number of schools in the district; charter schools were getting pushed out of the fram with the force layout since they pull from such far away places. It much more like a bubble chart than a map.
-      //I was experimenting with this, but didn't get far enough to keep it. There are some issues with small chartesr than have two schools in one building.
+      //Change to allow overlaps if there is a very small number of schools in the district; charter schools were getting pushed out of the frame with the force layout since they pull from such far away places. It much more like a bubble chart than a map.
+      //I was experimenting with this, but was able to handle small charters a different way.
       /*if(numSch<minSch){
         nodesData.forEach(d=>{
           if(d.xyNew){
@@ -96,7 +102,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
     
       links.merge(linksEnter)
         .transition()
-        .duration(1000)
+        .duration(600)
         .attr('x1', d=> {if(d.target.x){return d.target.x;
           }else{return 20;}})
         .attr('y1', d=> {if(d.target.y){return d.target.y;
@@ -130,7 +136,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
 
       nodes.merge(nodesEnter)
         .transition()
-        .duration(1000)
+        .duration(600)
         .attr('cx',d => {if(d.x){return d.x}})
         .attr('cy',d => {if(d.y){return d.y}})
         .attr('r',d => Math.sqrt(d.adm + 4))
@@ -263,7 +269,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
 
       labels.merge(labelsEnter)
         .transition()
-        .duration(1000)
+        .duration(600)
         .text(d => {if(d.distcode ==distcode){
             return (d.schname15 + ', mobility rate: ' + d.mobRate)}
         })
@@ -281,7 +287,75 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
 
 }
 
+function checkEdges(nodes,dom){
+  //checks for nodes pushed off the page and returns the amount off, only handles existing cases, NOT if nodes are pushed off both top and bottom or both sides
+  var edgeShift = {};
+  
+  const w= dom.clientWidth;
+  const h = dom.clientHeight;
+  nodes.forEach(d => {
+    const rH = Math.sqrt(d.adm + 4)/2;
+    if((d.x-rH)<0){
+      if(edgeShift.l){
+        var oldl = edgeShift.l;
+      }else{var oldl = 0};
+      edgeShift.l = Math.max(0 - (d.x-rH),oldl);
+    };
+    if((d.y-rH)<0){
+      if(edgeShift.t){
+        var ot = edgeShift.t;
+      }else{var ot = 0};
+      edgeShift.t = Math.max(0 - (d.y-rH),ot);
+    };
+    if((d.x+rH)>w){
+      if(edgeShift.r){
+        var oldr = edgeShift.r;
+      }else{var oldr = 0};
+      edgeShift.r = Math.min(w - (d.x+rH),oldr);
+    };
+    if((d.y+rH)>h){
+      if(edgeShift.b){
+        var ob = edgeShift.b;
+      }else{var ob = 0};
+      edgeShift.b = Math.min(h - (d.y+rH),ob);
+    };
+  });
+  return(edgeShift);
+};
 
+
+function shiftEdges(edgeShift,nodesData){
+  //If nodes were found to go off the format, shift the whole format to get them back in
+
+  if(edgeShift.t > 0){
+    nodesData.forEach(d=>{
+      var oy = d.y;
+      d.y = oy + edgeShift.t + 20;
+      return d;
+    });
+  };
+  if(edgeShift.l > 0){
+    nodesData.forEach(d=>{
+      var ox = d.x;
+      d.x = ox + edgeShift.l + 20;
+      return d;
+    });
+  };
+  if(edgeShift.b < 0){
+    nodesData.forEach(d=>{
+      var oy = d.y;
+      d.y = oy + edgeShift.b - 20;
+      return d;
+    });
+  };
+  if(edgeShift.r < 0){
+    nodesData.forEach(d=>{
+      var ox = d.x;
+      d.x = ox + edgeShift.r - 20;
+      return d;
+    });
+  };
+};
 
 
 function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){

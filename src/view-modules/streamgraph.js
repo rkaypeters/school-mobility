@@ -114,6 +114,8 @@ function renderStream(data){
   
   streams.merge(streamsEnter)
     //.attr('d', data => lineGenerator2(data.values)) //if using line instead of area
+    .transition()
+    .duration(300)
     .attr('d', data => areaGenerator(data.values))
     .style('fill',d => d.color);
     //.style('stroke','#333') //options if using line instead of area
