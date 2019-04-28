@@ -41,13 +41,6 @@ Promise.all([ mobstabdataPromise,
     //Lea (local education agency/'district') data formatting
     const leaEnters1718 = formatLeaEnters(metadataLEA,mobstabLEA,geodata,metadataSch,entersdataLEA);
     const [nodesDataLea,linksDataLea] = networkSetupLea(leaEnters1718);
-
-    //Commented out old view with all schools in the state
-    //renderNetwork('.network',
-              //nodesData,
-              //linksData.filter(d => d.target.schcode != '00000')
-                //.filter(d => d.source.schcode != '00000')
-             //);
   
     renderLeaNetwork('.network',
                    nodesDataLea,
@@ -59,12 +52,6 @@ Promise.all([ mobstabdataPromise,
                      linksData);
   
     select('.btn').on('click', function(){
-      //Commented out old view with all schools in the state
-      //renderNetwork('.network',
-        //nodesData,
-        //linksData.filter(d => d.target.schcode != '00000')
-          //.filter(d => d.source.schcode != '00000')
-      //);
       renderLeaNetwork('.network',
                        nodesDataLea,
                        linksDataLea.filter(d => d.source.distcode != d.target.distcode),
@@ -77,7 +64,7 @@ Promise.all([ mobstabdataPromise,
 
   
   } 
-)
+);
 
 
 /// Dropdown
@@ -89,8 +76,7 @@ function districtDropdown(leaData,rootDom,nodes,links){
   leaData.sort(function(a,b){
     if(a.distname < b.distname) {return -1;}
     if(a.firstname > b.firstname) {return 1;}
-  })
-
+  });
   
   //Create the necessary dom elements
   const districtList = select(rootDom)
@@ -112,7 +98,7 @@ function districtDropdown(leaData,rootDom,nodes,links){
     
   });
   
-}
+};
 
 
 /// Global Dispatches
@@ -150,37 +136,37 @@ globalDispatch.on('select:school', (schcode,nodesData,linksData) => {
     select('.flowText').html(`<strong>${schname} Student Flow:</strong> Comparing <font color='#2B7C8F'>out-of-state</font>, <font color = '#70b3c2'>in-state</font>, and <font color='#a5cad2'>in-district</font> transfers over time.<br><i>&nbsp;&nbsp;&nbsp;&nbsp;[Select a school or district above. Y-axis is total entering students. Bands represent the three types of transfers.]</i>`);
 
     const entersDataSch = entersdata
-        .filter(d => d.schcode_dest == schcode)
-        .filter(d => d.schcode_origin != schcode)
-        .map(d => {
-          const md = metaMap.get(d.schcode_dest);
-          d.adminSite_dest = md.adminSite;
-          d.distcode_dest = md.distcode;
-          d.schname30_dest = md.schname30;
-          return d;
-        })
-        .map(d => {
-          if (metaMap.get(d.schcode_origin)){
-            const md = metaMap.get(d.schcode_origin);
-            if(md.distcode){
-              d.adminSite_origin = md.adminSite;
-              d.distcode_origin = md.distcode;
-              d.schname30_origin = md.schname30;
-              d.gradeCfg_origin = md.gradeCfg;
-            }
-          } return d;
-        })
-        .map(d => {
-          const md = leaMetaMap.get(d.distcode_dest);
-          d.distname_dest = md.distname;
-          return d;
-        })
-        .map(d => {
-          if(d.schcode_origin === '00000'){
-            d.distcode_origin = '00';
-          };
-          return d;
-        });  
+      .filter(d => d.schcode_dest == schcode)
+      .filter(d => d.schcode_origin != schcode)
+      .map(d => {
+        const md = metaMap.get(d.schcode_dest);
+        d.adminSite_dest = md.adminSite;
+        d.distcode_dest = md.distcode;
+        d.schname30_dest = md.schname30;
+        return d;
+      })
+      .map(d => {
+        if (metaMap.get(d.schcode_origin)){
+          const md = metaMap.get(d.schcode_origin);
+          if(md.distcode){
+            d.adminSite_origin = md.adminSite;
+            d.distcode_origin = md.distcode;
+            d.schname30_origin = md.schname30;
+            d.gradeCfg_origin = md.gradeCfg;
+          }
+        } return d;
+      })
+      .map(d => {
+        const md = leaMetaMap.get(d.distcode_dest);
+        d.distname_dest = md.distname;
+        return d;
+      })
+      .map(d => {
+        if(d.schcode_origin === '00000'){
+          d.distcode_origin = '00';
+        };
+        return d;
+      });  
     
     //Now call renderStream
     renderStream(entersDataSch);
@@ -197,20 +183,20 @@ globalDispatch.on('select:district',(distcode) => {
   Promise.all([leaMetadataPromise,leaEntersPromise])
     .then(([metadataLEA,entersdata]) => {
   
-    const meta_tmp = metadataLEA.map(d => [d.distcode,d]);
-    const metaMap = new Map(meta_tmp);
-    
-    //Change the labelling
-    const distname = metaMap.get(distcode).distname;
-    select('.flowText').html(`<strong>${distname} Student Flow:</strong> Comparing <font color='#2B7C8F'>out-of-state</font>, <font color = '#70b3c2'>in-state</font>, and <font color='#a5cad2'>in-district</font> transfers over time.<br><i>&nbsp;&nbsp;&nbsp;&nbsp;[Select a school or district above. Y-axis is total entering students. Bands represent the three types of transfers.]</i>`);
-    
-    //Only minor filtering for data structure
-    const entersDataDist = entersdata
-      .filter(d => d.distcode_dest == distcode);
-    
-    //Call renderStream
-    renderStream(entersDataDist);
-    window.scrollTo({top:500, behavior: 'smooth' });
+      const meta_tmp = metadataLEA.map(d => [d.distcode,d]);
+      const metaMap = new Map(meta_tmp);
+
+      //Change the labelling
+      const distname = metaMap.get(distcode).distname;
+      select('.flowText').html(`<strong>${distname} Student Flow:</strong> Comparing <font color='#2B7C8F'>out-of-state</font>, <font color = '#70b3c2'>in-state</font>, and <font color='#a5cad2'>in-district</font> transfers over time.<br><i>&nbsp;&nbsp;&nbsp;&nbsp;[Select a school or district above. Y-axis is total entering students. Bands represent the three types of transfers.]</i>`);
+
+      //Only minor filtering for data structure
+      const entersDataDist = entersdata
+        .filter(d => d.distcode_dest == distcode);
+
+      //Call renderStream
+      renderStream(entersDataDist);
+      window.scrollTo({top:500, behavior: 'smooth' });
     
   });
   

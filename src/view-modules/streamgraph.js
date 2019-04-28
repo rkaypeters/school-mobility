@@ -60,9 +60,17 @@ function renderStream(data){
   //Formatting the format
   const w = select('.streamgraph').node().clientWidth;
   const h = 110;
-  const margin = {l:30,r:15,t:10,b:20};
-  const innerWidth = w - margin.l - margin.r;
+  const margin = {l:35,r:15,t:10,b:20};
+  var innerWidth = w - margin.l - margin.r;
   const innerHeight = h - margin.t - margin.b;
+  
+  var wo = 0;
+  var wt = 0;
+  if(innerWidth>700){
+    wo = innerWidth;
+    innerWidth=700;
+    wt = (wo-innerWidth)/2;
+  };
   
 
   //Scales for axes
@@ -101,7 +109,8 @@ function renderStream(data){
 
   const plot = svg.merge(svgEnter)
     .attr('width', w)
-    .attr('height', h);
+    .attr('height', h)
+    .attr('transform',`translate(${wt},0)`);
   
   const streams = plot
     .selectAll('.stream')

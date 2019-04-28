@@ -65,7 +65,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
     .alpha([.002])
     .on('end',function(){
     
-      //Check if any nodes go off the fram and if so, shift everything in the frame to get them back in; simplified function, doesn't handle all possible cases, bu handles what I need
+      //Check if any nodes go off the fram and if so, shift everything in the frame to get them back in; simplified function, doesn't handle all possible cases, but handles what I need
       var edgeShift = checkEdges(nodesMain,plot.node());
       shiftEdges(edgeShift,nodesData);
     
@@ -171,26 +171,35 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
             });
         }else{console.log('second click')};
         
-        //if(numSch>12 && (d.adm <= 850 && d.mobRate <=35) && d.distcode ==distcode){
-          plot.append('text')
-            .attr('class','clickLabel')
-            .text(d.schname15 + ', mobility rate: ' + Math.round(+d.mobRate*10)/10)
-            .attr('x',d.x)
-            .attr('y',d.y+3)
-            .attr('opacity',1);
-          
-          if(plot.node().clientWidth<d.x+162){
-            plot.select('.clickLabel')
-              .attr('text-anchor','end');
-          };
+        plot.append('text')
+          .attr('class','clickLabel')
+          .text(d.schname15 + ', mobility rate: ' + Math.round(+d.mobRate*10)/10)
+          .attr('x',d.x)
+          .attr('y',d.y+3)
+          .attr('opacity',1);
+
+        if(plot.node().clientWidth<d.x+162){
+          plot.select('.clickLabel')
+            .attr('text-anchor','end');
+        };
+
+        plot.selectAll('.label')
+          .transition()
+          .duration(200)
+          .attr('visibility', 'hidden');
         
-          plot.selectAll('.label')
-            .transition()
-            .duration(200)
-            .attr('visibility', 'hidden');
+        //nested actions - oh boy. Basically if a node is selected I need mouseover functionality for all nodes now, not just the ones that have it otherwise
+        nodes.merge(nodesEnter).on('mouseenter',d =>{
+          if(activeSch != d.schcode){
+              mouseEnterNode(d,plot);
+            }
+          })
+          .on('mouseleave',d =>{
+            mouseLeaveNode(d,plot,numSch);
+          });
         
         //Hover functionality when a relevant link is entered
-        //I wanted to add this, but with so many nodes going off the page, I needed to adjust the location of the display and did not have time for that... So many features I'd like to add or small changes I'd like to make.
+        //I wanted to add this, but with so many nodes going off the page, I needed to adjust the location of the display and did not have time for that... So many features I'd like to add or small changes I'd like to make. Also, it might make things too busy, regardless.
         /*links.merge(linksEnter)
           .on('mouseenter',e=>{
             if(e.target.schcode == activeSch){
@@ -238,39 +247,13 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
       //Hover labels just for cases in large districts that aren't alreayd labelled
       .on('mouseenter',d =>{
         if(numSch>12 || d.distcode != distcode){
-          if(((d.adm <= 800 && d.mobRate <=35) && d.distcode ==distcode) || d.distcode != distcode){
-          
-            plot.append('text')
-              .attr('class','mouseOverLabel')
-              .text(d.schname15 + ', mobility rate: ' + Math.round(+d.mobRate*10)/10)
-              .attr('x',d.x)
-              .attr('y',d.y+3)
-              .attr('opacity',1);
-            
-            if(plot.node().clientWidth<d.x+162){
-              plot.selectAll('.mouseOverLabel')
-                .attr('text-anchor','end');
-            };
-            
-            labels.merge(labelsEnter)
-              .transition()
-              .duration(200)
-              .attr('opacity', d=> 0);
+          if((d.mobRate <=35 && d.distcode ==distcode) || d.distcode != distcode){
+            mouseEnterNode(d,plot);
           }
         };
       })
       .on('mouseleave',d =>{
-        plot.selectAll('.mouseOverLabel')
-          .transition()
-          .duration(200)
-          .remove();
-        
-        labels.merge(labelsEnter)
-          .transition()
-          .duration(400)
-          .attr('opacity', d=> {if(numSch>12){
-            if(d.adm > 800 || d.mobRate >35){return 1}else{return 0}
-          }else{return 1}});
+        mouseLeaveNode(d,plot,numSch);
       });
     
     
@@ -296,7 +279,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
             return d.y+3
           }})
         .attr('opacity', d=> {if(numSch>12){
-            if(d.adm > 800 || d.mobRate >35){return 1}else{return 0}
+            if(d.mobRate >35){return 1}else{return 0}
           }else{return 1}})
         .attr('text-anchor',d => {if(plot.node().clientWidth<d.x+162){
             return 'end';}else{return 'start'}});
@@ -375,6 +358,40 @@ function shiftEdges(edgeShift,nodesData){
   };
 };
 
+function mouseEnterNode(d,plot){
+  //When the mouse enters an unlabeled (defined above) node, show it's mouseOverLabel, and hide other labels
+  plot.append('text')
+    .attr('class','mouseOverLabel')
+    .text(d.schname15 + ', mobility rate: ' + Math.round(+d.mobRate*10)/10)
+    .attr('x',d.x)
+    .attr('y',d.y+3)
+    .attr('opacity',1);
+
+  if(plot.node().clientWidth<d.x+162){
+    plot.selectAll('.mouseOverLabel')
+      .attr('text-anchor','end');
+  };
+
+  plot.selectAll('.label')
+    .transition()
+    .duration(200)
+    .attr('opacity', d=> 0);
+};
+
+function mouseLeaveNode(d,plot,numSch){
+  //When the mouse leaves a node with a mouseOverLabel, return to previous conditions. There's probably a more efficient way to do this; I coud have a flag for labelled or not and turn that on and off instead of having all these different label types and conditions. Oh well.
+  plot.selectAll('.mouseOverLabel')
+    .transition()
+    .duration(200)
+    .remove();
+
+  plot.selectAll('.label')
+    .transition()
+    .duration(400)
+    .attr('opacity', d=> {if(numSch>12){
+      if(d.mobRate >35){return 1}else{return 0}
+    }else{return 1}});
+};
 
 function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
   
@@ -530,6 +547,7 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
             }else{return e.value*e.value * 0.03}}});
         
         plot.selectAll('.clickLabel').remove();
+        plot.selectAll('.mouseOverLabel').remove();
         
         plot.append('text')
             .attr('class','clickLabel')
@@ -567,9 +585,8 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
       })
       //Hover functionality for entering a node
       .on('mouseenter',d =>{
-        plot.append('text')
-          //.transition()
-          //.duration(1000)
+        if(activeDist != d.distcode){
+                  plot.append('text')
           .attr('class','mouseOverLabel')
           .text(e =>{
             var myString;
@@ -582,6 +599,7 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
           .attr('x',d.x)
           .attr('y',d.y+4)
           .attr('opacity',1);
+        };
       })
       .on('mouseleave',d =>{
         plot.selectAll('.mouseOverLabel')
