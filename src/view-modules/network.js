@@ -59,7 +59,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
           {if(d.xyNew){
             return d.xyNew[1]
           }}))
-    .force('collide',forceCollide().radius(d => Math.sqrt(d.adm + 4)+3))
+    .force('collide',forceCollide().radius(d => Math.sqrt(d.adm + 4)*2/3+2))
     //.force('collide',forceCollide().radius(d => Math.sqrt(d.adm + 4)))//Direct neighbors option
     .tick([200])
     .alpha([.002])
@@ -139,7 +139,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
         .duration(600)
         .attr('cx',d => {if(d.x){return d.x}})
         .attr('cy',d => {if(d.y){return d.y}})
-        .attr('r',d => Math.sqrt(d.adm + 4))
+        .attr('r',d => Math.sqrt(d.adm + 4)*2/3)
         .style('fill-opacity', .95)
         .style('fill', d => {
           if(d.distcode ==distcode){
@@ -274,7 +274,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
             return (d.schname15 + ', mobility rate: ' + d.mobRate)}
         })
         .attr('x',d => {if(d.x){
-                return d.x +Math.sqrt(d.adm + 4)/4
+                return d.x +Math.sqrt(d.adm + 4)/9
               }})
         .attr('y',d => {if(d.y){
                 return d.y+3
@@ -294,7 +294,7 @@ function checkEdges(nodes,dom){
   const w= dom.clientWidth;
   const h = dom.clientHeight;
   nodes.forEach(d => {
-    const rH = Math.sqrt(d.adm + 4)/2;
+    const rH = Math.sqrt(d.adm + 4)/3;
     if((d.x-rH)<0){
       if(edgeShift.l){
         var oldl = edgeShift.l;
@@ -365,12 +365,19 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
   const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 325;
 
   var w, h;
-  if(w1>=400){
+  var wo = 0;
+  var wt = 0;
+  if(w1>=300){
      w = w1;
-  }else{ w = 400;};
-  if(h1 >= 600){
+  }else{ w = 300;};
+  if(h1 >= 400){
     h = h1;
-  }else{h = 600;};
+  }else{h = 400;};
+  if(w>1.5*h){
+    wo = w;
+    w=1.5*h;
+    wt = (wo-w)/2;
+  };
   
   const nodesDataArray = Array.from(nodesData.values());
   
@@ -380,7 +387,8 @@ function renderLeaNetwork(rootDom,nodesData,linksData,dispatch){
     .selectAll('svg')
     .data([1]);
   const svgEnter = svg.enter()
-    .append('svg');
+    .append('svg')
+    .attr('transform',`translate(${wt},0)`);
 
   const plot = svg.merge(svgEnter)
     .attr('width', w)

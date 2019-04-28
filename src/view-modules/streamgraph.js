@@ -59,7 +59,7 @@ function renderStream(data){
   
   //Formatting the format
   const w = select('.streamgraph').node().clientWidth;
-  const h = 130;
+  const h = 110;
   const margin = {l:30,r:15,t:10,b:20};
   const innerWidth = w - margin.l - margin.r;
   const innerHeight = h - margin.t - margin.b;
@@ -162,8 +162,8 @@ function renderStream(data){
     .attr('class','tooltip')
     .attr('id','tooltiprect')
     .style('opacity',0)
-    .attr('width',140)
-    .attr('height',66)
+    .attr('width',125)
+    .attr('height',54)
     .attr('fill','white')
     .attr('rx',5)
     .attr('ry',5);
@@ -222,7 +222,7 @@ function renderStream(data){
       const sd = originDataRollup['same district'][rptID];
     
       const indent = 8;
-      const lineHeight = 16;
+      const lineHeight = 13;
       const toolTipY = 12+lineHeight;
       const boxW = plot.select('#tooltiprect').node().width.animVal.value;
       var toolTipX;

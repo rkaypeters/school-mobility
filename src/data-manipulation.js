@@ -327,12 +327,15 @@ function myProjection(rootDom,data){
   const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 325;//Having this value hard coded in multiple files is not great.
 
   var w, h;
-  if(w1>=400){
+  if(w1>=300){
      w = w1;
-  }else{ w = 400;};
-  if(h1 >= 600){
+  }else{ w = 300;};
+  if(h1 >= 400){
     h = h1;
-  }else{h = 600;};
+  }else{h = 400;};
+  if(w>1.5*h){
+    w=1.5*h;
+  };
   
   
   //Set map scale
@@ -359,7 +362,7 @@ function myProjection(rootDom,data){
   
   const projection = geoMercator()
     .scale(myScale)
-    .center([(maxLng+minLng+.4-shiftVal)/2,(maxLat+minLat)/2+.172]);
+    .center([(maxLng+minLng+1.25-shiftVal)/2,(maxLat+minLat)/2+0.02]);
     //.translate([w/2,h/2]);
 
   data.forEach(d => {d.xy = projection(d.lngLat);});
@@ -376,12 +379,15 @@ function adjustProjection(nodesData,linksData,distcode){
   const h1 = window.innerHeight - select('.intro').node().clientHeight - select('.dropdown').node().clientHeight - 325;//This is hard coded in three places. Good god.
 
   var w, h;
-  if(w1>=400){
+  if(w1>=300){
      w = w1;
-  }else{ w = 400;};
-  if(h1 >= 600){
+  }else{ w = 300;};
+  if(h1 >= 400){
     h = h1;
-  }else{h = 600;};
+  }else{h = 400;};
+  if(w>1.5*h){
+    w=1.5*h;
+  };
   
   
   //Minimum number of nodes for focusing only on district versus district plus connecting schools
