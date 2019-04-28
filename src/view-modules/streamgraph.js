@@ -1,13 +1,7 @@
-import {nest,select,selectAll,sum,scaleLinear,line,area,curveMonotoneX,axisBottom,axisLeft,max} from 'd3';
+import {nest,select,selectAll,sum,scaleLinear,line,area,curveMonotoneX,axisBottom,axisLeft,max,mouse} from 'd3';
 
 function renderStream(data){
   //This function displays the streamgraph
-  
-  /*console.log(data);
-  console.log(select('.flowText').node());
-  var hey = 'heyo';
-  
-  select('.flowText').html(`<strong>${hey} Student Flow:</strong> Comparing <font color='#2B7C8F'>out-of-state</font>, <font color = '#70b3c2'>in-state</font>, and <font color='#a5cad2'>in-district</font> transfers over time. <br><i>[Select a school or district above. Y-axis is total entering students.]</i>`);*/
   
   //Add origin_type to group the incoming students based on their district. Then nest by origin_type
   data.map(d =>{
@@ -66,7 +60,7 @@ function renderStream(data){
   //Formatting the format
   const w = select('.streamgraph').node().clientWidth;
   const h = 130;
-  const margin = {l:25,r:15,t:10,b:20};
+  const margin = {l:30,r:15,t:10,b:20};
   const innerWidth = w - margin.l - margin.r;
   const innerHeight = h - margin.t - margin.b;
   
@@ -126,26 +120,149 @@ function renderStream(data){
     //.style('stroke-width','2px');
 
   const axisX = axisBottom()
-      .scale(scaleX)
-      .tickFormat(function(value){ return "'"+String(value+40).slice(-2)+ "-" + String(value+41).slice(-2)})
+    .scale(scaleX)
+    .tickFormat(function(value){ return "'"+String(value+40).slice(-2)+ "-" + String(value+41).slice(-2)})
 
   const axisY = axisLeft()
-      .scale(scaleY)
-      //.tickSize(-innerWidth) //option to extend ticks across chart
-      .ticks(3)
+    .scale(scaleY)
+    //.tickSize(-innerWidth) //option to extend ticks across chart
+    .ticks(3)
   
   const axes = plot
     .selectAll('.axis').remove();
   
   plot.append('g')
-		.attr('class','axis')
-		.attr('transform',`translate(${margin.l}, ${innerHeight+margin.t})`)
-		.call(axisX)
+    .attr('class','axis')
+    .attr('transform',`translate(${margin.l}, ${innerHeight+margin.t})`)
+    .call(axisX)
 
   plot.append('g')
-		.attr('class','axis')
-        .attr('transform',`translate(${margin.l},${margin.t})`)
-		.call(axisY);
+    .attr('class','axis')
+    .attr('transform',`translate(${margin.l},${margin.t})`)
+    .call(axisY);
+  
+  
+  //Tooltips - everything from here on
+  //Remove previous iteration dom elements
+  plot.selectAll('.tooltip').remove();
+  
+  //Create all the current dom elements
+  plot.append('rect') //tooltip line
+    .attr('class','tooltip')
+    .attr('id','tooltiphighlight')
+    .style('opacity',0)
+    .attr('width',3)
+    .attr('height',innerHeight)
+    .attr('fill','#A9A9A9')
+    .attr('rx',1.5)
+    .attr('ry',1.5);
+  plot.append('rect') //tooltip background
+    .attr('class','tooltip')
+    .attr('id','tooltiprect')
+    .style('opacity',0)
+    .attr('width',140)
+    .attr('height',66)
+    .attr('fill','white')
+    .attr('rx',5)
+    .attr('ry',5);
+  plot.append('text') //tooltip header
+    .attr('class','tooltip')
+    .attr('id','tooltip0')
+    .style('opacity', 0)
+    .attr('stroke','#505050');
+  plot.append('text') //tooltip line 1
+    .attr('class','tooltip')
+    .attr('id','tooltip1')
+    .style('opacity', 0)
+    .attr('stroke','#88b8c3');
+  plot.append('text') //tooltip line 2
+    .attr('class','tooltip')
+    .attr('id','tooltip2')
+    .style('opacity', 0)
+    .attr('stroke','#4da0b3');
+  plot.append('text') //tooltip line 3
+    .attr('class','tooltip')
+    .attr('id','tooltip3')
+    .style('opacity', 0)
+    .attr('stroke','#297889');
+  plot.append('rect') //rect for mouseenter, etc
+    .attr('class','tooltip')
+    .attr('id','mouse-target')
+    .attr('width', innerWidth)
+    .attr('height', innerHeight)
+    .attr('x',margin.l)
+    .attr('y',margin.t)
+    .style('opacity', 0);
+  
+  //On mouseenter, make elements visible (opacity >0)
+  plot.select('#mouse-target')
+    .on('mouseenter', function(d){
+      plot.select('#tooltip0')
+        .style('opacity',1);
+      plot.select('#tooltip1')
+          .style('opacity',1);
+      plot.select('#tooltip2')
+          .style('opacity',1);
+      plot.select('#tooltip3')
+          .style('opacity',1);
+      plot.select('#tooltiphighlight')
+        .style('opacity','.6');
+      plot.select('#tooltiprect')
+        .style('opacity','.8');
+    })
+    //On move, adjust positioning and text
+    .on('mousemove', function(d){
+      const mouseCoord = mouse(plot.select('#mouse-target').node());
+      const mouseX = mouseCoord[0];
+      const rptID = Math.round(scaleX.invert(mouseX-margin.l));
+      const oos = originDataRollup['out of state'][rptID];
+      const ood = originDataRollup['out of district'][rptID];
+      const sd = originDataRollup['same district'][rptID];
+    
+      const indent = 8;
+      const lineHeight = 16;
+      const toolTipY = 12+lineHeight;
+      const boxW = plot.select('#tooltiprect').node().width.animVal.value;
+      var toolTipX;
+      if(rptID==76 || rptID ==77){
+          toolTipX = scaleX(77)+margin.l-boxW-2
+          }else{toolTipX = scaleX(rptID)+margin.l+12};
+      const hXpos = scaleY(streamCoords[2].values[rptID-68].y1)+margin.t-4;
+      const hHeight = scaleY(0)-scaleY(streamCoords[2].values[rptID-68].y1)+8; 
+    
+      plot.select('#tooltiphighlight')
+        .attr('x',scaleX(rptID)+margin.l-1.5)
+        .attr('y',hXpos)
+        .attr('height',hHeight);
+      plot.select('#tooltiprect')
+        .attr('x',toolTipX-6)
+        .attr('y',toolTipY-lineHeight+2);
+      plot.select('#tooltip0')
+        .text("20"+String(rptID+40).slice(-2)+ "-" + String(rptID+41).slice(-2)+' midyear enters')
+        .attr('x',toolTipX)
+        .attr('y',toolTipY);
+      plot.select('#tooltip1')
+        .text(`In-district:  ${sd}`)
+        .attr('x',toolTipX+indent)
+        .attr('y',toolTipY+lineHeight);
+      plot.select('#tooltip2')
+        .text(`In-state: ${ood}`)
+        .attr('x',toolTipX+indent)
+        .attr('y',toolTipY+2*lineHeight);
+      plot.select('#tooltip3')
+        .text(`Out-of-state: ${oos}`)
+        .attr('x',toolTipX+indent)
+        .attr('y',toolTipY+3*lineHeight);
+
+    })
+    //On leave, disappear (opacity = 0)
+    .on('mouseleave', function(d){
+      plot.selectAll('.tooltip')
+        .transition()
+        .duration(200)
+        .style('opacity','0');
+    });
+  
   
 };
 
