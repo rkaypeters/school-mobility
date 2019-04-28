@@ -1,9 +1,10 @@
-#Rhode Island School Mobility
+# Rhode Island School Mobility
 
 ARTG6900 Visualization Technologies II final project, Rachel Peterson
 
 
-##Summary
+
+## Summary
 
 Changing schools midyear disrupts curriculum, expectations, and relationships for students. These changes can have long-term impact on student learning.
 
@@ -14,8 +15,10 @@ I thought of doing this when I was cleaning individual student data at work and 
 I got permisison from our director of Data and Technology Services to aggregate our individual level enrollment data to get the connections between schools, rather than only one school level rate, for this project.
 
 
-##Extensions
+
+## Extensions
     
 The key next step I would include is incorporating student dmeographics and performance. This visualization requires local knowledge of Rhode Island schools to be very useful. Providing more context would make it accessible to additional users who may be interested in overall mobility trends rather than specific school to school interactions.
 
 A larger extension would be to also consider the impact of mobility on students. Here I report out information on mobility, but take for granted that it impacts student learning. This would be a significant research project. 
+
