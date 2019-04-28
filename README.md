@@ -1,23 +1,21 @@
-My next steps (I think) as of 4/7:
-    4. reconsider visual elements; this is a good point for design considerations (color for source v target for filters? whats the best way to show the strength of these relationships? where should the 190s and 000s go?, etc). this needs work.
-        a. color systems and highlighting
-        b. consider altering weight of links to match percentage of students rather than count
-        c. title and whatnot
-        d. css
-        done - e. consider repsentation of overall mobility rate in a channel in this chart 
-        f. improve labelling
-    DONE - 5. streamgraph of students by school over time
-    6. school information (mobility and stability rate, % economicaly disadvantaged, english learners, nonwhite, proficiency, etc; consider what makes sense)
-    mostly done - 7. fix data errors on comses chools and districts
-    DONE - 8. check funky geocoding
-    DONE - 9. adjust zoom/panning
-    DONE - 10. add option to return to full state.
-    
+#Rhode Island School Mobility
+
+ARTG6900 Visualization Technologies II final project, Rachel Peterson
 
 
-Key questions for Siqi (4/18):
-    1. issues with width/height of doms, generally div layout tips if time
-    2. design feedback
-    3. any coding best practices I'm missing
+##Summary
+
+Changing schools midyear disrupts curriculum, expectations, and relationships for students. These changes can have long-term impact on student learning.
+
+Rhode Island publishes school-level mobility and stability data each year, but doesn't do much with it. Mobility and stability rates are two ways to report on student flow during the school year, both focusing on midyear changes, students changing schools between Oct. 1 and June 1. A school's mobility rate is defined as the sum of students entering and exiting midyear divided by the average number of students enrolled on a given day in the school year. A school's stability rate (not examined in this visualizaiton) is defined as out of all students enrolled at some point, the percentage who were continuously enrolled from Oct. 1 through June 1.
+
+I thought of doing this when I was cleaning individual student data at work and noticed a number of students who had attened 9+ schools over their time in the Rhode Island school system. That lack of consistency shocked me. If we knew how students were moving (between schools within a district versus out of district, etc), maybe we could shape policy to better support mobile students.
+
+I got permisison from our director of Data and Technology Services to aggregate our individual level enrollment data to get the connections between schools, rather than only one school level rate, for this project.
+
+
+##Extensions
     
-    
+The key next step I would include is incorporating student dmeographics and performance. This visualization requires local knowledge of Rhode Island schools to be very useful. Providing more context would make it accessible to additional users who may be interested in overall mobility trends rather than specific school to school interactions.
+
+A larger extension would be to also consider the impact of mobility on students. Here I report out information on mobility, but take for granted that it impacts student learning. This would be a significant research project. 
