@@ -150,6 +150,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
         .style('stroke-opacity', .2);
     
     
+      //Functionality for selecting a school
       nodes.merge(nodesEnter).on('click', d=>{
         
         plot.selectAll('.clickLabel').remove();
@@ -170,14 +171,23 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
             });
         }else{console.log('second click')};
         
-        if(numSch>12 && (d.adm <= 850 && d.mobRate <=35) && d.distcode ==distcode){
+        //if(numSch>12 && (d.adm <= 850 && d.mobRate <=35) && d.distcode ==distcode){
           plot.append('text')
             .attr('class','clickLabel')
             .text(d.schname15 + ', mobility rate: ' + Math.round(+d.mobRate*10)/10)
             .attr('x',d.x)
             .attr('y',d.y+3)
             .attr('opacity',1);
-        };
+          
+          if(plot.node().clientWidth<d.x+162){
+            plot.select('.clickLabel')
+              .attr('text-anchor','end');
+          };
+        
+          plot.selectAll('.label')
+            .transition()
+            .duration(200)
+            .attr('visibility', 'hidden');
         
         //Hover functionality when a relevant link is entered
         //I wanted to add this, but with so many nodes going off the page, I needed to adjust the location of the display and did not have time for that... So many features I'd like to add or small changes I'd like to make.
@@ -227,8 +237,8 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
     
       //Hover labels just for cases in large districts that aren't alreayd labelled
       .on('mouseenter',d =>{
-        if(numSch>12){
-          if((d.adm <= 800 && d.mobRate <=35) && d.distcode ==distcode){
+        if(numSch>12 || d.distcode != distcode){
+          if(((d.adm <= 800 && d.mobRate <=35) && d.distcode ==distcode) || d.distcode != distcode){
           
             plot.append('text')
               .attr('class','mouseOverLabel')
@@ -236,6 +246,11 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
               .attr('x',d.x)
               .attr('y',d.y+3)
               .attr('opacity',1);
+            
+            if(plot.node().clientWidth<d.x+162){
+              plot.selectAll('.mouseOverLabel')
+                .attr('text-anchor','end');
+            };
             
             labels.merge(labelsEnter)
               .transition()
@@ -247,7 +262,7 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
       .on('mouseleave',d =>{
         plot.selectAll('.mouseOverLabel')
           .transition()
-          .duration(400)
+          .duration(200)
           .remove();
         
         labels.merge(labelsEnter)
@@ -261,7 +276,8 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
     
       // Labels - overall
       const labels = plot.selectAll('.label')
-        .data(nodesData, d=> d.schcode);
+        .data(nodesData, d=> d.schcode)
+        .attr('visibility', 'visible');
 
       const labelsEnter = labels.enter()
         .append('text')
@@ -274,14 +290,16 @@ function renderNetworkUpdate(rootDom,nodesData,linksData,distcode,dispatch){
             return (d.schname15 + ', mobility rate: ' + d.mobRate)}
         })
         .attr('x',d => {if(d.x){
-                return d.x +Math.sqrt(d.adm + 4)/9
-              }})
+            return d.x +Math.sqrt(d.adm + 4)/9
+          }})
         .attr('y',d => {if(d.y){
-                return d.y+3
+            return d.y+3
           }})
         .attr('opacity', d=> {if(numSch>12){
-          if(d.adm > 800 || d.mobRate >35){return 1}else{return 0}
-        }else{return 1}});
+            if(d.adm > 800 || d.mobRate >35){return 1}else{return 0}
+          }else{return 1}})
+        .attr('text-anchor',d => {if(plot.node().clientWidth<d.x+162){
+            return 'end';}else{return 'start'}});
   
   });
 
